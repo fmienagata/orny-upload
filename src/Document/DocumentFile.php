@@ -6,7 +6,9 @@ namespace UploadBundle\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\File;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\Id;
 
-/** @File(bucketName='document-file') */
+/**
+ * @File(bucketName="document-file")
+ */
 class DocumentFile
 {
     /** @Id */
@@ -24,7 +26,7 @@ class DocumentFile
     /** @File\ChunkSize */
     private $chunkSize;
 
-    /** @File\Metadata(targetDocument=PaperFileMetadata::class) */
+    /** @File\Metadata(targetDocument=DocumentMetadata::class) */
     private $metadata;
 
     public function getId(): ?string
@@ -52,7 +54,7 @@ class DocumentFile
         return $this->uploadDate;
     }
 
-    public function getMetadata(): ?ImageMetadata
+    public function getMetadata(): ?DocumentMetadata
     {
         return $this->metadata;
     }

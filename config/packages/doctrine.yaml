@@ -14,7 +14,7 @@ doctrine:
                 is_bundle: false
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'UploadBundle\Entity'
-                alias: App
+                alias: UploadBundle
 
 when@test:
     doctrine:
