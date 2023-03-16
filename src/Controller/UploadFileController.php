@@ -5,16 +5,14 @@ namespace UploadBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use UploadBundle\Document\DocumentFile;
 use UploadBundle\Form\Type\DocumentFileType;
 
-/**
- * Class UploadFileController
- *
- * @package UploadBundle\Controller
- */
+
+#[AsController]
 class UploadFileController extends AbstractController
 {
     /**
@@ -23,8 +21,12 @@ class UploadFileController extends AbstractController
      *
      * @return Response
      */
-    #[Route('/api/upload-bundle/1.0.0/file', name: 'upload_bundle_file_post', methods:'POST')]
-    public function post(Request $request, SluggerInterface $slugger): Response
+    #[Route(
+        '/api/upload-bundle/1.0.0/file',
+        name: 'upload_bundle_file_post',
+        methods: ['POST']
+    )]
+    public function uploadFile(Request $request, SluggerInterface $slugger): Response
     {
         $documentFile = new DocumentFile();
         $form = $this->createForm(DocumentFileType::class, $documentFile);

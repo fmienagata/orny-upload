@@ -1,6 +1,6 @@
 {
   "name": "docaposte/uploadbundle",
-  "description": "Upload file bundle",
+  "description": "Upload file bundle in safe-deposit box",
   "minimum-stability": "stable",
   "license": "proprietary",
   "authors": [
@@ -13,12 +13,10 @@
     "php": ">=8.0.2",
     "ext-ctype": "*",
     "ext-iconv": "*",
-    "api-platform/core": "^2.7",
+    "api-platform/core": "^3.0",
     "doctrine/annotations": "^1.0",
     "doctrine/doctrine-bundle": "^2.7",
-    "doctrine/doctrine-migrations-bundle": "^3.2",
     "doctrine/mongodb-odm-bundle": "^4.5",
-    "doctrine/orm": "^2.13",
     "gedmo/doctrine-extensions": "^3.10",
     "lexik/jwt-authentication-bundle": "^2.16",
     "mongodb/mongodb": "1.13.1",

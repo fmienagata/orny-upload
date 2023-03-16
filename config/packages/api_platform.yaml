@@ -15,8 +15,6 @@ api_platform:
     # Specify a name converter to use.
     name_converter: ~
 
-    metadata_backward_compatibility_layer: false
-
     defaults:
         pagination_enabled: true
 
