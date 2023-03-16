@@ -29,6 +29,18 @@ class DocumentFile
     /** @File\Metadata(targetDocument=DocumentMetadata::class) */
     private $metadata;
 
+    /**
+     * DocumentFile constructor.
+     *
+     * @param \Symfony\Component\HttpFoundation\File\File|null $file
+     */
+    public function __construct(\Symfony\Component\HttpFoundation\File\File $file = null)
+    {
+        if (!empty($file)) {
+            $this->setName($file->getFilename());
+        }
+    }
+
     public function getId(): ?string
     {
         return $this->id;
@@ -37,6 +49,18 @@ class DocumentFile
     public function getName(): ?string
     {
         return $this->name;
+    }
+
+    /**
+     * @param string|null $name
+     *
+     * @return $this
+     */
+    public function setName(?string $name) : self
+    {
+        $this->name = $name;
+
+        return $this;
     }
 
     public function getChunkSize(): ?int

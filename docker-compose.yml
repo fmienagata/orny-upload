@@ -1,21 +1,59 @@
-version: '3'
+---
+version: '3.8'
 
 services:
-###> doctrine/doctrine-bundle ###
-  database:
-    image: postgres:${POSTGRES_VERSION:-14}-alpine
+  api:
+    privileged: true
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      network: host
+    image: docaposte/ubuntu20-apache2-php8:1.0.0
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
-      POSTGRES_USER: ${POSTGRES_USER:-app}
+      - TZ=Europe/Paris
+    ports:
+      - '8900:80'
+      - '8990:443'
+    container_name: UPLOAD-BUNDLE
+    hostname: upload-bundle-local.demat.lan
+    restart: unless-stopped
+    expose:
+      - 80
+      - 443
     volumes:
-      - db-data:/var/lib/postgresql/data:rw
-      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./docker/db/data:/var/lib/postgresql/data:rw
-###< doctrine/doctrine-bundle ###
+      - apidata:/data
+      - ./:/data/sites/api
+      - ./config/apache/api.conf:/etc/apache2/sites-available/api.conf
+      - ./config/apache/apache2.conf:/etc/apache2/apache2.conf
+      - ./config/apache/php.ini:/etc/php.ini
+      - .:/app:cached
+    tty: true
+    networks:
+      nginx-proxy:
+    command: ["sh", "-c", "
+        /usr/sbin/init;
+        /usr/bin/redis-server /etc/redis/redis.conf --daemonize yes;
+        /usr/bin/supervisord -c /etc/supervisor/supervisord.conf;
+        /usr/sbin/usermod -s /bin/bash www-data;
+        /usr/bin/mv -f /etc/php/8.2/apache2/conf.d/15-psr.ini /etc/php/8.2/apache2/conf.d/15-psr.ini.disable;
+        /usr/bin/mv -f /etc/php/8.2/apache2/conf.d/20-xdebug.ini /etc/php/8.2/apache2/conf.d/20-xdebug.ini.disable;
+        /usr/bin/chown -R www-data:www-data /data/sites;
+        /usr/bin/chmod -R 777 /data/sites/api/var;
+        /usr/bin/chmod -R 777 /data/logs;
+        export APACHE_LOG_DIR=/data/logs;
+        /usr/sbin/a2enmod rewrite;
+        /usr/sbin/a2ensite api;
+        /usr/sbin/a2dissite 000-default;
+        /usr/sbin/service apache2 reload;
+        /usr/sbin/apachectl -D FOREGROUND;
+        /bin/bash;
+      "
+    ]
 
 volumes:
-###> doctrine/doctrine-bundle ###
-  db-data:
-###< doctrine/doctrine-bundle ###
+  apidata:
+    driver: local
+
+networks:
+  nginx-proxy:
+    name: nginx-proxy

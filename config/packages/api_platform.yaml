@@ -1,7 +1,47 @@
 api_platform:
+    # The title of the API.
+    title: 'Upload bundle API'
+
+    # The description of the API.
+    description: |-
+        Module de téléversement des documents, des fichiers dans les coffre fort électronique.
+
+    # The version of the API.
+    version: '1.0.0'
+
+    # Set this to false if you want Webby to disappear.
+    show_webby: false
+
+    # Specify a name converter to use.
+    name_converter: ~
+
+    metadata_backward_compatibility_layer: false
+
+    defaults:
+        pagination_enabled: true
+
     mapping:
-        paths: ['%kernel.project_dir%/src/Entity']
+        paths:
+            - '%kernel.project_dir%/src/Entity'
+            - '%kernel.project_dir%/src/Document'
+
+    formats:
+        #jsonld: [ 'application/ld+json' ]
+        #jsonhal: [ 'application/hal+json' ]
+        #jsonapi: [ 'application/vnd.api+json' ]
+        json: [ 'application/json' ]
+        #xml: [ 'application/xml', 'text/xml' ]
+        #yaml: [ 'application/x-yaml' ]
+        #csv: [ 'text/csv' ]
+        html: [ 'text/html' ]
+        #myformat: [ 'application/vnd.myformat' ]
+
     patch_formats:
         json: ['application/merge-patch+json']
+
     swagger:
         versions: [3]
+        api_keys:
+            JWT:
+                name: Authorization
+                type: header

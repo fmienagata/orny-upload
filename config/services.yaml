@@ -6,6 +6,7 @@
 parameters:
     env(MONGODB_URL): '%env(resolve:MONGODB_URL)%'
     env(MONGODB_DB): '%env(resolve:MONGODB_DB)%'
+    files_directory: '%env(resolve:FILES_UPLOAD_PATH)%'
 
 services:
     # default configuration for services in *this* file
