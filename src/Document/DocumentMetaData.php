@@ -3,13 +3,14 @@
 
 namespace UploadBundle\Document;
 
-use Doctrine\ODM\MongoDB\Mapping\Annotations\EmbeddedDocument;
-use Doctrine\ODM\MongoDB\Mapping\Annotations\Field;
+use Doctrine\ODM\MongoDB\Mapping\Annotations As MongoDB;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-/** @EmbeddedDocument */
+#[MongoDB\EmbeddedDocument]
 class DocumentMetaData
 {
-    /** @Field(type="string") */
+    #[MongoDB\Field("string")]
+    #[Groups(["document_files" =>"read", "document_files" => "write"])]
     private $contentType;
 
     /**

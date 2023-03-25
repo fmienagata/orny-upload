@@ -21,7 +21,7 @@ services:
       - 80
       - 443
     volumes:
-      - apidata:/data
+      - uploaddata:/data
       - ./:/data/sites/api
       - ./config/apache/api.conf:/etc/apache2/sites-available/api.conf
       - ./config/apache/apache2.conf:/etc/apache2/apache2.conf
@@ -34,6 +34,7 @@ services:
         /usr/sbin/init;
         /usr/bin/redis-server /etc/redis/redis.conf --daemonize yes;
         /usr/bin/supervisord -c /etc/supervisor/supervisord.conf;
+        /etc/init.d/clamav-daemon start;
         /usr/sbin/usermod -s /bin/bash www-data;
         /usr/bin/mv -f /etc/php/8.2/apache2/conf.d/15-psr.ini /etc/php/8.2/apache2/conf.d/15-psr.ini.disable;
         /usr/bin/mv -f /etc/php/8.2/apache2/conf.d/20-xdebug.ini /etc/php/8.2/apache2/conf.d/20-xdebug.ini.disable;
@@ -45,13 +46,16 @@ services:
         /usr/sbin/a2ensite api;
         /usr/sbin/a2dissite 000-default;
         /usr/sbin/service apache2 reload;
+        /usr/bin/mongod -f /etc/mongod.conf --bind_ip 127.0.0.1 --fork;
         /usr/sbin/apachectl -D FOREGROUND;
         /bin/bash;
+        /usr/bin/cp -R /data/sites/api/src/Resources/* /data/temp;
+        /etc/init.d/clamav-daemon restart;
       "
     ]
 
 volumes:
-  apidata:
+  uploaddata:
     driver: local
 
 networks:

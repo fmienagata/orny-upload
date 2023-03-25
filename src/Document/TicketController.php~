@@ -1,0 +1,27 @@
+<?php
+
+namespace UploadBundle\Document;
+
+use UploadBundle\Document\Ticket;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Attribute\AsController;
+use Symfony\Component\Routing\Annotation\Route;
+
+#[AsController]
+class TicketController extends AbstractController
+{
+    #[Route(
+        '/tickets',
+        methods: ['GET'],
+        name: '_api_/tickets_get_collection',
+        schemes: ["http","https"],
+        defaults: [
+            '_api_resource_class' => Ticket::class
+        ]
+    )]
+    public function GetCollection(): JsonResponse
+    {
+        return $this->json([]);
+    }
+}

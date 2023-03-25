@@ -22,8 +22,8 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-        api:
-            pattern: ^/api/
+        upload:
+            pattern: ^/upload/
             stateless: true
             provider: 'chain_provider'
             x509:

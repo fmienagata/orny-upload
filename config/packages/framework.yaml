@@ -1,3 +1,24 @@
+---
+parameters:
+    # Configuration Memcached for contents
+    upload.redis.content_servers: '%env(REDIS_URL)%'
+    # Configuration Memcached for sessions
+    upload.redis.session_servers: '%env(REDIS_URL)%'
+    upload.redis.session_prefix: 'Session_'
+    upload.redis.session_expire: 4200
+
+    upload.version.number: 0.1.0
+    upload.version.numero.doctrine.cache: "%api_platform.version%"
+    upload.version.major: 0
+    upload.version.minor: 0
+    upload.version.patch: 0
+    upload.version.build: 10
+    upload.version.date: "$VERSION_DATE"
+
+    upload.resources_dir: '%kernel.project_dir%/src/Resources'
+
+    upload.temporary_folder: '%env(UPLOAD_TEMP)%'
+    upload.antivirus_script: "%env(ANTIVIRUS_SCRIPT)% %kernel.logs_dir%/clamdscan-%kernel.environment%.log"
 # see https://symfony.com/doc/current/reference/configuration/framework.html
 framework:
     secret: '%env(APP_SECRET)%'

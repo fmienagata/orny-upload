@@ -15,12 +15,14 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
 use ApiPlatform\Metadata\{GetCollection, Get, Patch, Post, Delete, Put};
 use Doctrine\Common\Collections\{ArrayCollection, Collection};
 use ApiPlatform\OpenApi\Model;
-use Doctrine\ORM\Mapping as ORM;
 use UploadBundle\Controller\MediaObjectController;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[Vich\Uploadable]
-#[ORM\Entity]
+#[MongoDB\Document(
+    collection: "media_objects",
+    repositoryClass: "UploadBundle\Repository\Document\MediaObjectRepository"
+)]
 #[ApiResource(
     normalizationContext: ['groups' => ['media_object:read']],
     types: ['https://schema.org/MediaObject'],
@@ -56,12 +58,12 @@ class MediaObject
     use TimestampableEntity;
 
     #[ApiProperty(identifier:true)]
-    #[Groups(["media_object:read"])]
+    #[Groups(["media_objects:read"])]
     #[MongoDB\Id]
     private string $id;
 
     #[ApiProperty(types: ['https://schema.org/contentUrl'])]
-    #[Groups(['media_object:read'])]
+    #[Groups(['media_objects:read'])]
     public ?string $contentUrl = null;
 
     #[Vich\UploadableField(mapping: "media_object", fileNameProperty: "filePath")]
@@ -69,19 +71,19 @@ class MediaObject
     public ?\Symfony\Component\HttpFoundation\File\File $file = null;
 
     #[MongoDB\Field(type:"string")]
-    #[Groups(["media_object" =>"read", "media_object_create"])]
+    #[Groups(["media_objects" =>"read", "media_object_create"])]
     public ?string $filePath = null;
 
     #[Assert\NotBlank()]
     #[Gedmo\Timestampable(on: "create")]
     #[MongoDB\Field(type: 'date')]
-    #[Groups(["media_object:read"])]
+    #[Groups(["media_objects:read"])]
     protected $createdAt;
 
     #[Assert\NotBlank()]
     #[Gedmo\Timestampable(on: "update", field: "updatedAt")]
     #[MongoDB\Field(type: 'date')]
-    #[Groups(["media_object:read"])]
+    #[Groups(["media_objects:read"])]
     protected $updatedAt;
 
     public function getId(): ?string
