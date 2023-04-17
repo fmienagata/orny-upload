@@ -1,0 +1,15 @@
+<config xmlns="http://dps.docapost.com/esc/xml/config">
+	<httpsSslCertificate>
+		<![CDATA[
+		CERTIFICATE_SYSTEM
+		]]>
+	</httpsSslCertificate>
+	<esc name="ESCNAME">
+		<connector name="mysql">
+			<hostname>MYSQL_HOSTNAME</hostname>
+			<port>MYSQL_PORT</port>
+			<user>MYSQL_USER</user>
+			<password>MYSQL_PWD</password>
+		</connector>
+	</esc>
+</config>

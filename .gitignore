@@ -1,17 +1,28 @@
 ###> IDE ###
-.idea
+*.idea*
 ###< IDE ###
 
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
 /.env.*.local
+/bin/curl
+/bin/java
+/bin/httpclient-4.2.3.jar
+
+/config/keycloack/*
+!/config/keycloack/.gitkeep
 /config/secrets/prod/prod.decrypt.private.php
+/config/esc/certificats/*
+!/config/esc/certificats/index.txt
+!/config/esc/certificats/openssl.cnf
+
 /public/bundles/
 /var/cache/*
 !/var/cache/.gitignore
 /var/log/*
 !/var/log/.gitignore
+
 /vendor/
 ###< symfony/framework-bundle ###
 

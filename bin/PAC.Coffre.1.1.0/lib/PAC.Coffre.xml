@@ -1,0 +1,1716 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>PAC.Coffre</name>
+    </assembly>
+    <members>
+        <member name="T:PAC.Coffre.Classe.ArchiveEsc">
+            <summary>
+            Contient les informations concernant une archive
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.ArchiveEsc.#ctor">
+            <summary>
+            Classe sur l'information de l'archive
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.ArchiveEsc.#ctor(System.String,System.String,System.String,System.Boolean,System.String,System.String,System.String,System.String,System.String,System.Int64,PAC.Coffre.Classe.ConfigurationHorodatage,System.String,System.String,System.Boolean)">
+            <summary>
+            Renvoie les informations concernant une archive
+            </summary>
+            <param name="id_archive">Identifiant de l'archive</param>
+            <param name="nom_fichier">Nom du fichier</param>
+            <param name="libelle_archive">Libellé de l'archive</param>
+            <param name="archive_principale">Archive principale</param>
+            <param name="id_ucs">Identifiant UCS</param>
+            <param name="id_salle">Identifiant de la salle</param>
+            <param name="id_coffre">Identifiant du coffre</param>
+            <param name="date_depot">Date du dépôt</param>
+            <param name="date_suppression">Date de suppression</param>
+            <param name="poids_octet">Taille en octet</param>
+            <param name="config_horodatage">Configuration horodatage</param>
+            <param name="hash">Hash</param>
+            <param name="hash_type">Type de hash</param>
+            <param name="verrouille">Verouillé</param>
+        </member>
+        <member name="P:PAC.Coffre.Classe.ArchiveEsc.IdArchive">
+            <summary>
+            Identifiant de l'archive
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.ArchiveEsc.NomFichier">
+            <summary>
+            Nom du fichier
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.ArchiveEsc.LibelleArchive">
+            <summary>
+            Obtient ou définit le libellé de l'archive
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.ArchiveEsc.ArchivePrincipale">
+            <summary>
+            Archive principale
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.ArchiveEsc.IdUcs">
+            <summary>
+            Identifiant UCS
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.ArchiveEsc.IdSalle">
+            <summary>
+            identifiant de la salle
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.ArchiveEsc.IdCoffre">
+            <summary>
+            identifiant du coffre
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.ArchiveEsc.DateDepot">
+            <summary>
+            Date du dépôt
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.ArchiveEsc.DateSuppression">
+            <summary>
+            Date de suppression
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.ArchiveEsc.PoidsOctet">
+            <summary>
+            Poids en octet
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.ArchiveEsc.ConfigHorodatage">
+            <summary>
+            Configuration horodatage
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.ArchiveEsc.Hash">
+            <summary>
+            Hash
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.ArchiveEsc.HashType">
+            <summary>
+            Type de hash
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.ArchiveEsc.Verrouille">
+            <summary>
+            Verouillé
+            </summary>
+        </member>
+        <member name="T:PAC.Coffre.Classe.BackGroundTaskEsc">
+            <summary>
+            Classe gérant les tâches asynchrone
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.BackGroundTaskEsc.#ctor">
+            <summary>
+            Initialisation de la classe
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.BackGroundTaskEsc.#ctor(System.String,System.Int32,System.String,System.String,System.String,System.Boolean,System.String,System.String,System.String,System.String,System.Boolean,System.String)">
+            <summary>
+            Initialisation de la classe avec les paramètres
+            </summary>
+            <param name="id_task">Identifiant de la classe</param>
+            <param name="type">Type</param>
+            <param name="parameters">Parametres</param>
+            <param name="userId">Identifiant de l'utilisateur</param>
+            <param name="site">Site</param>
+            <param name="owned">Possédé par</param>
+            <param name="owner">Propriétaire</param>
+            <param name="date">Date</param>
+            <param name="validity_date">Date de validité</param>
+            <param name="repeat_time">Délai de répétition</param>
+            <param name="error">Erreur</param>
+            <param name="resultData">Résultat</param>
+        </member>
+        <member name="P:PAC.Coffre.Classe.BackGroundTaskEsc.IdTask">
+            <summary>
+            Identifiant de la classe
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.BackGroundTaskEsc.Type">
+            <summary>
+            Type
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.BackGroundTaskEsc.Parameters">
+            <summary>
+            Parametres
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.BackGroundTaskEsc.UserId">
+            <summary>
+            Identifiant de l'utilisateur
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.BackGroundTaskEsc.Site">
+            <summary>
+            Site
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.BackGroundTaskEsc.Owned">
+            <summary>
+            Possédé par
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.BackGroundTaskEsc.Owner">
+            <summary>
+            Propriétaire
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.BackGroundTaskEsc.Date">
+            <summary>
+            Date
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.BackGroundTaskEsc.ValidityDate">
+            <summary>
+            Date de validité
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.BackGroundTaskEsc.RepeatTime">
+            <summary>
+            Délai de répétition
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.BackGroundTaskEsc.Error">
+            <summary>
+            Erreur
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.BackGroundTaskEsc.ResultData">
+            <summary>
+            Résultat
+            </summary>
+        </member>
+        <member name="T:PAC.Coffre.Classe.CertificatEsc">
+            <summary>
+            Classe gérant les certificats
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.CertificatEsc.#ctor">
+            <summary>
+            Initialisation de la classe
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.CertificatEsc.#ctor(System.String,System.String,System.String,System.String,System.Int32,System.String)">
+            <summary>
+            Initialisation de la classe avec des paramètres
+            </summary>
+            <param name="conteneurType">Type de conteneur</param>
+            <param name="conteneurId">Identifiant du conteneur</param>
+            <param name="conteneurName">Nom du conteneur</param>
+            <param name="dateExpiration">Date d'expiration</param>
+            <param name="daysBeforeDeprecation">Nombre de jour avant dépréciation</param>
+            <param name="content">Contenu</param>
+        </member>
+        <member name="P:PAC.Coffre.Classe.CertificatEsc.ConteneurType">
+            <summary>
+            Type de conteneur
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.CertificatEsc.ConteneurId">
+            <summary>
+            Identifiant du conteneur
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.CertificatEsc.ConteneurName">
+            <summary>
+            Nom du conteneur
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.CertificatEsc.DateExpiration">
+            <summary>
+            Date d'expiration
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.CertificatEsc.DaysBeforeDeprecation">
+            <summary>
+            Nombre de jour avant dépréciation
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.CertificatEsc.Content">
+            <summary>
+            Contenu
+            </summary>
+        </member>
+        <member name="T:PAC.Coffre.Classe.ChargeItem">
+            <summary>
+            Classe inconnu
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.ChargeItem.#ctor">
+            <summary>
+            Initialisation de la classe
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.ChargeItem.#ctor(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Initialisation de la classe avec des parametres
+            </summary>
+            <param name="inUse">Inconnu</param>
+            <param name="total">Inconnu</param>
+            <param name="waiting">Inconnu</param>
+        </member>
+        <member name="P:PAC.Coffre.Classe.ChargeItem.InUse">
+            <summary>
+            Inconnu
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.ChargeItem.Total">
+            <summary>
+            Inconnu
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.ChargeItem.Waiting">
+            <summary>
+            Inconnu
+            </summary>
+        </member>
+        <member name="T:PAC.Coffre.Classe.CoffreEsc">
+            <summary>
+            Contient les informations d'un coffre
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.CoffreEsc.#ctor">
+            <summary>
+            Initialisation de la classe
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.CoffreEsc.#ctor(System.String,System.String,System.String,System.String,System.String,System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Initialisaiton de la classe avec parametres
+            </summary>
+            <param name="id_coffre">Identifiant du coffre</param>
+            <param name="id_salle">Identifiant de la salle</param>
+            <param name="nom_usuel_coffre">Nom usuel du coffre</param>
+            <param name="date_creation">Date de création</param>
+            <param name="date_suppression">Date de suppression</param>
+            <param name="nbUCS">Nombre d'Ucs</param>
+            <param name="nbArchives">Nombre d'archive</param>
+            <param name="verrouille">Vérouillé</param>
+        </member>
+        <member name="P:PAC.Coffre.Classe.CoffreEsc.IdCoffre">
+            <summary>
+            Identifiant du coffre
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.CoffreEsc.IdSalle">
+            <summary>
+            Identifiant de la salle
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.CoffreEsc.NomUsuelCoffre">
+            <summary>
+            Nom usuel du coffre
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.CoffreEsc.DateCreation">
+            <summary>
+            Date de création
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.CoffreEsc.DateSuppression">
+            <summary>
+            Date de suppression
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.CoffreEsc.NbUcs">
+            <summary>
+            Nombre d'Ucs
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.CoffreEsc.NbArchives">
+            <summary>
+            Nombre d'archives
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.CoffreEsc.Verrouille">
+            <summary>
+            Verouillé
+            </summary>
+        </member>
+        <member name="T:PAC.Coffre.Classe.ConfigurationHorodatage">
+            <summary>
+            Enumerateur pour la configuration de l'horodatage
+            </summary>
+        </member>
+        <member name="F:PAC.Coffre.Classe.ConfigurationHorodatage.XMLDSIG">
+            <summary>
+            Enum
+            </summary>
+        </member>
+        <member name="F:PAC.Coffre.Classe.ConfigurationHorodatage.XMLDSIG_CERTEUROPE">
+            <summary>
+            Enum
+            </summary>
+        </member>
+        <member name="F:PAC.Coffre.Classe.ConfigurationHorodatage.XMLDSIG_CERTINOMIS">
+            <summary>
+            Enum
+            </summary>
+        </member>
+        <member name="T:PAC.Coffre.Classe.FiltreEsc">
+            <summary>
+            Classe gérant les filtre
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.FiltreEsc.#ctor">
+            <summary>
+            Initialisation de la classe
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.FiltreEsc.#ctor(System.String,PAC.Coffre.Classe.FiltreOperation,System.String,System.String)">
+            <summary>
+            Initialisation de la classe avec paramètres
+            </summary>
+            <param name="champ">Champ</param>
+            <param name="operation">Opération</param>
+            <param name="value1">Valeur 1</param>
+            <param name="value2">Valeur 2</param>
+        </member>
+        <member name="P:PAC.Coffre.Classe.FiltreEsc.Champ">
+            <summary>
+            Champ
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.FiltreEsc.Operation">
+            <summary>
+            Opération
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.FiltreEsc.Value1">
+            <summary>
+            Valeur 1
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.FiltreEsc.Value2">
+            <summary>
+            Valeur 2
+            </summary>
+        </member>
+        <member name="T:PAC.Coffre.Classe.FiltreOperation">
+            <summary>
+            Enumérateur permettant d'identifier l'opération à mener dans un filtre
+            </summary>
+        </member>
+        <member name="F:PAC.Coffre.Classe.FiltreOperation.egalA">
+            <summary>
+            Valeur égal à
+            </summary>
+        </member>
+        <member name="F:PAC.Coffre.Classe.FiltreOperation.compritEntre">
+            <summary>
+            Valeur compris entre
+            </summary>
+        </member>
+        <member name="F:PAC.Coffre.Classe.FiltreOperation.plusGrandQue">
+            <summary>
+            Valeur plus grand que
+            </summary>
+        </member>
+        <member name="F:PAC.Coffre.Classe.FiltreOperation.plusPetitQue">
+            <summary>
+            Valeur plus petit que
+            </summary>
+        </member>
+        <member name="F:PAC.Coffre.Classe.FiltreOperation.contient">
+            <summary>
+            valeur Contient
+            </summary>
+        </member>
+        <member name="F:PAC.Coffre.Classe.FiltreOperation.commencePar">
+            <summary>
+            Valeur commence par
+            </summary>
+        </member>
+        <member name="T:PAC.Coffre.Classe.NodeEsc">
+            <summary>
+            Classe gérant un noeud de l'ESC
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.NodeEsc.#ctor">
+            <summary>
+            Initialisation de la classe
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.NodeEsc.#ctor(System.String,System.String,System.Int32,System.String,System.String)">
+            <summary>
+            Initialisation de la classe avec paramètre
+            </summary>
+            <param name="nom">Nom</param>
+            <param name="host">Host</param>
+            <param name="port">Port</param>
+            <param name="status">Status</param>
+            <param name="dateDernierBattement">dateDernierBattement</param>
+        </member>
+        <member name="P:PAC.Coffre.Classe.NodeEsc.Nom">
+            <summary>
+            Nom
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.NodeEsc.Host">
+            <summary>
+            Host
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.NodeEsc.Port">
+            <summary>
+            Port
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.NodeEsc.Status">
+            <summary>
+            Status
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.NodeEsc.DateDernierBattement">
+            <summary>
+            Date dernier battement
+            </summary>
+        </member>
+        <member name="T:PAC.Coffre.Classe.ParametresEsc">
+            <summary>
+            Classe gérant les paramètres de l'ESC
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.ParametresEsc.#ctor">
+            <summary>
+            Initialisation de la classe
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.ParametresEsc.#ctor(System.String,System.String,System.String,System.String)">
+            <summary>
+            Initialistion de la classe avec paramètres
+            </summary>
+            <param name="nom">Nom</param>
+            <param name="valeur">Valeur</param>
+            <param name="dateMiseAJour">Date de mise à jour</param>
+            <param name="aide">Aide</param>
+        </member>
+        <member name="P:PAC.Coffre.Classe.ParametresEsc.Nom">
+            <summary>
+            Nom
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.ParametresEsc.Valeur">
+            <summary>
+            Valeur
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.ParametresEsc.DateMiseAJour">
+            <summary>
+            Date de mise à jour
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.ParametresEsc.Aide">
+            <summary>
+            Aide
+            </summary>
+        </member>
+        <member name="T:PAC.Coffre.Classe.PerimetreEsc">
+            <summary>
+            Informations concernant un droit d'un utilisateur sur un élément de l'ESC
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.PerimetreEsc.#ctor">
+            <summary>
+            Initialisation de la classe
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.PerimetreEsc.#ctor(System.String,System.String,System.Boolean,PAC.Coffre.Classe.SalleEsc,PAC.Coffre.Classe.CoffreEsc,System.String,System.String)">
+            <summary>
+            Initialisation de la classe avec es parametres
+            </summary>
+            <param name="id_droit">Identifiant du droit</param>
+            <param name="id_user">Identifiant de l'utilisateur</param>
+            <param name="actif">Actif</param>
+            <param name="salleEsc"></param>
+            <param name="coffreEsc"></param>
+            <param name="date_creation"></param>
+            <param name="date_suppression"></param>
+        </member>
+        <member name="P:PAC.Coffre.Classe.PerimetreEsc.IdDroit">
+            <summary>
+            Identifiant du droit
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.PerimetreEsc.IdUser">
+            <summary>
+            Identifiant de l'utilisateur
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.PerimetreEsc.Actif">
+            <summary>
+            Actif
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.PerimetreEsc.SalleEsc">
+            <summary>
+            Salle de l'ESC
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.PerimetreEsc.CoffreEsc">
+            <summary>
+            Coffre de l'ESC
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.PerimetreEsc.DateCreation">
+            <summary>
+            Date de création
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.PerimetreEsc.DateSuppression">
+            <summary>
+            Date de suppression
+            </summary>
+        </member>
+        <member name="T:PAC.Coffre.Classe.PointDeMontageEsc">
+            <summary>
+            Classe gérant les informations sur les points de montage
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.PointDeMontageEsc.#ctor">
+            <summary>
+            Initialisation de la classe
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.PointDeMontageEsc.#ctor(System.String,PAC.Coffre.Classe.TypePointDeMontage,System.String,System.String)">
+            <summary>
+            Initialisation de la classe avec paramètres
+            </summary>
+            <param name="escName">Nom du coffre</param>
+            <param name="type">Type</param>
+            <param name="site">Site</param>
+            <param name="path">Path</param>
+        </member>
+        <member name="P:PAC.Coffre.Classe.PointDeMontageEsc.EscName">
+            <summary>
+            Nom du coffre
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.PointDeMontageEsc.Type">
+            <summary>
+            Type
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.PointDeMontageEsc.Site">
+            <summary>
+            Site
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.PointDeMontageEsc.Path">
+            <summary>
+            Chemin
+            </summary>
+        </member>
+        <member name="T:PAC.Coffre.Classe.RapportEsc">
+            <summary>
+            Classe gérant les rapports de l'ESC
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.RapportEsc.#ctor">
+            <summary>
+            Initialisation de la classe
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.RapportEsc.#ctor(System.String,System.String,System.String,System.String,System.String,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Initialisation de la classe avec des paramètres
+            </summary>
+            <param name="id_rapport">Identifiant du rapport</param>
+            <param name="id_salle">Identifiant de la salle</param>
+            <param name="id_archive">Identifiant archive</param>
+            <param name="id_utilisateur">Identifiant de l'utilisateur</param>
+            <param name="date">Date</param>
+            <param name="description">Description</param>
+            <param name="en_cours">En cours</param>
+            <param name="ok">Ok</param>
+        </member>
+        <member name="P:PAC.Coffre.Classe.RapportEsc.IdRapport">
+            <summary>
+            Identifiant du rapport
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.RapportEsc.IdSalle">
+            <summary>
+            Identifiant de la salle
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.RapportEsc.IdArchive">
+            <summary>
+            Identifiant de l'archive
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.RapportEsc.IdUtilisateur">
+            <summary>
+            Identifiant de l'utilisateur
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.RapportEsc.Date">
+            <summary>
+            Date
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.RapportEsc.Description">
+            <summary>
+            Description
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.RapportEsc.EnCours">
+            <summary>
+            En cours
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.RapportEsc.Ok">
+            <summary>
+            Ok
+            </summary>
+        </member>
+        <member name="T:PAC.Coffre.Classe.SalleEsc">
+            <summary>
+            Information concernant une salle
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.SalleEsc.#ctor">
+            <summary>
+            Initialisation de la classe
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.SalleEsc.#ctor(System.String,System.String,System.Boolean)">
+            <summary>
+            Initialisation de la classe avec paramètres
+            </summary>
+            <param name="id_salle">Identifiant de la salle</param>
+            <param name="nom">Nom</param>
+            <param name="verrouille">Verouillé</param>
+        </member>
+        <member name="P:PAC.Coffre.Classe.SalleEsc.IdSalle">
+            <summary>
+            Identifiant de la salle
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.SalleEsc.Nom">
+            <summary>
+            Nom
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.SalleEsc.Verrouille">
+            <summary>
+            Verouillé
+            </summary>
+        </member>
+        <member name="T:PAC.Coffre.Classe.StatusEsc">
+            <summary>
+            Classe contenant les informations de l'ESC
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.StatusEsc.#ctor">
+            <summary>
+            Initialisation de la classe
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.StatusEsc.#ctor(System.String,System.String,System.String,System.String,System.Int64,System.Int64)">
+            <summary>
+            Initialisaiton de la classe avec parametres
+            </summary>
+            <param name="version">Version</param>
+            <param name="escName">Nom du coffre</param>
+            <param name="site">Site</param>
+            <param name="date">Date</param>
+            <param name="nbArchivesEsc">Nombre d'archive</param>
+            <param name="tailleArchivesEsc">Taille de l'archive</param>
+        </member>
+        <member name="P:PAC.Coffre.Classe.StatusEsc.Version">
+            <summary>
+            Version
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.StatusEsc.EscName">
+            <summary>
+            Nom du coffre
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.StatusEsc.Site">
+            <summary>
+            Site
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.StatusEsc.Date">
+            <summary>
+            Date
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.StatusEsc.NbArchivesEsc">
+            <summary>
+            Nombre d'archve dans le coffre
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.StatusEsc.TailleArchivesEsc">
+            <summary>
+            Taille de l'archive dans le coffre
+            </summary>
+        </member>
+        <member name="T:PAC.Coffre.Classe.StatusNodeEsc">
+            <summary>
+            Renvois des informatino sur l'etat du noeud, les informations sur la base de données sont relative à l'ESC d'appel
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.StatusNodeEsc.#ctor">
+            <summary>
+            Initialisation de la classe
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.StatusNodeEsc.#ctor(System.Boolean,System.String,System.String,PAC.Coffre.Classe.ChargeItem,PAC.Coffre.Classe.ChargeItem,System.Boolean)">
+            <summary>
+            Initialisation de la classe avec les paramètres
+            </summary>
+            <param name="isOk">Indique si l'état est correct</param>
+            <param name="nom">Nom</param>
+            <param name="mode">Mode</param>
+            <param name="chargeThread">Charge du Thread</param>
+            <param name="chargeBdd">Charge de la Bdd</param>
+            <param name="debug">Debug</param>
+        </member>
+        <member name="P:PAC.Coffre.Classe.StatusNodeEsc.IsOk">
+            <summary>
+            Indique si l'état est correct
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.StatusNodeEsc.Nom">
+            <summary>
+            Nom
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.StatusNodeEsc.Mode">
+            <summary>
+            Mode
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.StatusNodeEsc.ChargeThread">
+            <summary>
+            Charge du Thread
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.StatusNodeEsc.ChargeBdd">
+            <summary>
+            Charge de la Bdd
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.StatusNodeEsc.Debug">
+            <summary>
+            Debug
+            </summary>
+        </member>
+        <member name="T:PAC.Coffre.Classe.TraceEsc">
+            <summary>
+            Classe comprenant les informations de trace
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.TraceEsc.#ctor">
+            <summary>
+            Initialisation de la classe
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.TraceEsc.#ctor(System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Initialisation de la trace avec les informations
+            </summary>
+            <param name="id_trace">Identifiant de la trace</param>
+            <param name="date">Date</param>
+            <param name="id_user">Identifiant de l'utilisateur</param>
+            <param name="auNomDe">Au nom de</param>
+            <param name="id_salle">identifiant de la salle</param>
+            <param name="id_coffre">Identifiant du coffre</param>
+            <param name="id_ucs">Identifiant de l'ucs</param>
+            <param name="id_archive">Identifiant de l'archive</param>
+            <param name="nom_operation">Nom de l'opération</param>
+            <param name="label_externe">Label externe</param>
+            <param name="texte">Texte</param>
+            <param name="erreur">Erreur</param>
+        </member>
+        <member name="P:PAC.Coffre.Classe.TraceEsc.IdTrace">
+            <summary>
+            Identifiant de la trace
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.TraceEsc.Date">
+            <summary>
+            Date de la trace
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.TraceEsc.IdUser">
+            <summary>
+            Identifiant de l'utilisateur
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.TraceEsc.AuNomDe">
+            <summary>
+            Au nom de 
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.TraceEsc.IdSalle">
+            <summary>
+            Identifiant de la salle
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.TraceEsc.IdCoffre">
+            <summary>
+            Identifiant du coffre
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.TraceEsc.IdUcs">
+            <summary>
+            Identifiant de l'ucs
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.TraceEsc.IdArchive">
+            <summary>
+            Identifiant de l'archive
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.TraceEsc.NomOperation">
+            <summary>
+            Nom de l'opération
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.TraceEsc.LabelExterne">
+            <summary>
+            Label externe
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.TraceEsc.Texte">
+            <summary>
+            Texte
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.TraceEsc.Erreur">
+            <summary>
+            Erreur
+            </summary>
+        </member>
+        <member name="T:PAC.Coffre.Classe.TypePointDeMontage">
+            <summary>
+            Enumérateur sur le type de pointage
+            </summary>
+        </member>
+        <member name="T:PAC.Coffre.Classe.UtilisateurEsc">
+            <summary>
+            Classe contenant les informations d'un utilisateur
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.UtilisateurEsc.#ctor">
+            <summary>
+            Initialise une nouvelle instance de la classe
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.Classe.UtilisateurEsc.#ctor(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Initialise une nouvelle instance de la classe avec les informations de l'utilisateur
+            </summary>
+            <param name="id_user">Identifiant de l'utilisateur</param>
+            <param name="type">Type</param>
+            <param name="nom">Nom</param>
+            <param name="dateCreation">Date de création</param>
+            <param name="dateSuppression">Date de suppression</param>
+        </member>
+        <member name="P:PAC.Coffre.Classe.UtilisateurEsc.IdUser">
+            <summary>
+            Identiifiant de l'utilisateur
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.UtilisateurEsc.Type">
+            <summary>
+            Type
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.UtilisateurEsc.Nom">
+            <summary>
+            Nom
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.UtilisateurEsc.DateCreation">
+            <summary>
+            Date de création
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.Classe.UtilisateurEsc.DateSuppression">
+            <summary>
+            Date de suppression
+            </summary>
+        </member>
+        <member name="T:PAC.Coffre.EscClient">
+            <summary>
+            Classe gérant les accès à un coffre ESC
+            </summary>
+        </member>
+        <member name="F:PAC.Coffre.EscClient.SLASH">
+            <summary>
+            Définit la constante slasj
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.EscClient.AdresseCoffre">
+            <summary>
+            Obtient ou définit l'adresse du coffre
+            </summary>
+        </member>
+        <member name="F:PAC.Coffre.EscClient.Auteur">
+            <summary>
+            Obtient le nom de l'auteur par défaut
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.EscClient.SessionId">
+            <summary>
+            Obtient ou définit l'identifiant de session
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.EscClient.Client">
+            <summary>
+            Obtient ou définit le client Rest
+            </summary>
+        </member>
+        <member name="P:PAC.Coffre.EscClient.Certificat">
+            <summary>
+            Obtient ou défini le certificat
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Définition de la classe
+            </summary>
+            <param name="escName">Nom de l'ESC</param>
+            <param name="ip">Adresse IP de lESC</param>
+            <param name="port">Port</param>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.#ctor(System.String,System.String,System.String,System.String)">
+            <summary>
+            Initialisation de la classe EscClient
+            </summary>
+            <param name="escName">Nom de l'Esc</param>
+            <param name="ip">Adresse IP de l'Esc</param>
+            <param name="port">Port d'accès à l'Esc</param>
+            <param name="pemString">Certificat</param>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.#ctor(System.String,System.String,System.String,System.IO.FileInfo,System.String)">
+            <summary>
+            Initialisation de la classe EscClient
+            </summary>
+            <param name="escName">Nom de l'Esc</param>
+            <param name="ip">Adresse IP de l'Esc</param>
+            <param name="port">Port d'accès à l'Esc</param>
+            <param name="pemFile">Information sur le certificat</param>
+            <param name="author">Auteur de la demande</param>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.Connexion">
+            <summary>
+            Initialise une connexion au coffre
+            </summary>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.AdminInjectTimeStampCertificate(System.IO.FileInfo)">
+            <summary>
+            Injecte un nouveau certificat de creation de Jeton d'horodatage.
+            Utilisateur SYSTEM
+            </summary>
+            <param name="Body">Fichier contenant le certificat</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.AdminListerCertificats">
+            <summary>
+            Renvois la liste des certificat, triés par date de péremption.
+            Utilisateur SYSTEM
+            </summary>
+            <returns>Renvoie une liste d'objet <see cref="T:PAC.Coffre.Classe.CertificatEsc"/>, en cas de résussite, sinon null</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.ArchiveCheck(System.String,System.String,System.String)">
+            <summary>
+            Vérifie la conformité d'une archive à sa preuve. Il s'agit d'une tâche asynchrone.
+            Utilisateur GEST.
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <param name="ArchiveId">Identifiant de l'archive</param>
+            <returns>Identifiant de la tâche asynchrone si l'appel a réussi, sinon une chaîne vide</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.ArchiveDelete(System.String,System.String,System.String)">
+            <summary>
+            Suppression d'une archive de l'Esc
+            Utilisateur GEST.
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <param name="ArchiveId">Identifiant de l'archive</param>
+            <returns>Renvoie un tableau d'élement, comprenant l'identifiant asynchrone et le label, sinon un tableau vide</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.ArchiveEvidenceGet(System.String,System.String,System.String,System.String)">
+            <summary>
+            Permet d'obtenir la preuve de dépôt d'une archive
+            Utilisateur GEST LECT
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <param name="ArchiveId">Identifiant de l'archive</param>
+            <param name="NewPath">Facultatif. Définit le nouveau chemin d'accès du fichier</param>
+            <returns><see cref="T:System.IO.FileInfo"/> contenant la preuve de dépôt si l'appel a réussi, sinon null</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.ArchiveGet(System.String,System.String,System.String,System.String)">
+            <summary>
+            Permet de récupérer une archive donnée
+            Utilisateur GEST LECT
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <param name="ArchiveId">Identifiant de l'archive</param>
+            <param name="NewPath">Facultatif. Définit le nouveau chemin d'accès du fichier</param>
+            <returns><see cref="T:System.IO.FileInfo"/> contenant le fichier extrait de l'Esc si l'appel a réussi, sinon null</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.ArchiveGetSecure(System.String,System.String,System.String)">
+            <summary>
+            Inconnu
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <param name="ArchiveId">Identifiant de l'archive</param>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.ArchiveLock(System.String,System.String,System.String)">
+            <summary>
+            Verrouille une Archive
+            Utilisateur GEST 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <param name="ArchiveId">Identifiant de l'archive</param>
+            <returns>True si l'opération a réussi sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.ArchiveMetaDataGet(System.String,System.String,System.String)">
+            <summary>
+            Obtient les métadata d'une archive
+            Utilisateur GEST LECT
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <param name="ArchiveId">Identifiant de l'archive</param>
+            <returns>Retourne <see cref="T:PAC.Coffre.Classe.ArchiveEsc"/> avec les informations si l'appel a réussi sinon null</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.ArchivePut(System.String,System.String,System.String,System.String,System.IO.FileInfo,System.String,System.String,System.String,PAC.Coffre.Classe.ConfigurationHorodatage)">
+            <summary>
+            Dépose une archive dans l'Esc
+            Utilisateur GEST 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <param name="UcsId">L'id de l'UCS où placer cette archive, si vide l'archive est liée à un nouvel UCS</param>
+            <param name="ArchiveLabel">Texte libre pour le fichier déposé</param>
+            <param name="Body">Fichier à déposer</param>
+            <param name="FileName">Nom du fichier</param>
+            <param name="Hash">Le hash du fichier pour verification encodé sous forme d'une chaine de caractères HexaDecimale</param>
+            <param name="HashType">L'algorithme de hash</param>
+            <param name="DepositConfig">Objet <see cref="T:PAC.Coffre.Classe.ConfigurationHorodatage"/> contenant la configuration de l'horodatage</param>
+            <returns>Retourne <see cref="T:PAC.Coffre.Classe.ArchiveEsc"/> avec les informations si l'appel a réussi sinon null</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.ArchivePutNoControl(System.String,System.String,System.String,System.String,System.IO.FileInfo,System.String,PAC.Coffre.Classe.ConfigurationHorodatage)">
+            <summary>
+            Dépose un fichier dans l'Esc sans fournir de hash de sécurité
+            Utilisateur GEST 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <param name="UcsId">Identifiant de l'ucs</param>
+            <param name="ArchiveLabel">Texte libre accompagnant le fichier</param>
+            <param name="Body">Fichier à déposer</param>
+            <param name="FileName">Le nom du fichier</param>
+            <param name="DepositConfig">Objet <see cref="T:PAC.Coffre.Classe.ConfigurationHorodatage"/> contenant la configuration de l'horodatage</param>
+            <returns>Retourne <see cref="T:PAC.Coffre.Classe.ArchiveEsc"/> avec les informations du fichier déposé si l'appel a résussi, sinon null</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.ArchivePutNoControl(System.String,System.String,System.String,System.String,System.IO.FileInfo,System.String)">
+            <summary>
+            Dépose un fichier dans l'Esc sans fournir de hash de sécurité
+            Utilisateur GEST 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <param name="UcsId">Identifiant de l'ucs</param>
+            <param name="ArchiveLabel">Texte libre accompagnant le fichier</param>
+            <param name="Body"></param>
+            <param name="FileName">Le nom du fichier</param>
+            <returns>Retourne <see cref="T:PAC.Coffre.Classe.ArchiveEsc"/> avec les informations du fichier déposé si l'appel a réussi, sinon null</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.ArchiveReturn(System.String,System.String,System.String)">
+            <summary>
+            Renvois toute les données concernant une archive. Il s'agit d'une tâche asynchrone
+            Utilisateur GEST 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <param name="ArchiveId">Identifiant de l'archive</param>
+            <returns>Identifiant de la tâche asynchrone si l'appel a réussi, sinon une chaine vide</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.ArchivesCount(System.String,System.String)">
+            <summary>
+            Compte le nombre d'archive dans une salle pour une coffre
+            Utilisateur GEST LECT
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Idetifiant du coffre</param>
+            <returns>Renvoie le nombre d'archive si l'appel à réussi, sinon -1</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.ArchivesList(System.String,System.String,System.Int32)">
+            <summary>
+            Renvoie une liste d'Archive contenue dans un coffre
+            Utilisateur GEST LECT
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <param name="Page">La page de résultat à afficher</param>
+            <returns>Liste d'<see cref="T:PAC.Coffre.Classe.ArchiveEsc"/> si l'appel a réussi, sinon null</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.ArchiveUnlock(System.String,System.String,System.String)">
+            <summary>
+            Deverrouille une Archive
+            Utilisateur GEST 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <param name="ArchiveId">Identifiant de l'archive</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.ArchiveUpdateLabel(System.String,System.String,System.String,System.String)">
+            <summary>
+            Mise à jour du label d'une archive
+            Utilisateur GEST 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <param name="ArchiveId">Identifiant de l'archive</param>
+            <param name="NewArchiveLabel">Label à appliquer</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.AsyncReportGet(System.String)">
+            <summary>
+            Ouvre le fichier de rapport correspondant à la tâche asynchrone
+            Utilisateur SYSTEM ADMIN LECT GEST 
+            </summary>
+            <param name="ReportId">Identifiant du rapport, correspond à l'id de retour de la tâche asynchrone</param>
+            <returns>FileInfo contenant les informations du rapport si l'appel a réussi, sinon null</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.AsyncTaskList">
+            <summary>
+            Renvois la liste des taches asynchrone de l'utilisateur
+            Utilisateur SYSTEM ADMIN LECT GEST 
+            </summary>
+            <returns>Liste des objets <see cref="T:PAC.Coffre.Classe.RapportEsc"/> si l'appel a réussi, sinon null</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.AsyncTaskStatus(System.String)">
+            <summary>
+            Renvois les informations concernant une tache asynchrone
+            Utilisateur SYSTEM ADMIN LECT GEST 
+            </summary>
+            <param name="ReportId">Identifiant du rapport, correspond à l'id de retour de la tâche asynchrone</param>
+            <returns>Obtient les informations concernant un objet <see cref="T:PAC.Coffre.Classe.RapportEsc"/> si l'appel a réussi, sinon null</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.BackGroundTaskDrop(System.String)">
+            <summary>
+            Supprime une tache de fond
+            Utilisateur SYSTEM 
+            </summary>
+            <param name="TaskId">Identifiant de la tâche à supprimer</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.BackGroundTaskRestart(System.String)">
+            <summary>
+            Relance une tache de fond echouée
+            Utilisateur SYSTEM 
+            </summary>
+            <param name="TaskId">Identifiant de la tâche à relancer</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.BackGroundTasksList(System.Int32)">
+            <summary>
+            Obtient la liste des taches de fond
+            Utilisateur SYSTEM 
+            </summary>
+            <param name="Page">La page de résultat à afficher</param>
+            <returns>Renvoie la liste des tâches de fond  de type <see cref="T:PAC.Coffre.Classe.BackGroundTaskEsc"/> si l'appel a réussi, sinon null</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.BackGroundTaskUpdate(System.String,System.String,System.String,System.Int32)">
+            <summary>
+            Met a jour les paramètres de la tache de fond
+            Utilisateur SYSTEM 
+            </summary>
+            <param name="TaskId">Identifiant de la tâche</param>
+            <param name="NewParams">Les nouveaux parametres</param>
+            <param name="StartDate">La nouvelle date de lancement (format iso8601, vide si pas de date)</param>
+            <param name="Periode">La periode (un entier, vide si pas de periode)</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.CheckLock(System.String)">
+            <summary>
+            Verifie si un élément est verouillé
+            Utilisateur SYSTEM 
+            </summary>
+            <param name="ItemId">Identifiant de l'item à vérifier</param>
+            <returns>Renvoie true si l'élément est vérouillé, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.LogLifeCycleInject(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Injecte une trace dans le journal du cycle de vie
+            Utilisateur GEST 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <param name="ArchiveId">Identifiant de l'archive</param>
+            <param name="ModuleName">le nom du module injectant la trace</param>
+            <param name="Text">Le contenu de la trace</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.LogLifeCycleList(System.String,System.Int32,System.Collections.Generic.List{PAC.Coffre.Classe.FiltreEsc})">
+            <summary>
+            Renvois tout le contenus des traces d'une Salle
+            Utilisateur ADMIN 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="Page">Le numéro de la page</param>
+            <param name="Body">Liste de filtre de type <see cref="T:PAC.Coffre.Classe.FiltreEsc"/> à appliquer à la recherche</param>
+            <returns>Renvoie la liste de trace de type <see cref="T:PAC.Coffre.Classe.TraceEsc"/> au format JSON</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.LogSystemInject(System.String,System.String)">
+            <summary>
+            Injecte une trace dans le journal Système
+            Utilisateur ADMIN 
+            </summary>
+            <param name="ModuleName">Nom du module injectant la trace</param>
+            <param name="Text">Texte de la trace</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.LogSystemList(System.Int32,System.Collections.Generic.List{PAC.Coffre.Classe.FiltreEsc})">
+            <summary>
+            Renvois tout le contenus des traces ESC
+            Utilisateur SYSTEM 
+            </summary>
+            <param name="Page">La page de résultat à afficher</param>
+            <param name="Body">Liste des filtres de type <see cref="T:PAC.Coffre.Classe.FiltreEsc" /> à appliquer sur la recherche</param>
+            <returns>Renvoie une liste des traces de type <see cref="T:PAC.Coffre.Classe.TraceEsc"/> si l'appel a réussi, sinon null</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.MountPointAdd(System.String,PAC.Coffre.Classe.TypePointDeMontage,System.String,System.Boolean)">
+            <summary>
+            Ajoute un point de montage, écrase le point de montage existant si besoin
+            Utilisateur SYSTEM 
+            </summary>
+            <param name="Site">Le nom du site concerné</param>
+            <param name="Type">L'identifiant du type de point de montage de type <see cref="T:PAC.Coffre.Classe.TypePointDeMontage"/></param>
+            <param name="MountPoint">Le chemin du point de montage</param>
+            <param name="Overwrite">True pour écraser la valeur déjà présente pour ce site, sinon False</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.MountPointCheckSynchronization">
+            <summary>
+            Vérifie la synchronisation des fichiers entre points de montages et la corrige éventuellement
+            Utilisateur SYSTEM 
+            </summary>
+            <returns>Renvie l'identifiant de la tâche asynchrone, sinon une chaine vide</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.MountPointDelete(System.String,System.String)">
+            <summary>
+            Supprime un point de montage
+            Utilisateur SYSTEM 
+            </summary>
+            <param name="Site">Le nom du site concerné</param>
+            <param name="MountPoint">Le chemin du point de montage</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.MountPointList">
+            <summary>
+            Renvois la liste des points de montage present sur cet ESC
+            Utilisateur SYSTEM 
+            </summary>
+            <returns>Une liste des points de montage de type <see cref="T:PAC.Coffre.Classe.PointDeMontageEsc"/> si l'appel a réussi, sinon null</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.MountPointNumberGet">
+            <summary>
+            Indique le nombre de points de montages minimum sur lequel un fichier doit être écrit
+            Utilisateur SYSTEM 
+            </summary>
+            <returns>Renvoie le nombre de points si l'appel a réussi, sinon -1</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.MountPointNumberPut(System.Int32)">
+            <summary>
+            Change le nombre de points de montages minimum sur lequel un fichier doit être écrit
+            Utilisateur SYSTEM 
+            </summary>
+            <param name="Number">Valeur du nombre de point</param>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.NodeList">
+            <summary>
+            Retourne la liste des noeuds enregistré dans l'ESC
+            Utilisateur SYSTEM 
+            </summary>
+            <returns>Liste des noeuds de type <see cref="T:PAC.Coffre.Classe.NodeEsc"/>, si l'appel a réussi, sinon null</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.ParameterList">
+            <summary>
+            Retourne la liste des paramètres de configuration de l'ESC
+            Utilisateur SYSTEM 
+            </summary>
+            <returns>Liste des paramètres de type <see cref="T:PAC.Coffre.Classe.ParametresEsc"/>si l'appel a réussi, sinon null</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.ParameterUpdate(System.String,System.String)">
+            <summary>
+            Met a jour la valeur d'un parametre de l'ESC
+            Utilisateur SYSTEM 
+            </summary>
+            <param name="Parameter">Le nom du paramètre</param>
+            <param name="Value">La valeur du paramètre</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.RoomCertificateChange(System.String,System.IO.FileInfo)">
+            <summary>
+            Remplace le certificat de la salle
+            Utilisateur ADMIN 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="Body">Fichier pem contenant le nouveau certificat</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.RoomCheck(System.String)">
+            <summary>
+            Vérifie l'intégrité de toutes les archives du la salle. Il s'agit d'une tâche asynchrone
+            Utilisateur ADMIN GEST 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <returns>Identifiant de la tâche asynchrone si l'appel a réussi, sinon une chaine vide</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.RoomCreate(System.String,System.IO.FileInfo)">
+            <summary>
+            Créer une nouvelle salle
+            Utilisateur SYSTEM 
+            </summary>
+            <param name="Label">Le libellé de la salle</param>
+            <param name="Body">Objet FileInfo contenant le certificat de signature</param>
+            <returns>Renvoie l'identifiant de la salle si l'appel a réussi sinon une chaine vide</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.RoomDelete(System.String,System.Boolean)">
+            <summary>
+            Détruit une salle et tout les coffres/archives/ucs contenues dans celle-ci. Certaines méta-données sont conservées en base.
+            Il s'agit d'une tâche asynchrone
+            Utilisateur SYSTEM 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="Clean">Si True, toutes les données en base concernant l'élément sont supprimés</param>
+            <returns>Identifiant de la tache asynchrone si l'appel a réussi, sinon une chaine vide</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.RoomList">
+            <summary>
+            Renvois une liste des salles de l'ESC
+            Utilisateur SYSTEM 
+            </summary>
+            <returns>Liste des salles de l'ESC, de type <see cref="T:PAC.Coffre.Classe.SalleEsc"/> si l'appel a réussi, sinon null</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.RoomLock(System.String)">
+            <summary>
+            Verouille une salle
+            Utilisateur SYSTEM 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.RoomReturn(System.String)">
+            <summary>
+            Renvois toute les données d'une salle, incluant toutes les meta-données. Il s'agit d'une tâche asynchrone
+            Utilisateur SYSTEM 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <returns>Identifiant de la tâche asynchrone si l'appel a réussi, sinon une chaine vide</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.RoomRightAdd(System.String,System.String)">
+            <summary>
+            Ajoute un droit sur une salle pour un utilisateur
+            Utilisateur SYSTEM ADMIN
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="UserId">Identifiant de l'utilisateur</param>
+            <returns>Identifiant du droit ajouté si l'appel a réussi, sinon une chaine vide</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.RoomUnlock(System.String)">
+            <summary>
+            Deverouille une salle
+            Utilisateur SYSTEM 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.SafeCertificateChange(System.String,System.String,System.IO.FileInfo)">
+            <summary>
+            Remplace ou installe le certificat du coffre
+            Utilisateur ADMIN 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <param name="Body">FileInfo contenant le nouveau certificat</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.SafeCheck(System.String,System.String)">
+            <summary>
+            Vérifie l'intégrité d'une salle et des documents qu'elle contient. Il s'agit d'une tâche asynchrone
+            Utilisateur ADMIN GEST
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <returns>Identifiant de la tâche asynchrone si l'appel a réussi, sinon une chaine vide</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.SafeCreate(System.String,System.IO.FileInfo,System.String)">
+            <summary>
+            Permet de créer un coffre dans l'Esc
+            Utilisateur ADMIN 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="Body">FileInfo contenant le certificat pour le nouveau coffre</param>
+            <param name="Label">Le libellé du coffre</param>
+            <returns>Identifiant du coffre créé si l'appel a réussi sinon une chaine vide</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.SafeDelete(System.String,System.String,System.Boolean)">
+            <summary>
+            Détruit un coffre et toute les archives/ucs contenues dans celui ci. Certaines méta-données sont conservées en base.
+            il s'agit d'une tâche asynchrone
+            Utilisateur SYSTEM 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <param name="Clean">Si true, toutes les données concernant l'élément sont supprimés aussi</param>
+            <returns>Identifiant de la tâche asynchrone si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.SafeList(System.String)">
+            <summary>
+            Renvoie une liste des coffres d'une salle
+            Utilisateur SYSTEM ADMIN 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <returns>Liste de type <see cref="T:PAC.Coffre.Classe.CoffreEsc"/> contenu dans la salle si l'appel a réussi, sinon null</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.SafeLock(System.String,System.String)">
+            <summary>
+            Verrouille un coffre
+            Utilisateur ADMIN 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.SafeReturn(System.String,System.String)">
+            <summary>
+            Renvois tout le contenus d'un coffre, incluant toute les meta-informations. Il s'agit d'une tâche asynchrone
+            Utilisateur ADMIN 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <returns>Identifiant de la tâche asynchrone.</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.SafeRightAdd(System.String,System.String,System.String)">
+            <summary>
+            Ajoute un droit sur un coffre pour l'utilisateur fournis
+            Utilisateur ADMIN 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <param name="UserId">Identifiant de l'utilisateur</param>
+            <returns>L'identifiant du droit ajouté</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.SafeUnlock(System.String,System.String)">
+            <summary>
+            Deverrouille un coffre
+            Utilisateur ADMIN 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.SessionClose">
+            <summary>
+            Ferme une session de l'Esc
+            </summary>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.SessionOpen">
+            <summary>
+            Ouvre une cession sur l'Esc
+            </summary>
+            <returns>Renvoie un tableau contenant l'identifiant de la session et de l'utilisateur</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.Status">
+            <summary>
+            Fournis des informations sur l'ESC concerné, utilisateur SYSTEM
+            Utilisateur SYSTEM 
+            </summary>
+            <returns>Objet <see cref="T:PAC.Coffre.Classe.StatusEsc"/> contenant les informations de l'ESC</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.StatusNode">
+            <summary>
+            Cette commande fournis quelques informations sur le Noeud contacté et l'etat de ses liens avec l'ESC
+            Utilisateur SYSTEM 
+            </summary>
+            <returns>Objet <see cref="T:PAC.Coffre.Classe.StatusNodeEsc"/> avec les informations concernées</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.UcsArchiveDelete(System.String,System.String,System.String)">
+            <summary>
+            Détruit une archive membre d'un UCS. Si c'est une archive satellite de l'UCS seule celle ci est détruite, si c'est l'archive principale, toute les archives de l'UCS sont supprimées.
+            Utilisateur GEST 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <param name="ArchiveId">Identifiant de l'archive</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.UcsCheck(System.String,System.String,System.String)">
+            <summary>
+            Vérifie l'integrité de l'UCS et des archives le composant. Il s'agit d'une tâche asynchrone
+            Utilisateur GEST 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <param name="UcsId">Identifiant de l'Ecs</param>
+            <returns>Renvoie l'identifiant de la tâche asynchrone</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.UcsList(System.String,System.String,System.Int32)">
+            <summary>
+            Liste les Ucs d'un coffre
+            Utilisateur GEST 
+            </summary>
+            <param name="RoomId">Identifiant de la salle</param>
+            <param name="SafeId">Identifiant du coffre</param>
+            <param name="Page">Page de résultat à afficher</param>
+            <returns>Liste de type <see cref="T:PAC.Coffre.Classe.ArchiveEsc"/> contenant les archives </returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.UserAdd(System.String,System.String,System.IO.FileInfo)">
+            <summary>
+            Permet l'ajout d'un nouvel utilisateur
+            Utilisateur ADMIN 
+            </summary>
+            <param name="Type">Le type de l'utilisateur : GEST ou LECT</param>
+            <param name="Nom">Nom complet de l'utilisateur</param>
+            <param name="Body">FileInfo contenant le certificat avec lequel l'utilisateur va s'authentifier</param>
+            <returns>Identifiant de l'utilisateur ajouté</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.UserAddAdmin(System.String,System.IO.FileInfo)">
+            <summary>
+            Permet l'ajout d'un nouvel utilisateur ADMIN
+            Utilisateur SYSTEM 
+            </summary>
+            <param name="Nom">Nom complet de l'utilisateur</param>
+            <param name="Body">FileInfo contenant le certificat avec lequel l'utilisateur va s'authentifier</param>
+            <returns></returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.UserAddSystem(System.String,System.IO.FileInfo)">
+            <summary>
+            Permet l'ajout d'un nouvel utilisateur SYSTEM
+            Utilisateur SYSTEM 
+            </summary>
+            <param name="Nom">Nom complet de l'utilisateur</param>
+            <param name="Body">FileInfo contenant le certificat avec lequel l'utilisateur va s'authentifier</param>
+            <returns>Renvoie l'identifiant de l'utilisateur ajouté</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.UserCertificateChange(System.IO.FileInfo)">
+            <summary>
+            Remplace le certificat avec lequel cet utilisateur est enregistré
+            Utilisateur SYSTEM ADMIN  GEST LECT
+            </summary>
+            <param name="Body">FileInfo contenant les informations du certificat</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.UserDelete(System.String)">
+            <summary>
+            Supprime un utilisateur GEST ou LECT ayant des droits sur les salles gérées par l'ADMIN
+            Utilisateur ADMIN 
+            </summary>
+            <param name="UserId">Identifiant de l'utilisateur à supprimer</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.UserDeleteAdmin(System.String)">
+            <summary>
+            Supprime un utilisateur ADMIN
+            Utilisateur SYSTEM 
+            </summary>
+            <param name="UserId">Identifiant de l'utilisateur</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.UserDeleteSystem(System.String)">
+            <summary>
+            Supprime un utilisateur SYSTEM
+            Utilisateur SYSTEM 
+            </summary>
+            <param name="UserId">Identifiant de l'utilisateur</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.UserList(System.Int32)">
+            <summary>
+            Renvoie la liste des utilisateur sur un Esc
+            Utilisateur SYSTEM ADMIN 
+            </summary>
+            <param name="Page">N° de la page à afficher</param>
+            <returns>Liste des utilisateurs, de type <see cref="T:PAC.Coffre.Classe.UtilisateurEsc"/></returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.UserRightDelete(System.String,System.String)">
+            <summary>
+            Retire le droit du périmètre de l'utilisateur
+            Utilisateur SYSTEM ADMIN 
+            </summary>
+            <param name="UserId">Identifiant de l'utilisateur</param>
+            <param name="RightId">Identifiant du droit à supprimer</param>
+            <returns>Renvoie true si l'appel a réussi, sinon false</returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.UserRightList(System.Boolean)">
+            <summary>
+            Renvoie les droits de l'utilisateur
+            </summary>
+            <param name="Inactive">True pour renvoyer les droits inactifs, sinon false</param>
+            <returns>Liste du périmètre des utilisateurs, de type <see cref="T:PAC.Coffre.Classe.PerimetreEsc"/></returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.UserRightListAdmin(System.String,System.Boolean)">
+            <summary>
+            Renvois les droits de l'utilisateur demandé, uniquement partageant des éléments communs avec l'admin
+            Utilisateur ADMIN 
+            </summary>
+            <param name="UserId">Identifiant de l'utilisateur</param>
+            <param name="Inactive">True pour renvoyer les droits inactifs, sinon false</param>
+            <returns>Liste du périmètre des utilisateurs, de type <see cref="T:PAC.Coffre.Classe.PerimetreEsc"/></returns>
+        </member>
+        <member name="M:PAC.Coffre.EscClient.UserRightListSystem(System.String,System.Boolean)">
+            <summary>
+            Renvois les droits de l'utilisateur demandé
+            Utilisateur SYSTEM 
+            </summary>
+            <param name="UserId">Identifiant de l'utilisateur</param>
+            <param name="Inactive">True pour renvoyer les droits inactif, sinon False</param>
+            <returns>Liste du périmètre des utilisateurs, de type <see cref="T:PAC.Coffre.Classe.PerimetreEsc"/></returns>
+        </member>
+        <member name="M:PAC.Coffre.Utilitaire.PemToPfx(System.Text.StringBuilder)">
+            <summary>
+            Converti le certificat
+            </summary>
+            <param name="pemString">Certificat</param>
+            <returns></returns>
+        </member>
+        <member name="M:PAC.Coffre.Utilitaire.LireBodyFichier(System.String,RestSharp.RestClient,RestSharp.RestRequest)">
+            <summary>
+            Decodage d'un fichier
+            </summary>
+            <param name="FileName">Nom du fichier</param>
+            <param name="Client">Client Rest</param>
+            <param name="RequestArchive">Requete</param>
+            <returns></returns>
+        </member>
+        <member name="M:PAC.Coffre.Utilitaire.LireBodyFichierArchiveGet(System.String,RestSharp.RestClient,RestSharp.RestRequest)">
+            <summary>
+            Decodage d'un fichier
+            </summary>
+            <param name="FileName">Nom du fichier</param>
+            <param name="Client">Client Rest</param>
+            <param name="RequestArchive">Requete</param>
+            <returns>Nom du fichier qui a été téléchargé</returns>
+        </member>
+    </members>
+</doc>

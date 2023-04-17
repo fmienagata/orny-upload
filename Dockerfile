@@ -24,7 +24,7 @@ ADD ./bin/root/.scripts /root/.scripts
 RUN add-apt-repository universe
 RUN apt -y update
 RUN apt -y install lsb-release ca-certificates apt-transport-https software-properties-common \
-    apache2-bin apache2-utils apache2
+    apache2-bin apache2-utils apache2 default-jre
 RUN apt -y install nano hostname wget unzip zip git net-tools openssl sudo systemd supervisor \
     clamav clamav-daemon tree
 # Gitflow installer
@@ -65,7 +65,7 @@ RUN chmod 755 /usr/local/bin/composer
 RUN cp -ps /usr/local/bin/composer /bin/composer
 ENV PATH="/usr/local/bin/composer:${PATH}"
 
-RUN  apt-get -y install nano hostname wget unzip zip git net-tools openssl sudo systemd supervisor \
+RUN  apt-get -y install nano hostname wget unzip zip git net-tools sudo systemd supervisor \
     clamav clamav-daemon tree
 
 
@@ -80,6 +80,7 @@ RUN mkdir -p /run/php-fpm/ && mkdir -p /run/supervisor && chown -R www-data:www-
 RUN sed -E -i -e 's/logfile=\/var\/log\/supervisor\/supervisord.log(.*)$/logfile=\/data\/logs\/supervisord.log \1/g' /etc/supervisor/supervisord.conf
 
 RUN sed -E -i -e 's/memory_limit = 128M(.*)$/memory_limit = 4096M \1/g' /etc/php/8.2/cli/php.ini
+RUN sed -E -i -e 's/;ffi.enable=preload(.*)$/ffi.enable="false" \1/g' /etc/php/8.2/cli/php.ini
 
 RUN sed -E -i -e 's/<Directory \/var\/www\/>(.*)$/<Directory \/data\/sites\/> \1/g' /etc/apache2/apache2.conf
 
@@ -91,6 +92,12 @@ RUN systemctl enable mongod
 RUN systemctl enable clamav-daemon
 RUN freshclam
 RUN systemctl enable clamav-freshclam
+
+RUN rm -f /lib/systemd/system/systemd*udev* \
+  && rm -f /lib/systemd/system/getty.target
+
+VOLUME ["/sys/fs/cgroup", "/tmp", "/run"]
+CMD ["/lib/systemd/systemd"]
 
 EXPOSE 22
 

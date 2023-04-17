@@ -1,0 +1,23 @@
+<config xmlns="http://dps.docapost.com/esc/xml/config">
+	<httpsSslCertificate>
+		<![CDATA[
+		data
+		]]>
+	</httpsSslCertificate>
+	<esc name="unEsc">
+		<connector name="mysql">
+			<hostname>l'ip du serveur</hostname>
+			<port>le port</port>
+			<user>l'user</user>
+			<password>Son mot de passe</password>
+		</connector>
+	</esc>
+	<esc name="unAutreEsc">
+		<connector name="mysql">
+			<hostname>l'ip du serveur</hostname>
+			<port>le port</port>
+			<user>l'user</user>
+			<password>Son mot de passe</password>
+		</connector>
+	</esc>
+</config>

@@ -1,0 +1,3 @@
+CREATE USER 'escClient'@'%' IDENTIFIED BY 'escClient1234';
+GRANT ALL PRIVILEGES ON *.* TO 'escClient'@'%';
+FLUSH PRIVILEGES;

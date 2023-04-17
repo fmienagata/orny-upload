@@ -14,6 +14,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use UploadBundle\Document\DocumentFile;
 use UploadBundle\Form\Type\DocumentFileType;
 use UploadBundle\Manager\AntivirusManager;
+use UploadBundle\Manager\SafeDepositBoxManager;
 use UploadBundle\Manager\UploadManager;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -26,7 +27,8 @@ class DocumentFileController extends AbstractController
     public function __construct(
         private UploadManager $uploadManager,
         private DocumentFileRepository $repository,
-        private AntivirusManager $antivirusManager
+        private AntivirusManager $antivirusManager,
+        private SafeDepositBoxManager $safeDepositBoxManager
     ) {}
 
     #[Route(
@@ -68,12 +70,30 @@ class DocumentFileController extends AbstractController
         }
 
         //scan antivirus
-        if (($scanVirus = $this->antivirusManager->isFileSafe($file, true)) !== true) {
+        if (($scanVirus = $this->antivirusManager->isFileSafe($file, true)) !== true) {dump($scanVirus);
             return $scanVirus;
         }
 
+        //Check pdf and covert to pdf if needed
+        $isPdf = false;
         if ($scanVirus) {
+            $isPdf = true;
+        }
 
+        if (!isset($data['esc'])) {
+            $error = new HttpException("The safe-deposit box must be set, please check your request datas.");
+
+            return $this->json([
+                'code' => $error->getCode(),
+                'message' => $error->getMessage(),
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        //Send document to the safe-deposit box ESC
+        if ($isPdf) {
+            $this->safeDepositBoxManager->setUrlEsc($data['esc']);
+            $this->safeDepositBoxManager->setCertificate($data['esc']['certificate']);dump($this->safeDepositBoxManager);dump($this->safeDepositBoxManager);
+            $escResponse = $this->safeDepositBoxManager->sendDocument($data);
         }
 
         // this condition is needed because the 'brochure' field is not required

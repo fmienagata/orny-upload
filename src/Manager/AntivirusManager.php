@@ -44,6 +44,17 @@ class AntivirusManager
             if ($removeUnsafe) {
                 unlink($file->getRealPath());
             }
+
+            $tabError = explode('n', $process->getOutput());
+
+            return new Response(
+                json_encode([
+                    'code' => $process->getExitCode(),
+                    'message' => str_replace('\\n', '', explode('<br />', nl2br(trim($process->getOutput())))),
+                ]),
+                Response::HTTP_BAD_REQUEST,
+                ['content-type' => 'application/json']
+            );
         }
 
         return $process->isSuccessful();

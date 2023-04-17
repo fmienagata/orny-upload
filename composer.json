@@ -1,7 +1,6 @@
 {
   "name": "docaposte/uploadbundle",
   "description": "Upload file bundle in safe-deposit box",
-  "minimum-stability": "stable",
   "license": "proprietary",
   "authors": [
     {

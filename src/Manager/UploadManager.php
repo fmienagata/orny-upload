@@ -102,6 +102,20 @@ class UploadManager
     /**
      * @param File $file
      *
+     * @return bool|File
+     */
+    public function isPdf(File $file) : bool|File
+    {
+        if ($file->getExtension() !== 'pdf') {
+
+        }
+
+        return true;
+    }
+
+    /**
+     * @param File $file
+     *
      * @return bool|array
      */
     public function scanVirus(File $file) : bool|array

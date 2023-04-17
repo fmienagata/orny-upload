@@ -30,13 +30,12 @@ services:
     tty: true
     networks:
       nginx-proxy:
+        ipv4_address: 172.22.0.20
     command: ["sh", "-c", "
         /usr/sbin/init;
         /usr/bin/redis-server /etc/redis/redis.conf --daemonize yes;
         /usr/bin/supervisord -c /etc/supervisor/supervisord.conf;
-        /etc/init.d/clamav-daemon start;
         /usr/sbin/usermod -s /bin/bash www-data;
-        /usr/bin/mv -f /etc/php/8.2/apache2/conf.d/15-psr.ini /etc/php/8.2/apache2/conf.d/15-psr.ini.disable;
         /usr/bin/mv -f /etc/php/8.2/apache2/conf.d/20-xdebug.ini /etc/php/8.2/apache2/conf.d/20-xdebug.ini.disable;
         /usr/bin/chown -R www-data:www-data /data/sites;
         /usr/bin/chmod -R 777 /data/sites/api/var;
@@ -47,15 +46,87 @@ services:
         /usr/sbin/a2dissite 000-default;
         /usr/sbin/service apache2 reload;
         /usr/bin/mongod -f /etc/mongod.conf --bind_ip 127.0.0.1 --fork;
-        /usr/sbin/apachectl -D FOREGROUND;
-        /bin/bash;
-        /usr/bin/cp -R /data/sites/api/src/Resources/* /data/temp;
         /etc/init.d/clamav-daemon restart;
+        /usr/sbin/service apache2 restart;
+        /bin/bash;
       "
     ]
-
+  esc283:
+    privileged: true
+    image: docaposte/ubuntu20-esc:4.1.0
+    build:
+      context: .
+      dockerfile: ./esc.Dockerfile
+      args:
+        ESC_NAME: ESCNODE_410
+        ESC_VERSION: 4.1.0
+        ESC_MYSQL_USER: escClient
+        ESC_MYSQL_PASSWORD: escClient1234
+    container_name: ESCNODE-410
+    environment:
+      ESC_NAME: ESCNODE_410
+      ESC_VERSION: 4.1.0
+      MYSQL_HOST: localhost
+      MYSQL_PORT: 3306
+      MARIADB_ROOT_USER: escClient
+      MARIADB_ROOT_PASSWORD: escClient1234
+      ESC_MYSQL_USER: escClient
+      ESC_MYSQL_PASSWORD: escClient1234
+      SSL_CERTIFICAT_SYSTEM_PEM: /home/escnode/generationsCertificats/finalSystem/sslSysteme.pem
+      CERTIFICATE_SYSTEM: /home/escnode/generationsCertificats/finalSystem/sslSysteme.pem
+      JAVA_HOME: /usr/lib/jvm/java-1.8.0-openjdk-amd64
+      ESC_LOG_DIR: /data/logs/esc
+    ports:
+      - 12803:10443
+      - 12080:80
+      - 12443:443
+      - 12306:3306
+    restart: unless-stopped
+    expose:
+      - 80
+      - 443
+      - 3306
+      - 10443
+    hostname: safe-box-esc-local.demat.lan
+    volumes:
+      - escnodedata:/home
+      - databasedata:/var/lib/mysql
+      - ./bin/install_escnode.sh:/home/escnode/esc/install_escnode.sh
+      - ./config/esc/config.xml:/home/escnode/esc/config.xml
+      - ./config/esc/certificats:/home/escnode/generationsCertificats
+      - ./config/apache/apache2.conf:/etc/apache2/apache2.conf
+      - ./config/apache/php.ini:/etc/php.ini
+      - .:/app:cached
+    tty: true
+    networks:
+      nginx-proxy:
+        ipv4_address: 172.22.0.21
+    user: escnode:escnode
+    working_dir: /home/escnode
+    command: [ "sh", "-c", "
+        sudo -u root bash -c '/usr/sbin/service mysql start';
+        sudo -u root bash -c '/usr/sbin/service apache2 start';
+        sudo -u root bash -c 'mysql -e \"drop database if exists ESCNODE_410\"';
+        sudo -u root bash -c 'mysql -e \"GRANT ALL PRIVILEGES ON *.* TO 'escClient'@'localhost' IDENTIFIED BY 'escClient1234' WITH GRANT OPTION\"';
+        /home/escnode/esc/install_escnode.sh;
+      "
+    ]
+    #sudo -u root bash -c '/usr/sbin/init';
+    #sudo -u root bash -c '/etc/init.d/clamav-daemon start';
+    #        sudo -u root bash -c '/usr/sbin/service mysql start';
+    #        sudo -u root bash -c '/usr/sbin/service apache2 start';
+    #        sudo -u root bash -c '/etc/init.d/clamav-daemon start';
+    #sudo chown -R escnode:escnode /home/escnode;
+    #/home/escnode/esc/install_escnode.sh;
+    #update-java-alternatives -s java-1.8.0-openjdk-amd64;
+    #runuser -l escnode -c '/home/escnode/esc/install_esc.sh';
+    #sudo -u root bash -c 'mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'escClient'@'localhost' IDENTIFIED BY 'escnode1234' WITH GRANT OPTION"';
 volumes:
   uploaddata:
+    driver: local
+  escnodedata:
+    driver: local
+  databasedata:
     driver: local
 
 networks:
