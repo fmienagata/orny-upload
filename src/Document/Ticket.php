@@ -57,8 +57,7 @@ class Ticket
 
     #[MongoDB\Field(type:"string")]
     #[Groups(["tickets" =>"read", "tickets" => "write"])]
-    #[Assert\NotBlank()]
-    protected string $associatedDocument;
+    protected ?string $associatedDocument;
 
     #[MongoDB\Field(type:"string")]
     #[Groups(["tickets" =>"read", "tickets" => "write"])]
@@ -74,8 +73,7 @@ class Ticket
 
     #[Mongodb\Field(type: "int")]
     #[Groups(["tickets:read", "tickets:write"])]
-    #[Assert\NotBlank()]
-    protected int $pages;
+    protected ?int $pages;
 
     #[Mongodb\Field(type: "bool")]
     #[Groups(["tickets:read", "tickets:write"])]
@@ -152,19 +150,19 @@ class Ticket
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getAssociatedDocument(): string
+    public function getAssociatedDocument(): ?string
     {
         return $this->associatedDocument;
     }
 
     /**
-     * @param string $associatedDocument
+     * @param string|null $associatedDocument
      *
      * @return $this
      */
-    public function setAssociatedDocument(string $associatedDocument): self
+    public function setAssociatedDocument(?string $associatedDocument): self
     {
         $this->associatedDocument = $associatedDocument;
 
@@ -232,19 +230,19 @@ class Ticket
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getPages(): int
+    public function getPages(): ?int
     {
         return $this->pages;
     }
 
     /**
-     * @param int $pages
+     * @param int|null $pages
      *
      * @return $this
      */
-    public function setPages(int $pages): self
+    public function setPages(?int $pages): self
     {
         $this->pages = $pages;
 

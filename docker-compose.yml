@@ -22,6 +22,7 @@ services:
       - 443
     volumes:
       - uploaddata:/data
+      #- nfs-upload:/mnt/nfs-upload
       - ./:/data/sites/api
       - ./config/apache/api.conf:/etc/apache2/sites-available/api.conf
       - ./config/apache/apache2.conf:/etc/apache2/apache2.conf
@@ -36,7 +37,6 @@ services:
         /usr/bin/redis-server /etc/redis/redis.conf --daemonize yes;
         /usr/bin/supervisord -c /etc/supervisor/supervisord.conf;
         /usr/sbin/usermod -s /bin/bash www-data;
-        /usr/bin/mv -f /etc/php/8.2/apache2/conf.d/20-xdebug.ini /etc/php/8.2/apache2/conf.d/20-xdebug.ini.disable;
         /usr/bin/chown -R www-data:www-data /data/sites;
         /usr/bin/chmod -R 777 /data/sites/api/var;
         /usr/bin/chmod -R 777 /data/logs;
@@ -51,6 +51,7 @@ services:
         /bin/bash;
       "
     ]
+    #/usr/bin/mv -f /etc/php/8.2/apache2/conf.d/20-xdebug.ini /etc/php/8.2/apache2/conf.d/20-xdebug.ini.disable;
   esc283:
     privileged: true
     image: docaposte/ubuntu20-esc:4.1.0
@@ -107,7 +108,7 @@ services:
         sudo -u root bash -c '/usr/sbin/service mysql start';
         sudo -u root bash -c '/usr/sbin/service apache2 start';
         sudo -u root bash -c 'mysql -e \"drop database if exists ESCNODE_410\"';
-        sudo -u root bash -c 'mysql -e \"GRANT ALL PRIVILEGES ON *.* TO 'escClient'@'localhost' IDENTIFIED BY 'escClient1234' WITH GRANT OPTION\"';
+        sudo -u root bash -c 'mysql -e \"GRANT ALL PRIVILEGES ON *.* TO 'escClient'@'localhost';\"';
         /home/escnode/esc/install_escnode.sh;
       "
     ]
@@ -128,7 +129,12 @@ volumes:
     driver: local
   databasedata:
     driver: local
-
+  #nfs-upload:
+  #  driver: local
+  #  driver_opts:
+  #    type: "nfs"
+  #    o: "addr=127.0.0.1,nolock,soft,rw"
+  #    device: ":/data/upload"
 networks:
   nginx-proxy:
     name: nginx-proxy

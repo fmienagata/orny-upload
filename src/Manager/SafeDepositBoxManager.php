@@ -12,6 +12,10 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
+/**
+ * Archive GET : /EscBO2/764265cb4b5c4682a77ecae8209a31ac/468a2dbad8854f149fc4236f7d864e17/archiveGet
+ * Archive POST : /EscBO2/764265cb4b5c4682a77ecae8209a31ac/ed66215af90c4f77b90c0e254879272e/archivePutNoControl
+ */
 class SafeDepositBoxManager
 {
     public function __construct(
@@ -46,6 +50,7 @@ class SafeDepositBoxManager
         $options = [
             'verify_peer' => $verifypeer,
             'verify_host' =>  $verifypeer,
+            'http_version' => '1.1',
         ];
         if (isset($data['version'])) {
             $options['query']['version'] = $data['version'];
@@ -54,7 +59,9 @@ class SafeDepositBoxManager
             $filesystem = new Filesystem();
             $folder = sprintf('%s/%s', $this->parameterBag->get('kernel.cache_dir'), $data['customerCode']);
             $certificateFile = sprintf('%s/certificate.pem', $folder);
-            $pfx = sprintf('%s/certificate.pfx', $folder);
+            $certificateFile000041 = sprintf('%s/certificate000041.pem', $folder);
+
+            /*$pfx = sprintf('%s/certificate.pfx', $folder);
             $jks = sprintf('%s/certificate.jks', $folder);
             $p12 = sprintf('%s/certificate.p12', $folder);
             $filesystem->mkdir($folder);
@@ -82,107 +89,16 @@ class SafeDepositBoxManager
                 'keytool -importkeystore -srckeystore %s -srcstoretype pkcs12 -destkeystore %s -keypasswd "doca"',
                 $p12,
                 $jks
-            ));
-            /*$options['local_cert'] = $certificateFile;
-            $options['local_pk'] = $certificateFile;*/
-            $options['http_version'] = 1.1;
-
+            ));*/
+            $options['local_cert'] = $certificateFile000041;
+            $options['local_pk'] = $certificateFile000041;
         }
-        $options['body'] = base64_encode(file_get_contents('/data/sites/api/src/Resources/pdf/1679585281772_Guide_Usage_Keepass_12.pdf'));
-        //dump($options);
-
-        $result = exec("/data/sites/api/bin/curl7.19.7 -V 2>&1", $output, $return_var);dump($result);
-
-        $result = exec(sprintf(
-            'JVMARGS="$JVMARGS -Djavax.net.debug=ssl,handshake" && \
-            JVMARGS="$JVMARGS -Djavax.net.ssl.keyStore=%s -Djavax.net.ssl.keyStorePassword=doca" && \
-            java -jar /data/sites/api/bin/jcurl-v1.1.1.jar -e hc https://192.168.186.75:4010/EscBO2/sessionOpen 2>&1',
-                $jks
-            ),
-            $output,
-            $return_var
-        );dump($result);
-
-        /**
-         *
-         *
-        $ffi = FFI::cdef(
-            'unsigned long GetCurrentProcessId(void);',
-            "C:\\windows\\system32\\kernel32.dll"
-        );
-        var_dump($ffi->GetCurrentProcessId());
-         *
-
-        $ffi = \FFI::load(
-            "/data/sites/api/bin/PAC.Coffre.1.1.0/PAC.Coffre.dll"
-        );
-         *
-        */
-
-        $result = exec(sprintf(
-            "/data/sites/api/bin/curl7.19.7 --location --request POST 'https://192.168.186.75:4010/EscBO2/sessionOpen' --tlsv1.2 --cert %s 2>&1",
-            $certificateFile
-        ), $output, $return_var);dump($result);
-
-        $ch = curl_init();
-        try {
-            curl_setopt($ch, CURLOPT_URL, "https://192.168.186.75:4010/EscBO2/sessionOpen");
-            curl_setopt($ch, CURLOPT_HEADER, false);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_MAXREDIRS, 1);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
-            curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS | CURLPROTO_HTTP);
-            curl_setopt($ch, CURLOPT_REDIR_PROTOCOLS, CURLPROTO_HTTPS);
-            curl_setopt($ch, CURLOPT_SSLVERSION, 3);
-            curl_setopt($ch, CURLOPT_CAINFO, $certificateFile);
-            curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2TLS);
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-            curl_setopt($ch, CURLOPT_SSL_FALSESTART, true);
-            curl_setopt($ch, CURLOPT_SSL_OPTIONS,CURLSSLOPT_ALLOW_BEAST);
-            curl_setopt($ch, CURLOPT_USE_SSL, CURLUSESSL_ALL);
-
-            $response = curl_exec($ch);dump($response);
-
-            if (curl_errno($ch)) {
-                return curl_error($ch);
-            }
-
-            $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            if($http_code == intval(200)){
-                return $response;
-            }
-            else{
-                return "Ressource introuvable : " . $http_code;
-            }
-        } catch (\Throwable $th) {
-            throw $th;
-        } finally {
-            curl_close($ch);
-        }
-
-
-        $guzzleClient = new Client();
-        $responseGuzzle = $guzzleClient->request(
-            'POST',
-            'https://192.168.186.75:4010/EscBO2/sessionOpen',
-            [
-                'cert' => [$certificateFile, $certificateFile]
-            ]
-        );
-       dump($responseGuzzle);
-        $client = new CurlHttpClient();
-        $response = $client->request('POST',
-            'https://192.168.186.75:4010/EscBO2/sessionOpen',
-            $options);
-        $statusCode = $response->getStatusCode();
+        //$options['body'] = base64_encode(file_get_contents('/data/sites/api/src/Resources/pdf/1679585281772_Guide_Usage_Keepass_12.pdf'));
 
         $response = $this->client->request(
             'POST',
-            $this->getUrlEsc(),
+            //$this->getUrlEsc(),
+            'https://192.168.186.75:4010/EscBO2/sessionOpen',
             $options
         );
 

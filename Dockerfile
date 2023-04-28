@@ -87,11 +87,25 @@ RUN sed -E -i -e 's/<Directory \/var\/www\/>(.*)$/<Directory \/data\/sites\/> \1
 RUN mkdir -p /var/run/clamav/ && chmod -R 755 /var/run/clamav && touch /var/lib/clamav/clamd.sock && \
     chown clamav:clamav /var/lib/clamav/clamd.sock
 
+# install nfs
+RUN apt -y install nfs-kernel-server nfs-common ufw
+
+RUN mkdir -p /data/upload && mkdir -p /data/temp && chown -R www-data:www-data /data/upload && \
+    chown -R www-data:www-data /data/temp && mkdir /mnt/my_shares && chown nobody:nogroup /mnt/my_shares && \
+    chmod -R 777 /mnt/my_shares
+
+RUN echo '#' >> /etc/exports
+RUN echo '/mnt/my_shares 172.22.0.0/32(rw,sync,no_subtree_check)' >> /etc/exports
+
+#RUN exportfs -a
+RUN ufw allow from 172.22.0.0/32 to any port nfs
+
 RUN systemctl enable apache2
 RUN systemctl enable mongod
 RUN systemctl enable clamav-daemon
 RUN freshclam
 RUN systemctl enable clamav-freshclam
+RUN systemctl enable nfs-server
 
 RUN rm -f /lib/systemd/system/systemd*udev* \
   && rm -f /lib/systemd/system/getty.target

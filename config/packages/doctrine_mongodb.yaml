@@ -17,6 +17,7 @@ doctrine_mongodb:
                     prefix: 'UploadBundle\Document'
                     alias: UploadBundle
 
+
 when@prod:
     doctrine_mongodb:
         auto_generate_proxy_classes: false

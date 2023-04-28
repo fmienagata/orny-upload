@@ -53,7 +53,7 @@ class UploadManager
      */
     public function checkFile(string $fileName = '', string $folder = '', string $extension = '')
     {
-        
+        dump($fileName, $folder);
         if (!empty($fileName) && !empty($extension)) {
             $folder = sprintf('%s/%s', $folder, $extension);
         } elseif (!empty($fileName) && empty($extension)) {
@@ -65,7 +65,7 @@ class UploadManager
         if (!file_exists(sprintf('%s/%s', $folder, $fileName)) || empty($fileName)) {
             $error = new \RuntimeException(
                 sprintf("File '%s' was not found", $fileName)
-            );
+            );dump($fileName, $error);
 
             return $this->JsonResponse($error);
         }

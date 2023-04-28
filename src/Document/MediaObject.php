@@ -63,7 +63,7 @@ class MediaObject
     private string $id;
 
     #[ApiProperty(types: ['https://schema.org/contentUrl'])]
-    #[Groups(['media_objects:read'])]
+    #[Groups(['media_objects:read', "document_files" =>"read"])]
     public ?string $contentUrl = null;
 
     #[Vich\UploadableField(mapping: "media_object", fileNameProperty: "filePath")]
@@ -71,19 +71,19 @@ class MediaObject
     public ?\Symfony\Component\HttpFoundation\File\File $file = null;
 
     #[MongoDB\Field(type:"string")]
-    #[Groups(["media_objects" =>"read", "media_object_create"])]
+    #[Groups(["media_objects" =>"read", "media_object_create", "document_files" =>"read"])]
     public ?string $filePath = null;
 
     #[Assert\NotBlank()]
     #[Gedmo\Timestampable(on: "create")]
     #[MongoDB\Field(type: 'date')]
-    #[Groups(["media_objects:read"])]
+    #[Groups(["media_objects:read", "document_files" =>"read"])]
     protected $createdAt;
 
     #[Assert\NotBlank()]
     #[Gedmo\Timestampable(on: "update", field: "updatedAt")]
     #[MongoDB\Field(type: 'date')]
-    #[Groups(["media_objects:read"])]
+    #[Groups(["media_objects:read", "document_files" =>"read"])]
     protected $updatedAt;
 
     public function getId(): ?string

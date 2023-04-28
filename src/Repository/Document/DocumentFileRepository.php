@@ -6,6 +6,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Symfony\Component\HttpFoundation\File\File;
 use UploadBundle\Document\DocumentFile;
+use UploadBundle\Document\DocumentMetaData;
 
 #[\Attribute]
 class DocumentFileRepository extends DocumentRepository
@@ -51,6 +52,12 @@ class DocumentFileRepository extends DocumentRepository
         if (isset($data['metadata'])) {
             $this->documentFile->setChunkSize($data['metadata']['size']);
         }
+
+        if (isset($data['file']['path'])) {
+            $this->documentFile->getFile()->setFilePath($data['file']['path']);
+        }
+
+        $this->documentFile->setMetadata(new DocumentMetaData('application/pdf'));
 
         $this->dm->persist($this->documentFile);
         $this->dm->flush();

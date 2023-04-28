@@ -3,6 +3,7 @@
 namespace UploadBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,6 +38,7 @@ class DocumentFileController extends AbstractController
         methods: ['POST'],
         defaults: [
             '_api_resource_class' => DocumentFile::class,
+            '_api_operation_name' => '_upload_/document_files_post',
         ]
     )]
     public function Post(Request $request, SluggerInterface $slugger): Response
@@ -46,7 +48,10 @@ class DocumentFileController extends AbstractController
             return $response;
         }
 
-        $data = json_decode($request->getContent(), true);dump($data);
+        $data = \json_decode($request->getContent(), true);
+        if ($request->getContentTypeFormat() === 'form') {
+            $data = $request->request->all();
+        }
 
         //check the fileName parameter in the request data
         if ($response = $this->uploadManager->checkFileName($data)) {
@@ -55,7 +60,10 @@ class DocumentFileController extends AbstractController
 
         //check ticket
         if (!isset($data['ticketId'])) {
-            $error = new HttpException("The ticketId must be set, please check your request datas.");
+            $error = new HttpException(
+                Response::HTTP_BAD_REQUEST,
+                "The ticketId must be set, please check your request datas."
+            );
 
             return $this->json([
                 'code' => $error->getCode(),
@@ -64,16 +72,62 @@ class DocumentFileController extends AbstractController
         }
 
         //check file in temporary folder
+        if ($content = $request->get('fileContent')) {
+            // from scanner
+            $content = base64_decode($content);
+            $fhandle = fopen(sprintf(
+                '%s/%s',
+                $this->getParameter('upload.temporary_folder'),
+                $data['fileName']
+            ), 'w');
+            fwrite($fhandle, $content);
+            fclose($fhandle);
+            /**var File $file*/
+            $file = new File(
+                sprintf('%s/%s', $this->getParameter('upload.temporary_folder'), $data['fileName'])
+            );
+        } elseif ($request->files->count()) {
+            // from drag&drop
+            /**@var File $file*/
+            $file = $request->files->get('file');
+
+        } else {
+            $error = new BadRequestException('Empty data file found.');
+
+            return $this->json([
+                'code' => $error->getCode(),
+                'message' => $error->getMessage(),
+            ], Response::HTTP_BAD_REQUEST);
+        }
+        if (isset($data['fileExtension'])) {
+            $temporaryFolder = sprintf('%s/%s', $this->getParameter('upload.temporary_folder'), $data['fileExtension']);
+            if (!file_exists($temporaryFolder)) {
+                if (!mkdir($temporaryFolder, 0775, true) && !is_dir($temporaryFolder)) {
+                    $error = new \RuntimeException(sprintf('Directory "%s" was not created', $temporaryFolder));
+
+                    return $this->json([
+                        'code' => $error->getCode(),
+                        'message' => $error->getMessage(),
+                    ], Response::HTTP_BAD_REQUEST);
+                }
+            }
+        }
+        $file->move(sprintf(
+            '%s/%s',
+            $this->getParameter('upload.temporary_folder'),
+            $data['fileExtension']
+        ), $data['fileName']);
+
         $file = $this->uploadManager->checkFile($data['fileName'], $this->getParameter('upload.temporary_folder'));
         if (!$file instanceof UploadedFile) {
             return $file;
         }
 
         //scan antivirus
-        if (($scanVirus = $this->antivirusManager->isFileSafe($file, true)) !== true) {dump($scanVirus);
+        if (($scanVirus = $this->antivirusManager->isFileSafe($file, true)) !== true) {
             return $scanVirus;
         }
-
+dump($scanVirus);
         //Check pdf and covert to pdf if needed
         $isPdf = false;
         if ($scanVirus) {
@@ -92,22 +146,22 @@ class DocumentFileController extends AbstractController
         //Send document to the safe-deposit box ESC
         if ($isPdf) {
             $this->safeDepositBoxManager->setUrlEsc($data['esc']);
-            $this->safeDepositBoxManager->setCertificate($data['esc']['certificate']);dump($this->safeDepositBoxManager);dump($this->safeDepositBoxManager);
+            $this->safeDepositBoxManager->setCertificate($data['esc']['certificate']);
             $escResponse = $this->safeDepositBoxManager->sendDocument($data);
         }
 
         // this condition is needed because the 'brochure' field is not required
         // so the PDF file must be processed only when a file is uploaded
-        if ($file) {dump($file);
+        if ($file) {
             $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
             // this is needed to safely include the file name as part of the URL
-            $safeFilename = $slugger->slug($originalFilename);dump($safeFilename);
+            $safeFilename = $slugger->slug($originalFilename);
             $newFilename = sprintf(
                 '%s-%s.%s',
                 $safeFilename,
                 uniqid('', true),
                 $file->guessExtension()
-            );dump($newFilename);
+            );
 
             $data = $this->uploadManager->populateMedata($data, $file);
 
@@ -117,6 +171,18 @@ class DocumentFileController extends AbstractController
                     $this->getParameter('files_directory'),
                     $newFilename
                 );
+                $data['file']['path'] = sprintf(
+                    '%s/%s',
+                    $this->getParameter('files_directory'),
+                    $newFilename
+                );
+                $fileMoved = new UploadedFile(
+                    sprintf('%s/%s', $this->getParameter('files_directory'), $newFilename),
+                    $newFilename,
+                    null,
+                    null,
+                    true
+                );
             } catch (FileException $e) {
                 return $this->json([
                     'code' => $e->getCode(),
@@ -124,7 +190,7 @@ class DocumentFileController extends AbstractController
                 ], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
-            return $this->json($this->repository->saveDocumentFile($file, $data), Response::HTTP_CREATED);
+            return $this->json($this->repository->saveDocumentFile($fileMoved, $data), Response::HTTP_CREATED);
         }
 
         return $this->json([

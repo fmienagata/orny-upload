@@ -5,7 +5,6 @@ namespace UploadBundle\Serializer;
 use UploadBundle\Document\MediaObject;
 use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Vich\UploaderBundle\Storage\StorageInterface;
 
@@ -14,6 +13,10 @@ final class MediaObjectNormalizer implements ContextAwareNormalizerInterface, No
     use NormalizerAwareTrait;
 
     private const ALREADY_CALLED = 'MEDIA_OBJECT_NORMALIZER_ALREADY_CALLED';
+
+    public function __construct(private StorageInterface $storage)
+    {
+    }
 
     /**
      * @inheritDoc
@@ -37,10 +40,5 @@ final class MediaObjectNormalizer implements ContextAwareNormalizerInterface, No
         $object->contentUrl = $this->storage->resolveUri($object, 'file');
 
         return $this->normalizer->normalize($object, $format, $context);
-    }
-
-    public function setNormalizer(NormalizerInterface $normalizer)
-    {
-        // TODO: Implement setNormalizer() method.
     }
 }
