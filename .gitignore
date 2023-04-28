@@ -18,6 +18,8 @@
 !/config/esc/certificats/openssl.cnf
 
 /public/bundles/
+/public/media/*
+!/public/media/.gitkeep
 /var/cache/*
 !/var/cache/.gitignore
 /var/log/*
