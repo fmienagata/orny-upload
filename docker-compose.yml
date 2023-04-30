@@ -96,6 +96,7 @@ services:
       - ./config/esc/config.xml:/home/escnode/esc/config.xml
       - ./config/esc/certificats:/home/escnode/generationsCertificats
       - ./config/apache/apache2.conf:/etc/apache2/apache2.conf
+      - ./config/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf
       - ./config/apache/php.ini:/etc/php.ini
       - .:/app:cached
     tty: true
@@ -104,19 +105,24 @@ services:
         ipv4_address: 172.22.0.21
     user: escnode:escnode
     working_dir: /home/escnode
-    command: [ "sh", "-c", "
-        sudo -u root bash -c '/usr/sbin/service mysql start';
-        sudo -u root bash -c '/usr/sbin/service apache2 start';
-        sudo -u root bash -c 'mysql -e \"drop database if exists ESCNODE_410\"';
-        sudo -u root bash -c 'mysql -e \"GRANT ALL PRIVILEGES ON *.* TO 'escClient'@'localhost';\"';
-        /home/escnode/esc/install_escnode.sh;
-      "
-    ]
+    #command: [ "sh", "-c", "
+    #    sudo -u root bash -c '/usr/sbin/service mysql start';
+    #    sudo -u root bash -c 'mysql -e \"CREATE USER IF NOT EXISTS 'escClient'@'%' IDENTIFIED BY 'escClient1234';\";
+    #    sudo -u root bash -c 'mysql -e \"GRANT ALL PRIVILEGES ON *.* TO 'escClient'@'%';\";
+    #    sudo -u root bash -c 'chown -R www-data:www-data /var/www';
+    #    sudo -u root bash -c '/usr/sbin/service apache2 start';
+    #    sudo -u root bash -c '/etc/init.d/clamav-daemon start';
+    #  "
+    #]
+    #sudo -u root bash -c 'mysql -e \"drop database if exists ESCNODE_410\"';
     #sudo -u root bash -c '/usr/sbin/init';
-    #sudo -u root bash -c '/etc/init.d/clamav-daemon start';
+    #
     #        sudo -u root bash -c '/usr/sbin/service mysql start';
     #        sudo -u root bash -c '/usr/sbin/service apache2 start';
     #        sudo -u root bash -c '/etc/init.d/clamav-daemon start';
+    #sudo -u root bash -c 'mysql -e \"GRANT ALL PRIVILEGES ON *.* TO 'escClient'@'localhost';\"';
+    #sudo -u root bash -c '/usr/sbin/service apache2 stop';
+    #        sudo -u root bash -c '/usr/sbin/service apache2 start';
     #sudo chown -R escnode:escnode /home/escnode;
     #/home/escnode/esc/install_escnode.sh;
     #update-java-alternatives -s java-1.8.0-openjdk-amd64;

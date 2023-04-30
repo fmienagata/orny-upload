@@ -210,11 +210,15 @@ class DocumentFile
     #[File\Metadata(targetDocument: DocumentMetaData::class)]
     private $metadata;
 
+    #[ApiProperty(types: ['https://schema.org/file'])]
+    #[Groups(["document_files" =>"read", "document_files" => "write"])]
+    public \Symfony\Component\HttpFoundation\File\File|null $file = null;
+
     #[MongoDB\Field(type:"raw")]
     #[MongoDB\EmbedOne(targetDocument: MediaObject::class)]
     #[ApiProperty(types: ['https://schema.org/file'])]
     #[Groups(["document_files" =>"read"])]
-    public ?MediaObject $file = null;
+    public ?MediaObject $media = null;
 
     #[MongoDB\Field(type: 'date')]
     #[Groups(["tickets:read"])]
@@ -356,6 +360,24 @@ class DocumentFile
     }
 
     /**
+     * @return \Symfony\Component\HttpFoundation\File\File|null
+     */
+    public function getFile(): ?\Symfony\Component\HttpFoundation\File\File
+    {
+        return $this->file;
+    }
+
+    /**
+     * @param \Symfony\Component\HttpFoundation\File\File|null $file
+     */
+    public function setFile(?\Symfony\Component\HttpFoundation\File\File $file): self
+    {
+        $this->file = $file;
+
+        return $this;
+    }
+
+    /**
      * @param $metadata
      *
      * @return $this
@@ -370,25 +392,25 @@ class DocumentFile
     /**
      * @return MediaObject|null
      */
-    public function getFile(): ?MediaObject
+    public function getMedia(): ?MediaObject
     {
-        return $this->file;
+        return $this->media;
     }
 
     /**
-     * @param MediaObject|\Symfony\Component\HttpFoundation\File\File|null $file
+     * @param MediaObject|\Symfony\Component\HttpFoundation\File\File|null $media
      *
      * @return $this
      */
-    public function setFile(MediaObject|\Symfony\Component\HttpFoundation\File\File|null $file): self
+    public function setMedia(MediaObject|\Symfony\Component\HttpFoundation\File\File|null $media): self
     {
         $mediaObject = new MediaObject();
-        if ($file instanceof \Symfony\Component\HttpFoundation\File\File) {
-            $mediaObject->setFile($file);
-            $mediaObject->setFilePath($file->getRealPath());
-            $this->file = $mediaObject;dump($this->file);
+        if ($media instanceof \Symfony\Component\HttpFoundation\File\File) {
+            $mediaObject->setFile($media);
+            $mediaObject->setFilePath($media->getRealPath());
+            $this->media = $mediaObject;
         } else {
-            $this->file = $file;
+            $this->media = $media;
         }
 
         return $this;

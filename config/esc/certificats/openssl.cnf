@@ -80,8 +80,10 @@ organizationalUnitName          = Organizational Unit Name (eg, section)
 organizationalUnitName_default  = ESC
 commonName                      = Common Name (eg, YOUR name)
 commonName_max                  = 64
+commonName_default              = EscNode
 emailAddress                    = Email Address
 emailAddress_max                = 64
+emailAddress_default            = no-reply@docaposte.fr
 
 [ req_attributes ]
 challengePassword               = A challenge password

@@ -49,9 +49,7 @@ cat /home/escnode/esc/config.xml
 
 # Create standard user and grant permissions
 if [ $( echo "SHOW DATABASES LIKE '"$ESC_NAME"';" | mysql -N --host="$MYSQL_HOST" -u "$ESC_MYSQL_USER" -p"$ESC_MYSQL_PASSWORD" --port="$MYSQL_PORT" | wc -l ) -eq 0 ]; then
-    echo "java -jar /home/escnode/esc/EscNode.jar -install \"$ESC_NAME\" -name \"$ESC_NAME\" -site \"DOCKER\" -configPath \"/home/escnode/esc/config.xml\" -superUser \"/home/escnode/generationsCertificats/finalSystem/utilisateurSysteme.pem\" -certificatSignature \"/home/escnode/generationsCertificats/finalSystem/signatureSysteme.pem\" -certificatTimeStamp \"/home/escnode/generationsCertificats/finalSystem/horodatageSysteme.pem\" -mountPoint \"/data/esc\" -debugMode"
-    java -jar /home/escnode/esc/EscNode.jar -install "$ESC_NAME" -name "$ESC_NAME" -site "DOCKER" -configPath "/home/escnode/esc/config.xml" -superUser "/home/escnode/generationsCertificats/finalSystem/utilisateurSysteme.pem" -certificatSignature "/home/escnode/generationsCertificats/finalSystem/signatureSysteme.pem" -certificatTimeStamp "/home/escnode/generationsCertificats/finalSystem/horodatageSysteme.pem" -mountPoint "/data/esc" -debugMode
+    java -jar /home/escnode/esc/EscNode.jar -install "$ESC_NAME" -name "$ESC_NAME" -site "DOCKER" -configPath "/home/escnode/esc/config.xml" -superUser "/home/escnode/generationsCertificats/finalSystem/userSystem.pem" -certificatSignature "/home/escnode/generationsCertificats/finalSystem/certificateSigning.pem" -certificatTimeStamp "/home/escnode/generationsCertificats/finalSystem/timestampSystem.pem" -mountPoint "/data/esc" -debugMode
 fi
 
-echo "java -jar /home/escnode/esc/EscNode.jar -name \"$ESC_NAME\" -configPath \"/home/escnode/esc/config.xml\" -portNoSSL 10442 -port 10443 -logLevel TRACE -typeNode MIXTE -site DOCKER -nbWorker 64"
 java -jar /home/escnode/esc/EscNode.jar -name "$ESC_NAME" -configPath "/home/escnode/esc/config.xml" -portNoSSL 10442 -port 10443 -logLevel TRACE -typeNode MIXTE -site DOCKER -nbWorker 64
