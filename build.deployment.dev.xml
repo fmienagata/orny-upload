@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="AeSv8" default="full-build" basedir=".">
+    <!-- set global properties for this build-->
+
+    <property environment="env" />
+    <property name="version" value="${env.BUILD_DISPLAY_NAME}" />
+    <property name="build" value="${env.BUILD_NUMBER}" />
+    <property name="target_dir" value="/data/sites" />
+    <property name="server1" value="172.29.95.15" />
+
+    <target name="full-build"
+            depends="clean,prepare,deployment"
+            description="Performs static analysis, runs the tests"/>
+
+    <target name="quickest-build"
+            depends="clean,prepare,deployment"
+            description="Performs a lint check without running the tests"/>
+
+    <target name="clean"
+            unless="clean.done"
+            description="Cleanup build artifacts">
+        <delete dir="${basedir}/build/logs"/>
+        <delete>
+            <fileset dir="." includes="**/*.log"/>
+        </delete>
+        <property name="clean.done" value="true"/>
+    </target>
+
+    <target name="prepare"
+            unless="prepare.done"
+            depends="clean"
+            description="Prepare for build">
+        <mkdir dir="${basedir}/build/logs"/>
+        <property name="prepare.done" value="true"/>
+    </target>
+    <target name="deployment" description="Deployment script">
+        <exec executable="sh" failonerror="true">
+            <arg value="${basedir}/bin/deployment.sh" />
+        </exec>
+    </target>
+    <target name="package-deployment" description="Deployment from package">
+        <exec executable="scp" failonerror="true">
+            <arg value="${basedir}/backup.api.tar.gz" />
+            <arg value="www-data@${server1}:/${target_dir}/${version}" />
+        </exec>
+        <exec executable="ssh" failonerror="true">
+            <arg value="www-data@${server1}" />
+            <arg value="'tar -xvf ${target_dir}/backup.api.tar.gz -C ${target_dir}/${version}'" />
+        </exec>
+        <exec executable="ssh" failonerror="true">
+            <arg value="www-data@${server1}" />
+            <arg value="'mkdir -p ${target_dir}/${version}/var/cache;mkdir -p ${target_dir}/${version}/var/log;chmod -R 777 ${target_dir}/${version}/var'" />
+        </exec>
+        <exec executable="scp" failonerror="true">
+            <arg value="${basedir}/backup.api.tar.gz" />
+            <arg value="www-data@${server1}:/${target_dir}/${version}" />
+        </exec>
+        <exec executable="ssh" failonerror="true">
+            <arg value="www-data@${server1}" />
+            <arg value="'tar -xvf ${target_dir}/backup.api.tar.gz -C ${target_dir}/${version}'" />
+        </exec>
+        <exec executable="ssh" failonerror="true">
+            <arg value="www-data@${server1}" />
+            <arg value="'mkdir -p ${target_dir}/${version}/var/cache;mkdir -p ${target_dir}/${version}/var/log;chmod -R 777 ${target_dir}/${version}/var'" />
+        </exec>
+    </target>
+</project>
