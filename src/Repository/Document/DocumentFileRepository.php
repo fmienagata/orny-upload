@@ -54,7 +54,7 @@ class DocumentFileRepository extends DocumentRepository
         }
 
         if (isset($data['file']['path'])) {
-            $this->documentFile->getFile()->setFilePath($data['file']['path']);
+            $this->documentFile->getMedia()->setFilePath($data['file']['path']);
         }
 
         $this->documentFile->setMetadata(new DocumentMetaData('application/pdf'));

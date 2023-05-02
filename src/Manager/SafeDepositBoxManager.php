@@ -6,7 +6,9 @@ use GuzzleHttp\Client;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -50,7 +52,6 @@ class SafeDepositBoxManager
         $options = [
             'verify_peer' => $verifypeer,
             'verify_host' =>  $verifypeer,
-            'http_version' => '1.1',
         ];
         if (isset($data['version'])) {
             $options['query']['version'] = $data['version'];
@@ -61,7 +62,7 @@ class SafeDepositBoxManager
             $certificateFile = sprintf('%s/certificate.pem', $folder);
             $certificateFile000041 = sprintf('%s/certificate000041.pem', $folder);
 
-            /*$pfx = sprintf('%s/certificate.pfx', $folder);
+            $pfx = sprintf('%s/certificate.pfx', $folder);
             $jks = sprintf('%s/certificate.jks', $folder);
             $p12 = sprintf('%s/certificate.p12', $folder);
             $filesystem->mkdir($folder);
@@ -70,7 +71,7 @@ class SafeDepositBoxManager
             }
             $filesystem->touch($certificateFile);
             $filesystem->appendToFile($certificateFile, $data['esc']['certificate']);
-            //convert the file pem to pfx
+            /*//convert the file pem to pfx
             exec(sprintf(
                 'openssl pkcs12 -export -keypbe NONE -certpbe NONE -in %s -inkey %s -out %s',
                 $certificateFile,
@@ -90,18 +91,18 @@ class SafeDepositBoxManager
                 $p12,
                 $jks
             ));*/
-            $options['local_cert'] = $certificateFile000041;
-            $options['local_pk'] = $certificateFile000041;
+            $options['local_cert'] = $certificateFile;
+            $options['local_pk'] = $certificateFile;
         }
         //$options['body'] = base64_encode(file_get_contents('/data/sites/api/src/Resources/pdf/1679585281772_Guide_Usage_Keepass_12.pdf'));
 
         $response = $this->client->request(
             'POST',
             //$this->getUrlEsc(),
-            'https://192.168.186.75:4010/EscBO2/sessionOpen',
+            'https://ESCNODE-410:10443/ESCNODE_410/sessionOpen',
             $options
         );
-
+dump($response);
         $statusCode = $response->getStatusCode();
         $contentType = $response->getHeaders()['content-type'][0];
         $content = $response->toArray();

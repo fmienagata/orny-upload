@@ -96,11 +96,11 @@ i=1
 ### file framework
 while IFS= read -r line
 do
-    sed -i "s/aes.version.number: 0.1.0/aes.version.number: ${UPLOAD_VERSION}/g" "${WORKSPACE}/config/packages/framework.yaml"
-    sed -i "s/aes.version.major: 0/aes.version.major: ${UPLOAD_VERSION_MAJOR}/g" "${WORKSPACE}/config/packages/framework.yaml"
-    sed -i "s/aes.version.minor: 0/aes.version.minor: ${UPLOAD_VERSION_MINOR}/g" "${WORKSPACE}/config/packages/framework.yaml"
-    sed -i "s/aes.version.patch: 0/aes.version.patch: ${UPLOAD_VERSION_PATCH}/g" "${WORKSPACE}/config/packages/framework.yaml"
-    sed -i "s/aes.version.build: 10/aes.version.build: ${UPLOAD_VERSION_BUILD}/g" "${WORKSPACE}/config/packages/framework.yaml"
+    sed -i "s/upload.version.number: 0.1.0/upload.version.number: ${UPLOAD_VERSION}/g" "${WORKSPACE}/config/packages/framework.yaml"
+    sed -i "s/upload.version.major: 0/upload.version.major: ${UPLOAD_VERSION_MAJOR}/g" "${WORKSPACE}/config/packages/framework.yaml"
+    sed -i "s/upload.version.minor: 0/upload.version.minor: ${UPLOAD_VERSION_MINOR}/g" "${WORKSPACE}/config/packages/framework.yaml"
+    sed -i "s/upload.version.patch: 0/upload.version.patch: ${UPLOAD_VERSION_PATCH}/g" "${WORKSPACE}/config/packages/framework.yaml"
+    sed -i "s/upload.version.build: 10/upload.version.build: ${UPLOAD_VERSION_BUILD}/g" "${WORKSPACE}/config/packages/framework.yaml"
     ((i++))
     if [[ $i -eq 22 ]]; then
         break

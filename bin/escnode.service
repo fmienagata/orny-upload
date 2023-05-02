@@ -1,0 +1,19 @@
+[Unit]
+Description=EscNode Java driven simple service
+After=syslog.target network.target
+
+[Service]
+SuccessExitStatus=143
+
+User=escnode
+Group=escnode
+
+Type=simple
+
+Environment="JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64"
+WorkingDirectory=/home/escnode/esc
+ExecStart=${JAVA_HOME}/bin/java -jar EscNode.jar -name "ESCNODE_410" -configPath "config.xml" -portNoSSL 10442 -port 10443 -logLevel TRACE -typeNode MIXTE -site ESCNODE -nbWorker 64
+ExecStop=/bin/kill -15 $MAINPID
+
+[Install]
+WantedBy=multi-user.target

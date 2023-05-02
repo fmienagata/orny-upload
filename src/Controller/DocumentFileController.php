@@ -21,10 +21,13 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use UploadBundle\Repository\Document\DocumentFileRepository;
+use Uploadbundle\Trait\UploadTrait;
 
 #[AsController]
 class DocumentFileController extends AbstractController
 {
+    use \UploadBundle\Trait\UploadTrait;
+
     public function __construct(
         private UploadManager $uploadManager,
         private DocumentFileRepository $repository,
@@ -51,6 +54,12 @@ class DocumentFileController extends AbstractController
         $data = \json_decode($request->getContent(), true);
         if ($request->getContentTypeFormat() === 'form') {
             $data = $request->request->all();
+            foreach ($data as $k => $v) {
+                if ($k == 'paperless' || $k == 'ticket' || $k == 'esc') {
+                    $data[$k] = is_string($v) ? $this->jsonMinify($v) : $v;
+                    $data[$k] = \json_decode($data[$k], true);
+                }
+            }
         }
 
         //check the fileName parameter in the request data
@@ -60,15 +69,19 @@ class DocumentFileController extends AbstractController
 
         //check ticket
         if (!isset($data['ticketId'])) {
-            $error = new HttpException(
-                Response::HTTP_BAD_REQUEST,
-                "The ticketId must be set, please check your request datas."
-            );
+            if (!isset($data['ticket']['id'])) {
+                $error = new HttpException(
+                    Response::HTTP_BAD_REQUEST,
+                    "The ticketId must be set, please check your request datas."
+                );
 
-            return $this->json([
-                'code' => $error->getCode(),
-                'message' => $error->getMessage(),
-            ], Response::HTTP_BAD_REQUEST);
+                return $this->json([
+                    'code' => $error->getCode(),
+                    'message' => $error->getMessage(),
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            $data['ticketId'] = $data['ticket']['id'];
         }
 
         //check file in temporary folder
@@ -90,7 +103,6 @@ class DocumentFileController extends AbstractController
             // from drag&drop
             /**@var File $file*/
             $file = $request->files->get('file');
-
         } else {
             $error = new BadRequestException('Empty data file found.');
 
@@ -99,9 +111,15 @@ class DocumentFileController extends AbstractController
                 'message' => $error->getMessage(),
             ], Response::HTTP_BAD_REQUEST);
         }
+
+        if (!isset($data['fileExtension']) || empty($data['fileExtension'])) {
+            $tabFileName = explode('.', $data['fileName']);
+            $data['fileExtension'] = $tabFileName[count($tabFileName) - 1];
+        }
+
         if (isset($data['fileExtension'])) {
             $temporaryFolder = sprintf('%s/%s', $this->getParameter('upload.temporary_folder'), $data['fileExtension']);
-            if (!file_exists($temporaryFolder)) {
+            if (!file_exists($temporaryFolder)) {dump($temporaryFolder);
                 if (!mkdir($temporaryFolder, 0775, true) && !is_dir($temporaryFolder)) {
                     $error = new \RuntimeException(sprintf('Directory "%s" was not created', $temporaryFolder));
 
@@ -112,6 +130,7 @@ class DocumentFileController extends AbstractController
                 }
             }
         }
+
         $file->move(sprintf(
             '%s/%s',
             $this->getParameter('upload.temporary_folder'),
@@ -127,7 +146,7 @@ class DocumentFileController extends AbstractController
         if (($scanVirus = $this->antivirusManager->isFileSafe($file, true)) !== true) {
             return $scanVirus;
         }
-dump($scanVirus);
+
         //Check pdf and covert to pdf if needed
         $isPdf = false;
         if ($scanVirus) {
@@ -135,7 +154,10 @@ dump($scanVirus);
         }
 
         if (!isset($data['esc'])) {
-            $error = new HttpException("The safe-deposit box must be set, please check your request datas.");
+            $error = new HttpException(
+                Response::HTTP_BAD_REQUEST,
+                "The safe-deposit box must be set, please check your request datas."
+            );
 
             return $this->json([
                 'code' => $error->getCode(),

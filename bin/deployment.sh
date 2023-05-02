@@ -14,7 +14,7 @@ VERSION_DATE=`date +%d%m%Y`
 
 
 # Copie des fichiers vers le serveur web 172.29.95.125
-rsync -e ssh -avz --delete . www-data@172.29.95.125:"$DIR/$version"
+rsync -e ssh -avz --delete . www-data@172.29.95.15:"$DIR/$version"
 
 
 ssh www-data@172.29.95.15 "mkdir -p $DIR/$version/var/cache;"

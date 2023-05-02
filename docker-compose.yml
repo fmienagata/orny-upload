@@ -51,8 +51,7 @@ services:
         /bin/bash;
       "
     ]
-    #/usr/bin/mv -f /etc/php/8.2/apache2/conf.d/20-xdebug.ini /etc/php/8.2/apache2/conf.d/20-xdebug.ini.disable;
-  esc283:
+  esc410:
     privileged: true
     image: docaposte/ubuntu20-esc:4.1.0
     build:
@@ -105,29 +104,18 @@ services:
         ipv4_address: 172.22.0.21
     user: escnode:escnode
     working_dir: /home/escnode
-    #command: [ "sh", "-c", "
-    #    sudo -u root bash -c '/usr/sbin/service mysql start';
-    #    sudo -u root bash -c 'mysql -e \"CREATE USER IF NOT EXISTS 'escClient'@'%' IDENTIFIED BY 'escClient1234';\";
-    #    sudo -u root bash -c 'mysql -e \"GRANT ALL PRIVILEGES ON *.* TO 'escClient'@'%';\";
-    #    sudo -u root bash -c 'chown -R www-data:www-data /var/www';
-    #    sudo -u root bash -c '/usr/sbin/service apache2 start';
-    #    sudo -u root bash -c '/etc/init.d/clamav-daemon start';
-    #  "
-    #]
-    #sudo -u root bash -c 'mysql -e \"drop database if exists ESCNODE_410\"';
-    #sudo -u root bash -c '/usr/sbin/init';
-    #
-    #        sudo -u root bash -c '/usr/sbin/service mysql start';
-    #        sudo -u root bash -c '/usr/sbin/service apache2 start';
-    #        sudo -u root bash -c '/etc/init.d/clamav-daemon start';
-    #sudo -u root bash -c 'mysql -e \"GRANT ALL PRIVILEGES ON *.* TO 'escClient'@'localhost';\"';
-    #sudo -u root bash -c '/usr/sbin/service apache2 stop';
-    #        sudo -u root bash -c '/usr/sbin/service apache2 start';
-    #sudo chown -R escnode:escnode /home/escnode;
-    #/home/escnode/esc/install_escnode.sh;
-    #update-java-alternatives -s java-1.8.0-openjdk-amd64;
-    #runuser -l escnode -c '/home/escnode/esc/install_esc.sh';
-    #sudo -u root bash -c 'mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'escClient'@'localhost' IDENTIFIED BY 'escnode1234' WITH GRANT OPTION"';
+    command: [ "sh", "-c", "
+        sudo -u root bash -c '/usr/sbin/service mysql start &';
+        sudo -u root bash -c 'mysql -e \"CREATE USER IF NOT EXISTS 'escClient'@'%' IDENTIFIED BY 'escClient1234';\" &';
+        sudo -u root bash -c 'mysql -e \"GRANT ALL PRIVILEGES ON *.* TO 'escClient'@'%';\" &';
+        sudo -u root bash -c 'mysql -e \"drop database if exists ESCNODE_410;\" &';
+        sudo -u root bash -c 'mysql -e \"drop database if exists ESCNODE_410_00000000000000000000000000000000;\" &';
+        sudo -u root bash -c 'chown -R www-data:www-data /var/www &';
+        sudo -u root bash -c '/usr/sbin/service apache2 start &';
+        sudo -u root bash -c '/etc/init.d/clamav-daemon start &';
+        /home/escnode/esc/install_esc.sh;
+      "
+    ]
 volumes:
   uploaddata:
     driver: local

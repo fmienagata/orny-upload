@@ -54,6 +54,7 @@ use UploadBundle\Controller\DocumentFileController;
                                         'type' => 'string',
                                         'format' => 'binary'
                                     ],
+                                    'fileName' => ['type' => 'string', 'example' => 'file.pdf'],
                                     'paperless' => [
                                         'type' => 'object',
                                         'properties' => [
@@ -240,6 +241,7 @@ class DocumentFile
         if ($file) {
             $this->setOriginalName($file->getFilename());
             $this->setFile($file);
+            $this->setMedia($file);
         }
     }
 
