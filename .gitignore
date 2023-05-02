@@ -15,7 +15,11 @@
 /config/secrets/prod/prod.decrypt.private.php
 /config/esc/certificats/*
 !/config/esc/certificats/index.txt
-!/config/esc/certificats/openssl.cnf
+!/config/esc/certificats/ca.cnf
+!/config/esc/certificats/certificatFunctions.sh
+!/config/esc/certificats/generateCertificats.sh
+!/config/esc/certificats/preparer.sh
+!/config/esc/certificats/ssl
 
 /public/bundles/
 /public/media/*
