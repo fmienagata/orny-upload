@@ -74,13 +74,14 @@ services:
       ESC_MYSQL_PASSWORD: escClient1234
       SSL_CERTIFICAT_SYSTEM_PEM: /home/escnode/generationsCertificats/finalSystem/sslSysteme.pem
       CERTIFICATE_SYSTEM: /home/escnode/generationsCertificats/finalSystem/sslSysteme.pem
-      JAVA_HOME: /usr/lib/jvm/java-1.8.0-openjdk-amd64
+      #JAVA_HOME: /usr/lib/jvm/java-1.8.0-openjdk-amd64
       ESC_LOG_DIR: /data/logs/esc
     ports:
-      - 12803:10443
-      - 12080:80
+      - 4100:4100
+      - 4010:4010
+      - 12000:80
       - 12443:443
-      - 12306:3306
+      - 3309:3306
     restart: unless-stopped
     expose:
       - 80
@@ -93,7 +94,8 @@ services:
       - databasedata:/var/lib/mysql
       - ./bin/install_escnode.sh:/home/escnode/esc/install_escnode.sh
       - ./config/esc/config.xml:/home/escnode/esc/config.xml
-      - ./config/esc/certificats:/home/escnode/generationsCertificats
+      - ./config/esc/logback.xml:/home/escnode/esc/logback.xml
+      - ./config/esc/certificats:/home/escnode/certificates
       - ./config/apache/apache2.conf:/etc/apache2/apache2.conf
       - ./config/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf
       - ./config/apache/php.ini:/etc/php.ini
@@ -105,16 +107,24 @@ services:
     user: escnode:escnode
     working_dir: /home/escnode
     command: [ "sh", "-c", "
-        sudo -u root bash -c '/usr/sbin/service mysql start &';
-        sudo -u root bash -c 'mysql -e \"CREATE USER IF NOT EXISTS 'escClient'@'%' IDENTIFIED BY 'escClient1234';\" &';
-        sudo -u root bash -c 'mysql -e \"GRANT ALL PRIVILEGES ON *.* TO 'escClient'@'%';\" &';
-        sudo -u root bash -c 'mysql -e \"drop database if exists ESCNODE_410;\" &';
-        sudo -u root bash -c 'mysql -e \"drop database if exists ESCNODE_410_00000000000000000000000000000000;\" &';
-        sudo -u root bash -c 'chown -R www-data:www-data /var/www &';
-        sudo -u root bash -c '/usr/sbin/service apache2 start &';
-        sudo -u root bash -c '/etc/init.d/clamav-daemon start &';
-        /home/escnode/esc/install_esc.sh;
-      "
+            sudo -u root bash -c 'mkdir -p /home/escnode/generationsCertificats &';
+            sudo -u root bash -c 'cp -R certificates/* generationsCertificats &';
+            sudo -u root bash -c 'chown -R escnode:escnode /home/escnode';
+            sudo -u root bash -c 'mkdir -p /var/run/mysqld &';
+            sudo -u root bash -c 'chmod -R 777 /var/run/mysqld &';
+            sudo -u root bash -c 'chown -R mysql /var/run/mysqld &';
+            sudo -u root bash -c '/usr/sbin/service mysql start &';
+            sudo -u root bash -c 'mysql -e \"CREATE USER IF NOT EXISTS 'escClient'@'%' IDENTIFIED BY 'escClient1234';\" &';
+            sudo -u root bash -c 'mysql -e \"GRANT ALL PRIVILEGES ON *.* TO 'escClient'@'%';\" &';
+            sudo -u root bash -c 'mysql -e \"drop database if exists ESCNODE_410;\" &';
+            sudo -u root bash -c 'mysql -e \"drop database if exists ESCNODE_410_00000000000000000000000000000000;\" &';
+            sudo -u root bash -c 'mysql -e \"drop database if exists EscDgtt;\" &';
+            sudo -u root bash -c 'mysql -e \"drop database if exists EscDgtt_00000000000000000000000000000000;\" &';
+            sudo -u root bash -c 'chown -R www-data:www-data /var/www &';
+            sudo -u root bash -c '/usr/sbin/service apache2 start &';
+            sudo -u root bash -c '/etc/init.d/clamav-daemon start &';
+            /home/escnode/esc/install_escnode.sh;
+          "
     ]
 volumes:
   uploaddata:

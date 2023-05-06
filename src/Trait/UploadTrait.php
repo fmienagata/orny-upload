@@ -1,7 +1,8 @@
 <?php
 
-namespace Uploadbundle\Trait;
+namespace UploadBundle\Trait;
 
+#[\Attribute]
 trait UploadTrait
 {
     /**

@@ -9,7 +9,7 @@ openssl genrsa -out $1.key 2048
 openssl req -new -key $1.key -out $1.csr -subj /C=FR/ST=IDF/L=Paris/O=Docapost-dps/OU=ESC/CN=ESC-signature/emailAddress=esc@docapost-dps.fr
 
 #Génération certificat
-openssl x509 -req -days 365 -in $1.csr -signkey $1.key -out $2/$1.crt
+openssl x509 -req -days 3650 -in $1.csr -signkey $1.key -out $2/$1.crt
 cat $2/$1.crt $1.key > $2/$1.pem
 openssl x509 -text -in $2/$1.pem
 
@@ -27,7 +27,7 @@ openssl genrsa -out $1.key 2048
 openssl req -new -key $1.key -out $1.csr -subj /C=FR/ST=IDF/L=Paris/O=Docapost-dps/OU=ESC/CN=ESC-UserSysteme
 
 #Génération certificat
-openssl x509 -req -days 365 -in $1.csr -signkey $1.key -out $2/$1.crt
+openssl x509 -req -days 3650 -in $1.csr -signkey $1.key -out $2/$1.crt
 cat $2/$1.crt $1.key > $2/$1.pem
 
 #Création du PFX
@@ -67,7 +67,7 @@ openssl genrsa -out $1.key 2048
 #Génération request
 openssl req -new -key $1.key -out $1.csr -subj /C=FR/ST=IDF/L=Paris/O=Docapost-dps/OU=ESC/CN=ESC-ssl
 #Génération certificat
-openssl x509 -req -days 365 -in $1.csr -signkey $1.key -out $1.crt
+openssl x509 -req -days 3650 -in $1.csr -signkey $1.key -out $1.crt
 cat $1.crt $1.key > $2/$1.pem
 openssl x509 -text -in $2/$1.pem
 
@@ -84,7 +84,7 @@ openssl genrsa -out $1.key 2048
 #Génération request
 openssl req -new -key $1.key -out $1.csr -subj /C=FR/ST=IDF/L=Paris/O=CLIENT/OU=CLIENT/CN=ESC-Signature
 #Génération certificat
-openssl x509 -req -days 365 -in $1.csr -signkey $1.key -out $2/$1.crt
+openssl x509 -req -days 3650 -in $1.csr -signkey $1.key -out $2/$1.crt
 cat $2/$1.crt $1.key > $2/$1.pem
 openssl pkcs12 -export -out $2/$1.pfx -inkey $1.key -in $2/$1.crt -passout pass:
 openssl x509 -text -in $2/$1.pem

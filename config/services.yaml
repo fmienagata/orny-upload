@@ -29,3 +29,8 @@ services:
     UploadBundle\Manager\AntivirusManager:
         arguments:
             $command: '%upload.antivirus_script%'
+
+    Gedmo\Timestampable\TimestampableListener:
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+            - { name: doctrine_mongodb.odm.event_subscriber }

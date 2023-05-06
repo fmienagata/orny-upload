@@ -60,7 +60,7 @@ class SafeDepositBoxManager
             $filesystem = new Filesystem();
             $folder = sprintf('%s/%s', $this->parameterBag->get('kernel.cache_dir'), $data['customerCode']);
             $certificateFile = sprintf('%s/certificate.pem', $folder);
-            $certificateFile000041 = sprintf('%s/certificate000041.pem', $folder);
+            $utilisateurSysteme = sprintf('%s/utilisateurSysteme.pem', $folder);
 
             $pfx = sprintf('%s/certificate.pfx', $folder);
             $jks = sprintf('%s/certificate.jks', $folder);
@@ -91,26 +91,26 @@ class SafeDepositBoxManager
                 $p12,
                 $jks
             ));*/
-            $options['local_cert'] = $certificateFile;
-            $options['local_pk'] = $certificateFile;
+            $options['local_cert'] = $utilisateurSysteme;
+            //$options['local_pk'] = $utilisateurSysteme;
         }
         //$options['body'] = base64_encode(file_get_contents('/data/sites/api/src/Resources/pdf/1679585281772_Guide_Usage_Keepass_12.pdf'));
 
         $response = $this->client->request(
             'POST',
             //$this->getUrlEsc(),
-            'https://ESCNODE-410:10443/ESCNODE_410/sessionOpen',
+            'https://ESCNODE-410:4100/EscDgtt/sessionOpen',
             $options
         );
-dump($response);
-        $statusCode = $response->getStatusCode();
-        $contentType = $response->getHeaders()['content-type'][0];
-        $content = $response->toArray();
 
-        if (empty($values = $content['data'] ?? [])) {
-            return $values;
+        $statusCode = $response->getStatusCode();
+        $headers = $response->getHeaders();
+
+        if (empty($sessionId = $headers['ESC-sessionId'] ?? [])) {
+            return [];
         }
 
+        /**
         $parameters = $values['parameters'];
 
         //set legacy database url
@@ -136,9 +136,9 @@ dump($response);
             if ($this->request->getCurrentRequest()) {
                 $this->request->getCurrentRequest()->attributes->set('vault', $this);
             }
-        }
+        }*/
 
-        return $parameters;
+        return $headers;
     }
 
     /**

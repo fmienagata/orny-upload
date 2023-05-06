@@ -1,0 +1,49 @@
+<?php
+
+namespace UploadBundle\Controller;
+
+use Doctrine\ODM\MongoDB\MongoDBException;
+use MongoDB\Exception\Exception;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\AsController;
+use Symfony\Component\Routing\Annotation\Route;
+use UploadBundle\Document\Drawer;
+use UploadBundle\Repository\Document\DrawerRepository;
+
+#[AsController]
+class DrawerController extends AbstractController
+{
+    public function __construct(
+        private DrawerRepository $repository
+    ) {}
+
+    #[Route(
+        '/upload/drawers',
+        name: '_upload_/drawers_post',
+        methods: ['POST'],
+        defaults: [
+            '_api_resource_class' => Drawer::class,
+            '_api_operation_name' => '_upload_/drawers_post',
+        ]
+    )]
+    public function Post(Request $request)
+    {
+        $data = \json_decode($request->getContent(), true);
+        if ($request->getContentTypeFormat() === 'form') {
+            $data = $request->request->all();
+        }
+
+        try {
+            $drawer = $this->repository->saveDrawer($data);
+        } catch (MongoDBException $mongoDBException) {
+            return $this->json([
+                'code' => $mongoDBException->getCode(),
+                'message' => $mongoDBException->getMessage(),
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        return $this->json($drawer, Response::HTTP_CREATED);
+    }
+}

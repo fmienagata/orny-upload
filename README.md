@@ -64,7 +64,7 @@ cat finalSystem/sslSystem.crt finalSystem/certificateSigning.key > finalSystem/s
 
 ### Se connecter en system et récupérer le header 'ESC-sessionId' => \<sessionSystem>
 ```
-curl -v -X POST -k --cert "certificats/finalSystem/utilisateurSysteme.pem" https://127.0.0.1:12713/ESCNODE_2713/sessionOpen
+curl -v -X POST -k --cert "certificats/finalSystem/utilisateurSysteme.pem" https://127.0.0.1:10443/ESCNODE_410/sessionOpen
 ```
 #### Générer un certificat auto-signé au format RSA/PEM via openssl => \<certificatsalle>
 

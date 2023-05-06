@@ -55,7 +55,7 @@ class DocumentFileController extends AbstractController
         if ($request->getContentTypeFormat() === 'form') {
             $data = $request->request->all();
             foreach ($data as $k => $v) {
-                if ($k == 'paperless' || $k == 'ticket' || $k == 'esc') {
+                if (($k == 'paperless' || $k == 'ticket' || $k == 'esc') && is_string($v)) {
                     $data[$k] = is_string($v) ? $this->jsonMinify($v) : $v;
                     $data[$k] = \json_decode($data[$k], true);
                 }

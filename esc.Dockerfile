@@ -24,10 +24,10 @@ ADD ./bin/root/.scripts /root/.scripts
 RUN add-apt-repository universe
 RUN apt -y update
 RUN apt -y install lsb-release ca-certificates apt-transport-https software-properties-common \
-    apache2-bin apache2-utils apache2  openjdk-8-jdk icedtea-netx
-ADD --chown=root:root ./bin/java/jdk1.7.0_80 /usr/lib/jvm/jdk1.7.0_80
-RUN apt -y install nano hostname wget unzip zip git net-tools openssl systemd supervisor
-RUN apt -y install clamav clamav-daemon tree
+    apache2-bin apache2-utils apache2 default-jre icedtea-netx
+
+RUN apt -y install nano hostname wget unzip zip git net-tools openssl systemd supervisor telnet iputils-ping
+RUN apt -y install clamav clamav-daemon tree tcpdump
 # Gitflow installer
 COPY ./bin/gitflow-installer.sh /root/gitflow-installer.sh
 RUN chmod +x /root/gitflow-installer.sh
@@ -66,9 +66,7 @@ RUN chmod 755 /usr/local/bin/composer
 RUN cp -ps /usr/local/bin/composer /bin/composer
 ENV PATH="/usr/local/bin/composer:${PATH}"
 
-RUN  apt-get -y install nano hostname wget unzip zip git net-tools sudo systemd supervisor \
-    clamav clamav-daemon tree
-
+RUN  apt-get -y install nano hostname wget unzip zip git net-tools sudo systemd supervisor
 
 RUN usermod -a -G root,www-data -d /home/www-data www-data
 COPY --chown=www-data:www-data ./config/www-data/.ssh /home/www-data/.ssh
@@ -98,11 +96,15 @@ COPY ./bin/esc/srm-1.2.15-1.el7.x86_64.rpm /root/srm-1.2.15-1.el7.x86_64.rpm
 RUN apt -y install alien && alien -i /root/srm-1.2.15-1.el7.x86_64.rpm
 RUN rm -f /root/srm-1.2.15-1.el7.x86_64.rpm
 
+RUN systemctl enable mariadb
 RUN systemctl enable apache2
 RUN systemctl enable mongod
 RUN systemctl enable clamav-daemon
 RUN freshclam
 RUN systemctl enable clamav-freshclam
+
+RUN apt -y install apt install openjdk-8-jre
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
 
 ARG ESC_NAME=ESCNODE_410
 ARG ESC_VERSION=4.1.0
@@ -156,6 +158,7 @@ EXPOSE 80
 EXPOSE 443
 
 EXPOSE 10443
+EXPOSE 4100
 
 # Define default command.
 CMD ["bash"]

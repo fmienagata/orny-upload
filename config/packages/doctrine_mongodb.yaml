@@ -16,7 +16,12 @@ doctrine_mongodb:
                     dir: '%kernel.project_dir%/src/Document'
                     prefix: 'UploadBundle\Document'
                     alias: UploadBundle
-
+                gedmo_translatable:
+                    type: attribute
+                    prefix: Gedmo\Timestampable
+                    dir: "%kernel.project_dir%/vendor/gedmo/doctrine-extensions/src/Timestampable"
+                    alias: GedmoTimestampable # (optional) it will default to the name set for the mapping
+                    is_bundle: false
 
 when@prod:
     doctrine_mongodb:
