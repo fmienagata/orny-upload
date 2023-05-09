@@ -7,12 +7,13 @@ MYSQL_PORT="3306"
 ESC_MYSQL_USER="escClient"
 ESC_MYSQL_PASSWORD="escClient1234"
 SSL_CERTIFICAT_SYSTEM_PEM=$(</home/escnode/generationsCertificats/finalSystem/sslSysteme.pem)
+JAVA="/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java"
 
 set -o errexit
 set -o nounset
 maxcounter=45
 counter=1
-while ! mysql --host="localhost" -u "$ESC_MYSQL_USER" -p"$ESC_MYSQL_PASSWORD" --port="3306" -e "show databases;" > /dev/null 2>&1; do
+while ! mysql --host="$MYSQL_HOST" -u "$ESC_MYSQL_USER" -p"$ESC_MYSQL_PASSWORD" --port="3306" -e "show databases;" > /dev/null 2>&1; do
     sleep 1
     counter=`expr $counter + 1`
     if [ $counter -gt $maxcounter ]; then
@@ -25,7 +26,7 @@ cat /home/escnode/esc/config.xml
 
 # Create standard user and grant permissions
 if [ $( echo "SHOW DATABASES LIKE '"$ESC_NAME"';" | mysql -N --host="$MYSQL_HOST" -u "$ESC_MYSQL_USER" -p"$ESC_MYSQL_PASSWORD" --port="$MYSQL_PORT" | wc -l ) -eq 0 ]; then
-    java -jar /home/escnode/esc/EscNode.jar \
+    $JAVA -jar /home/escnode/esc/EscNode.jar \
     -install "$ESC_NAME" \
     -name "$ESC_NAME" \
     -site "$ESC_NAME" \
@@ -37,7 +38,7 @@ if [ $( echo "SHOW DATABASES LIKE '"$ESC_NAME"';" | mysql -N --host="$MYSQL_HOST
     -debugMode
 fi
 
-java -jar /home/escnode/esc/EscNode.jar \
+$JAVA -jar /home/escnode/esc/EscNode.jar \
 -name "$ESC_NAME" \
 -configPath "/home/escnode/esc/config.xml" \
 -portNoSSL 4010 \

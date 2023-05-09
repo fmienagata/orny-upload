@@ -22,10 +22,12 @@ fi
 
 #############################################################################################
 #initialisation des fonction de generation
-source ./preparer.sh
-source ./certificatFunctions.sh
+source /home/escnode/generationsCertificats/preparer.sh
+source /home/escnode/generationsCertificats/certificatFunctions.sh
 
 #############################################################################################
+cd /home/escnode/generationsCertificats
+
 # Lancement des scripts
 preparation $clientFolder $systemFolder > installation_certificat.log 2>&1
 signatureSystem signatureSysteme $systemFolder >> installation_certificat.log 2>&1

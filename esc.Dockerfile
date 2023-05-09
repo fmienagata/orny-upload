@@ -103,7 +103,7 @@ RUN systemctl enable clamav-daemon
 RUN freshclam
 RUN systemctl enable clamav-freshclam
 
-RUN apt -y install apt install openjdk-8-jre
+RUN apt -y install openjdk-8-jre
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
 
 ARG ESC_NAME=ESCNODE_410
@@ -140,25 +140,33 @@ RUN chown -R escnode:escnode /data/logs/esc
 RUN chown -R escnode:escnode /data/esc
 
 RUN mkdir -p /home/escnode/esc
-RUN mkdir -p /home/escnode/generationsCertificats
+#RUN mkdir -p /home/escnode/generationsCertificats
 ADD --chown=escnode:escnode ./config/esc/config.xml /home/escnode/esc/config.xml
+RUN sed -E -i -e 's/SSL_CERTIFICAT_SYSTEM_PEM(.*)$/$SSL_CERTIFICAT_SYSTEM_PEM\1/g' /home/escnode/esc/config.xml
 ADD --chown=escnode:escnode ./bin/esc/esc-${ESC_VERSION}/EscNode.jar /home/escnode/esc/EscNode.jar
 ADD --chown=escnode:escnode ./config/esc/logback.xml /home/escnode/esc/logback.xml
-ADD --chown=escnode:escnode ./bin/install_escnode.sh /home/escnode/esc/install_esc.sh
-RUN chmod +x /home/escnode/esc/install_esc.sh
+ADD --chown=escnode:escnode ./bin/install_escnode.sh /home/escnode/esc/install_escnode.sh
+ADD --chown=escnode:escnode ./config/esc/certificats /home/escnode/generationsCertificats
+RUN bash /home/escnode/generationsCertificats/generateCertificats.sh
+RUN chmod +x /home/escnode/esc/install_escnode.sh
+ADD ./bin/escnode.service /home/escnode/esc/escnode.service
+ADD ./bin/escnode.service /lib/systemd/system/escnode.service
+RUN chmod 0644 /lib/systemd/system/escnode.service
+RUN ln -s /lib/systemd/system/escnode.service /etc/systemd/system/escnode.service
+RUN ln -s /lib/systemd/system/systemd-sysctl.service /etc/systemd/system/systemd-sysctl.service
+RUN systemctl enable escnode
+RUN systemctl enable systemd-sysctl
 
 VOLUME ["/sys/fs/cgroup", "/tmp", "/run"]
-CMD ["/lib/systemd/systemd"]
-#CMD ./esc/install_esc.sh
+CMD ["/usr/sbin/init", "/lib/systemd/systemd", "/usr/sbin/service mysql start", "mysql -e \"CREATE USER IF NOT EXISTS 'escClient'@'%' IDENTIFIED BY 'escClient1234';\"", "mysql -e \"GRANT ALL PRIVILEGES ON *.* TO 'escClient'@'%';\""]
+#CMD /home/escnode/esc/install_escnode.sh
 
 EXPOSE 22
-
 EXPOSE 80
-
 EXPOSE 443
-
-EXPOSE 10443
 EXPOSE 4100
+EXPOSE 4110
+EXPOSE 10443
 
 # Define default command.
-CMD ["bash"]
+ENTRYPOINT ["/lib/systemd/systemd"]

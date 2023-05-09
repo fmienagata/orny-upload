@@ -10,13 +10,15 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
 use UploadBundle\Document\Drawer;
+use UploadBundle\Manager\SafeDepositBoxManager;
 use UploadBundle\Repository\Document\DrawerRepository;
 
 #[AsController]
 class DrawerController extends AbstractController
 {
     public function __construct(
-        private DrawerRepository $repository
+        private DrawerRepository $repository,
+        private SafeDepositBoxManager $safeDepositBoxManager
     ) {}
 
     #[Route(
@@ -36,7 +38,8 @@ class DrawerController extends AbstractController
         }
 
         try {
-            $drawer = $this->repository->saveDrawer($data);
+            $dataWithRoom = $this->safeDepositBoxManager->createRoom($data);dump($dataWithRoom);
+            $drawer = $this->repository->saveDrawer($dataWithRoom);
         } catch (MongoDBException $mongoDBException) {
             return $this->json([
                 'code' => $mongoDBException->getCode(),

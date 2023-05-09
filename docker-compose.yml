@@ -91,41 +91,22 @@ services:
     hostname: safe-box-esc-local.demat.lan
     volumes:
       - escnodedata:/home
-      - databasedata:/var/lib/mysql
-      - ./bin/install_escnode.sh:/home/escnode/esc/install_escnode.sh
-      - ./config/esc/config.xml:/home/escnode/esc/config.xml
-      - ./config/esc/logback.xml:/home/escnode/esc/logback.xml
-      - ./config/esc/certificats:/home/escnode/certificates
       - ./config/apache/apache2.conf:/etc/apache2/apache2.conf
       - ./config/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf
       - ./config/apache/php.ini:/etc/php.ini
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
       - .:/app:cached
     tty: true
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
     networks:
       nginx-proxy:
         ipv4_address: 172.22.0.21
-    user: escnode:escnode
+    user: root:root
     working_dir: /home/escnode
-    command: [ "sh", "-c", "
-            sudo -u root bash -c 'mkdir -p /home/escnode/generationsCertificats &';
-            sudo -u root bash -c 'cp -R certificates/* generationsCertificats &';
-            sudo -u root bash -c 'chown -R escnode:escnode /home/escnode';
-            sudo -u root bash -c 'mkdir -p /var/run/mysqld &';
-            sudo -u root bash -c 'chmod -R 777 /var/run/mysqld &';
-            sudo -u root bash -c 'chown -R mysql /var/run/mysqld &';
-            sudo -u root bash -c '/usr/sbin/service mysql start &';
-            sudo -u root bash -c 'mysql -e \"CREATE USER IF NOT EXISTS 'escClient'@'%' IDENTIFIED BY 'escClient1234';\" &';
-            sudo -u root bash -c 'mysql -e \"GRANT ALL PRIVILEGES ON *.* TO 'escClient'@'%';\" &';
-            sudo -u root bash -c 'mysql -e \"drop database if exists ESCNODE_410;\" &';
-            sudo -u root bash -c 'mysql -e \"drop database if exists ESCNODE_410_00000000000000000000000000000000;\" &';
-            sudo -u root bash -c 'mysql -e \"drop database if exists EscDgtt;\" &';
-            sudo -u root bash -c 'mysql -e \"drop database if exists EscDgtt_00000000000000000000000000000000;\" &';
-            sudo -u root bash -c 'chown -R www-data:www-data /var/www &';
-            sudo -u root bash -c '/usr/sbin/service apache2 start &';
-            sudo -u root bash -c '/etc/init.d/clamav-daemon start &';
-            /home/escnode/esc/install_escnode.sh;
-          "
-    ]
+
 volumes:
   uploaddata:
     driver: local

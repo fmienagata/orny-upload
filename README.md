@@ -97,7 +97,7 @@ curl -v -X POST -k --cert "certificats/finalClient/administrateurCLIENT.pem" -�
 ```
 curl -v -X POST -k --cert "certificats/finalClient/administrateurCLIENT.pem" -–header "ESC-sessionId: <sessionAdmin>" –-header "ESC-userId: <gestionnaireID>" https://127.0.0.1:12713/ESCNODE_2713/<RoomID>/roomRightAdd
 ```
-###Se connecter en tant que gestionnaire et récupérer le header 'ESC-sessionId' => \<sessionGestionnaire>
+### Se connecter en tant que gestionnaire et récupérer le header 'ESC-sessionId' => \<sessionGestionnaire>
 ```
 curl -v -X POST -k --cert "certificats/finalClient/gestionaireCLIENT.pem" https://127.0.0.1:12713/ESCNODE_2713/sessionOpen
 ```

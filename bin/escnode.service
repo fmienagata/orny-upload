@@ -10,9 +10,9 @@ Group=escnode
 
 Type=simple
 
-Environment="JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64"
+Environment="JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre/"
 WorkingDirectory=/home/escnode/esc
-ExecStart=${JAVA_HOME}/bin/java -jar EscNode.jar -name "ESCNODE_410" -configPath "config.xml" -portNoSSL 10442 -port 10443 -logLevel TRACE -typeNode MIXTE -site ESCNODE -nbWorker 64
+ExecStart=/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java -jar /home/escnode/esc/EscNode.jar -name "EscDgtt" -configPath "config.xml" -portNoSSL 4110 -port 4100 -logLevel TRACE -typeNode MIXTE -site EscDgtt -nbWorker 64
 ExecStop=/bin/kill -15 $MAINPID
 
 [Install]

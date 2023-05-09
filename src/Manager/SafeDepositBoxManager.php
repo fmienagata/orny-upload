@@ -28,6 +28,94 @@ class SafeDepositBoxManager
     ) {}
 
     /**
+     * @param array|null $data
+     * @param bool       $verifypeer
+     *
+     * @return array|\string[][]|JsonResponse
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     */
+    public function createRoom(array $data = null, bool $verifypeer = false)
+    {
+        if ((!isset($data['escName'])) ||
+            (isset($data['escName']) && empty($data['escName']))
+        ) {
+            return new JsonResponse([
+                'code' => Response::HTTP_BAD_REQUEST,
+                'message' => 'No route found, empty uri found.'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $options = [
+            'verify_peer' => $verifypeer,
+            'verify_host' =>  $verifypeer,
+        ];
+        if (isset($data['version'])) {
+            $options['query']['version'] = $data['version'];
+        }
+
+        $filesystem = new Filesystem();
+        $folder = sprintf('%s/%s', $this->parameterBag->get('kernel.cache_dir'), '9463');
+        $certificateFile = sprintf('%s/certificate.pem', $folder);
+        $utilisateurSysteme = sprintf('%s/utilisateurSysteme.pem', $folder);
+
+        $pfx = sprintf('%s/certificate.pfx', $folder);
+        $jks = sprintf('%s/certificate.jks', $folder);
+        $p12 = sprintf('%s/certificate.p12', $folder);
+        $filesystem->mkdir($folder);
+        if ($filesystem->exists($certificateFile)) {
+            $filesystem->remove($certificateFile);
+        }
+
+        $options['local_cert'] = $utilisateurSysteme;
+
+        //Open session esc
+        $response = $this->client->request(
+            'POST',
+            //$this->getUrlEsc(),
+            'https://ESCNODE-410:4100/EscDgtt/sessionOpen',
+            $options
+        );
+
+        $statusCode = $response->getStatusCode();
+        $headers = $response->getHeaders();
+
+        if (empty($sessionId = $headers['esc-sessionid'] ?? [])) {
+            return [];
+        }
+
+        $data['userIdCmd'] = $headers['esc-useridcmd'][0];
+        $options['headers']['ESC-label'] = 'Vehicle';
+        $options['headers']['ESC-sessionId'] = $headers['esc-sessionid'];
+        $body = fopen(sprintf('%s/config/esc/certificats/salle1.pem', $this->parameterBag->get('kernel.project_dir')), 'r');
+        $size = dump(fstat($body)['size'] ?? null);
+        $options['headers']['Content-Disposition'] = "attachment; filename=file";
+        $options['headers']['Content-Length'] = $size;
+        //create room
+        $responseRoom = $this->client->request(
+            'POST',
+            //$this->getUrlEsc(),
+            'https://ESCNODE-410:4100/EscDgtt/roomCreate',
+            $options
+        );
+
+        $statusCode = $responseRoom->getStatusCode();
+        switch ($statusCode) {
+            case 500:
+                return [];
+        }
+        $headersRoomCreated = $responseRoom->getHeaders();dump($headersRoomCreated);
+        if (empty($roomId = $headersRoomCreated['esc-roomid'] ?? [])) {
+            return [];
+        }
+        $data['roomId'] = $roomId[0];
+
+        return $data;
+    }
+
+    /**
      * @param array      $credentials
      * @param array|null $data
      *
