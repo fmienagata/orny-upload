@@ -182,7 +182,6 @@ class DocumentFile
     private string $id;
 
     #[MongoDB\Field(type:"string")]
-    #[MongoDB\File\Filename]
     #[Groups(["document_files" =>"read", "document_files" => "write"])]
     private string $originalName;
 
@@ -192,17 +191,14 @@ class DocumentFile
 
     #[Gedmo\Timestampable(on: "create")]
     #[MongoDB\Field(type:"date")]
-    #[MongoDB\File\UploadDate]
     #[Groups(["document_files" =>"read", "document_files" => "write"])]
     private \DateTime $uploadDate;
 
     #[MongoDB\Field(type:"int")]
-    #[MongoDB\File\Length]
     #[Groups(["document_files" =>"read", "document_files" => "write"])]
     private int $length;
 
     #[MongoDB\Field(type:"int")]
-    #[MongoDB\File\ChunkSize]
     #[Groups(["document_files" =>"read", "document_files" => "write"])]
     private int $chunkSize;
 
@@ -215,11 +211,29 @@ class DocumentFile
     #[Groups(["document_files" =>"read", "document_files" => "write"])]
     public \Symfony\Component\HttpFoundation\File\File|null $file = null;
 
-    #[MongoDB\Field(type:"raw")]
-    #[MongoDB\EmbedOne(targetDocument: MediaObject::class)]
     #[ApiProperty(types: ['https://schema.org/file'])]
     #[Groups(["document_files" =>"read"])]
     public ?MediaObject $media = null;
+
+    #[MongoDB\Field(type:"string")]
+    #[Groups(["document_files" =>"read", "document_files" => "write"])]
+    private string $archiveId;
+
+    #[MongoDB\Field(type:"string")]
+    #[Groups(["document_files" =>"read", "document_files" => "write"])]
+    private string $ucsId;
+
+    #[MongoDB\Field(type:"date")]
+    #[Groups(["document_files" =>"read", "document_files" => "write"])]
+    private string $timestamp;
+
+    #[MongoDB\Field(type:"string")]
+    #[Groups(["document_files" =>"read", "document_files" => "write"])]
+    private string $escName;
+
+    #[MongoDB\Field(type:"string")]
+    #[Groups(["document_files" =>"read", "document_files" => "write"])]
+    private string $userIdCmd;
 
     #[MongoDB\Field(type: 'date')]
     #[Groups(["tickets:read"])]
@@ -414,6 +428,106 @@ class DocumentFile
         } else {
             $this->media = $media;
         }
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getArchiveId(): string
+    {
+        return $this->archiveId;
+    }
+
+    /**
+     * @param string $archiveId
+     *
+     * @return $this
+     */
+    public function setArchiveId(string $archiveId): self
+    {
+        $this->archiveId = $archiveId;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUcsId(): string
+    {
+        return $this->ucsId;
+    }
+
+    /**
+     * @param string $ucsId
+     *
+     * @return $this
+     */
+    public function setUcsId(string $ucsId): self
+    {
+        $this->ucsId = $ucsId;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTimestamp(): string
+    {
+        return $this->timestamp;
+    }
+
+    /**
+     * @param string $timestamp
+     *
+     * @return $this
+     */
+    public function setTimestamp(string $timestamp): self
+    {
+        $this->timestamp = $timestamp;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEscName(): string
+    {
+        return $this->escName;
+    }
+
+    /**
+     * @param string $escName
+     *
+     * @return $this
+     */
+    public function setEscName(string $escName): self
+    {
+        $this->escName = $escName;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUserIdCmd(): string
+    {
+        return $this->userIdCmd;
+    }
+
+    /**
+     * @param string $userIdCmd
+     *
+     * @return $this
+     */
+    public function setUserIdCmd(string $userIdCmd): self
+    {
+        $this->userIdCmd = $userIdCmd;
 
         return $this;
     }

@@ -11,6 +11,7 @@ services:
     image: docaposte/ubuntu20-apache2-php8:1.0.0
     environment:
       - TZ=Europe/Paris
+      - APACHE_LOG_DIR=/data/logs
     ports:
       - '8900:80'
       - '8990:443'
@@ -21,36 +22,41 @@ services:
       - 80
       - 443
     volumes:
-      - uploaddata:/data
+      - uploaddata:/data:rw
       #- nfs-upload:/mnt/nfs-upload
-      - ./:/data/sites/api
-      - ./config/apache/api.conf:/etc/apache2/sites-available/api.conf
-      - ./config/apache/apache2.conf:/etc/apache2/apache2.conf
+      - ./:/data/sites/api:rw
+      #- ./config/apache/api.conf:/etc/apache2/sites-available/api.conf
+      #- ./config/apache/apache2.conf:/etc/apache2/apache2.conf
       - ./config/apache/php.ini:/etc/php.ini
+      -  /sys/fs/cgroup:/sys/fs/cgroup:rw
       - .:/app:cached
     tty: true
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
     networks:
       nginx-proxy:
         ipv4_address: 172.22.0.20
-    command: ["sh", "-c", "
-        /usr/sbin/init;
-        /usr/bin/redis-server /etc/redis/redis.conf --daemonize yes;
-        /usr/bin/supervisord -c /etc/supervisor/supervisord.conf;
-        /usr/sbin/usermod -s /bin/bash www-data;
-        /usr/bin/chown -R www-data:www-data /data/sites;
-        /usr/bin/chmod -R 777 /data/sites/api/var;
-        /usr/bin/chmod -R 777 /data/logs;
-        export APACHE_LOG_DIR=/data/logs;
-        /usr/sbin/a2enmod rewrite;
-        /usr/sbin/a2ensite api;
-        /usr/sbin/a2dissite 000-default;
-        /usr/sbin/service apache2 reload;
-        /usr/bin/mongod -f /etc/mongod.conf --bind_ip 127.0.0.1 --fork;
-        /etc/init.d/clamav-daemon restart;
-        /usr/sbin/service apache2 restart;
-        /bin/bash;
-      "
-    ]
+    #command: ["sh", "-c", "
+    #    /usr/sbin/init;
+    #    /usr/bin/redis-server /etc/redis/redis.conf --daemonize yes;
+    #    /usr/bin/supervisord -c /etc/supervisor/supervisord.conf;
+    #    /usr/sbin/usermod -s /bin/bash www-data;
+    #    /usr/bin/chown -R www-data:www-data /data/sites;
+    #    /usr/bin/chmod -R 777 /data/sites/api/var;
+    #    /usr/bin/chmod -R 777 /data/logs;
+    #    export APACHE_LOG_DIR=/data/logs;
+    #    /usr/sbin/a2enmod rewrite;
+    #    /usr/sbin/a2ensite api;
+    #    /usr/sbin/a2dissite 000-default;
+    #    /usr/sbin/service apache2 reload;
+    #    /usr/bin/mongod -f /etc/mongod.conf --bind_ip 127.0.0.1 --fork;
+    #    /etc/init.d/clamav-daemon restart;
+    #    /usr/sbin/service apache2 restart;
+    #    /bin/bash;
+    #  "
+    #]
   esc410:
     privileged: true
     image: docaposte/ubuntu20-esc:4.1.0
@@ -74,7 +80,7 @@ services:
       ESC_MYSQL_PASSWORD: escClient1234
       SSL_CERTIFICAT_SYSTEM_PEM: /home/escnode/generationsCertificats/finalSystem/sslSysteme.pem
       CERTIFICATE_SYSTEM: /home/escnode/generationsCertificats/finalSystem/sslSysteme.pem
-      #JAVA_HOME: /usr/lib/jvm/java-1.8.0-openjdk-amd64
+      JAVA_HOME: /usr/lib/jvm/java-1.8.0-openjdk-amd64
       ESC_LOG_DIR: /data/logs/esc
     ports:
       - 4100:4100

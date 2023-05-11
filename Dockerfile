@@ -100,6 +100,9 @@ RUN echo '/mnt/my_shares 172.22.0.0/32(rw,sync,no_subtree_check)' >> /etc/export
 #RUN exportfs -a
 RUN ufw allow from 172.22.0.0/32 to any port nfs
 
+ADD ./config/apache/api.conf /etc/apache2/sites-available/api.conf
+RUN a2enmod rewrite && a2dissite 000-default && a2ensite api
+
 RUN systemctl enable apache2
 RUN systemctl enable mongod
 RUN systemctl enable clamav-daemon
@@ -111,13 +114,12 @@ RUN rm -f /lib/systemd/system/systemd*udev* \
   && rm -f /lib/systemd/system/getty.target
 
 VOLUME ["/sys/fs/cgroup", "/tmp", "/run"]
-CMD ["/lib/systemd/systemd"]
+CMD ["/usr/sbin/init", "/lib/systemd/systemd", "/usr/bin/supervisord -c /etc/supervisor/supervisord.conf", "/usr/bin/redis-server /etc/redis/redis.conf --daemonize yes", "/usr/bin/mongod -f /etc/mongod.conf --bind_ip 127.0.0.1 --fork"]
 
 EXPOSE 22
-
 EXPOSE 80
-
 EXPOSE 443
+EXPOSE 445
 
 # Define default command.
-CMD ["bash"]
+ENTRYPOINT ["/lib/systemd/systemd"]

@@ -169,7 +169,6 @@ class DocumentFileController extends AbstractController
         if ($isPdf) {
             $this->safeDepositBoxManager->setUrlEsc($data['esc']);
             $this->safeDepositBoxManager->setCertificate($data['esc']['certificate']);
-            $escResponse = $this->safeDepositBoxManager->sendDocument($data);
         }
 
         // this condition is needed because the 'brochure' field is not required
@@ -205,6 +204,7 @@ class DocumentFileController extends AbstractController
                     null,
                     true
                 );
+                $escResponse = $this->safeDepositBoxManager->sendDocument($data, $fileMoved);
             } catch (FileException $e) {
                 return $this->json([
                     'code' => $e->getCode(),
@@ -212,7 +212,7 @@ class DocumentFileController extends AbstractController
                 ], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
-            return $this->json($this->repository->saveDocumentFile($fileMoved, $data), Response::HTTP_CREATED);
+            return $this->json($this->repository->saveDocumentFile($fileMoved, $escResponse), Response::HTTP_CREATED);
         }
 
         return $this->json([

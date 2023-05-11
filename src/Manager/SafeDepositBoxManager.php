@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
@@ -126,7 +127,7 @@ class SafeDepositBoxManager
      * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
-    public function sendDocument(array $data = null, bool $verifypeer = false)
+    public function sendDocument(array $data = null, UploadedFile $file = null, bool $verifypeer = false)
     {
         if ((!isset($data['customerCode'])) ||
             (isset($data['customerCode']) && empty($data['customerCode']))
@@ -148,85 +149,75 @@ class SafeDepositBoxManager
             $filesystem = new Filesystem();
             $folder = sprintf('%s/%s', $this->parameterBag->get('kernel.cache_dir'), $data['customerCode']);
             $certificateFile = sprintf('%s/certificate.pem', $folder);
-            $utilisateurSysteme = sprintf('%s/utilisateurSysteme.pem', $folder);
-
-            $pfx = sprintf('%s/certificate.pfx', $folder);
-            $jks = sprintf('%s/certificate.jks', $folder);
-            $p12 = sprintf('%s/certificate.p12', $folder);
             $filesystem->mkdir($folder);
             if ($filesystem->exists($certificateFile)) {
                 $filesystem->remove($certificateFile);
             }
             $filesystem->touch($certificateFile);
             $filesystem->appendToFile($certificateFile, $data['esc']['certificate']);
-            /*//convert the file pem to pfx
-            exec(sprintf(
-                'openssl pkcs12 -export -keypbe NONE -certpbe NONE -in %s -inkey %s -out %s',
-                $certificateFile,
-                $certificateFile,
-                $pfx
-            ));
-            //convert the file pem to jks
-            exec(sprintf(
-                'openssl pkcs12 -export -keypbe NONE -certpbe NONE -in %s -inkey %s -out %s -name "certificate%s"',
-                $certificateFile,
-                $certificateFile,
-                $p12,
-                $data['customerCode']
-            ));
-            exec(sprintf(
-                'keytool -importkeystore -srckeystore %s -srcstoretype pkcs12 -destkeystore %s -keypasswd "doca"',
-                $p12,
-                $jks
-            ));*/
-            $options['local_cert'] = $utilisateurSysteme;
-            //$options['local_pk'] = $utilisateurSysteme;
+            $options['local_cert'] = $certificateFile;
         }
-        //$options['body'] = base64_encode(file_get_contents('/data/sites/api/src/Resources/pdf/1679585281772_Guide_Usage_Keepass_12.pdf'));
 
         $response = $this->client->request(
             'POST',
-            //$this->getUrlEsc(),
-            'https://ESCNODE-410:4100/EscDgtt/sessionOpen',
+            sprintf(
+                '%s://%s:%s/%s/sessionOpen',
+                $data['esc']['scheme'],
+                $data['esc']['dns'],
+                $data['esc']['port'],
+                $data['esc']['name']
+            ),
             $options
         );
 
         $statusCode = $response->getStatusCode();
+        switch ($statusCode) {
+            case 400:
+            case 401:
+            case 404:
+            case 500:
+                $data['error']['code'] = $statusCode;
+                $data['error']['message'] = $response->getContent();
+                return $data;
+        }
         $headers = $response->getHeaders();
 
-        if (empty($sessionId = $headers['ESC-sessionId'] ?? [])) {
+        if (empty($sessionId = $headers['esc-sessionid'][0] ?? [])) {
             return [];
         }
 
-        /**
-        $parameters = $values['parameters'];
+        $data['userIdCmd'] = $headers['esc-useridcmd'][0];
+        $options['headers']['ESC-sessionId'] = $sessionId;
+        $options['headers']['ESC-ucsId'] = '';
+        $options['headers']['ESC-fileName'] = $file->getFilename();
+        $options['headers']['ESC-archiveLabel'] = $file->getFilename();
+        $body = fopen($file->getPathname(), 'r');
+        $size = fstat($body)['size'] ?? null;
+        $options['body'] = $body;
+        $options['headers']['Content-Disposition'] = "attachment; filename=" . $file->getFilename();
+        $options['headers']['Content-Length'] = $size;
 
-        //set legacy database url
-        foreach ($parameters as $parameter) {
-            switch ($parameter['type']) {
-                case '_DATABASE_LEGACY_URL_':
-                    $this->setLegacyDatabase($parameter);
-                    break;
-                case '_DATABASE_URL_':
-                    $this->setDatabase($parameter);
-                    break;
-                case '_MONGODB_URL_':
-                    $this->setMongodb($parameter);
-                    break;
-                case 'WEBVIS':
-                    $this->setVis($parameter);
-                    break;
-                case 'ESCLASERLIKE':
-                    $this->setEscLaserLike($parameter);
-                    break;
+        $responseArchive = $this->client->request(
+            'POST',
+            sprintf('%sarchivePutNoControl', $this->getUrlEsc()),
+            $options
+        );
+
+        $statusCode = $responseArchive->getStatusCode();
+        switch ($statusCode) {
+            case 400:
+            case 500:
+                return [];
+        }
+        $headersArchiveCreated = $responseArchive->getHeaders();
+        foreach ($headersArchiveCreated as $key => $item) {
+            if (strpos($key, 'esc-') !== false) {
+                $key = str_replace('esc-', '', $key);
+                $data[$key] = trim($item[0]);
             }
+        }
 
-            if ($this->request->getCurrentRequest()) {
-                $this->request->getCurrentRequest()->attributes->set('vault', $this);
-            }
-        }*/
-
-        return $headers;
+        return $data;
     }
 
     /**
@@ -271,8 +262,8 @@ class SafeDepositBoxManager
                 $urlEsc['dns'],
                 $urlEsc['port'],
                 $urlEsc['name'],
-                $urlEsc['box'],
-                $urlEsc['room']
+                $urlEsc['room'],
+                $urlEsc['box']
             );
         }
 

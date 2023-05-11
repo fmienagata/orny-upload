@@ -32,10 +32,32 @@ class DocumentFileRepository extends DocumentRepository
      */
     public function saveDocumentFile(File $file, array $data = []) :  DocumentFile
     {
-        $this->documentFile = new DocumentFile($file);
-        $this->persistDocumentFile($data);
+        $documentFile = new DocumentFile($file);
+        if (isset($data['ticketId'])) {
+            $documentFile->setTicket($data['ticketId']);
+        }
 
-        return $this->documentFile;
+        if (isset($data['metadata'])) {
+            $documentFile->setChunkSize($data['metadata']['size']);
+        }
+
+        if (isset($data['file']['path'])) {
+            $documentFile->getMedia()->setFilePath($data['file']['path']);
+        }
+
+        $documentFile->setMetadata(new DocumentMetaData('application/pdf'));
+
+        foreach ($data as $key => $value) {
+            $method = sprintf('set%s', ucfirst($key));
+            if (method_exists(DocumentFile::class, $method) && $key != 'file') {
+                $documentFile->$method($value);
+            }
+        }
+
+        $this->dm->persist($documentFile);
+        $this->dm->flush();
+
+        return $documentFile;
     }
 
     /**
@@ -58,6 +80,13 @@ class DocumentFileRepository extends DocumentRepository
         }
 
         $this->documentFile->setMetadata(new DocumentMetaData('application/pdf'));
+
+        foreach ($data as $key => $value) {
+            $method = sprintf('set%s', ucfirst($key));dump($method);
+            if (method_exists(DocumentFile::class, $method) && $key != 'file') {
+                $this->documentFile->$method($value);
+            }
+        }dump($this->documentFile);
 
         $this->dm->persist($this->documentFile);
         $this->dm->flush();
