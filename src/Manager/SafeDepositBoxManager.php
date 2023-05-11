@@ -220,6 +220,92 @@ class SafeDepositBoxManager
         return $data;
     }
 
+    public function findDocument(array $data = null, bool $verifypeer = false)
+    {
+        if ((!isset($data['customerCode'])) ||
+            (isset($data['customerCode']) && empty($data['customerCode']))
+        ) {
+            return new JsonResponse([
+                'code' => Response::HTTP_BAD_REQUEST,
+                'message' => 'No route found, empty uri found.'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $options = [
+            'verify_peer' => $verifypeer,
+            'verify_host' =>  $verifypeer,
+        ];
+        if (isset($data['version'])) {
+            $options['query']['version'] = $data['version'];
+        }
+        if (isset($data['esc']['certificate'])) {
+            $filesystem = new Filesystem();
+            $folder = sprintf('%s/%s', $this->parameterBag->get('kernel.cache_dir'), $data['customerCode']);
+            $certificateFile = sprintf('%s/reader.pem', $folder);
+            $filesystem->mkdir($folder);
+            if ($filesystem->exists($certificateFile)) {
+                $filesystem->remove($certificateFile);
+            }
+            $filesystem->touch($certificateFile);
+            $filesystem->appendToFile($certificateFile, $data['esc']['certificate']);
+            $options['local_cert'] = $certificateFile;
+        }
+
+        $response = $this->client->request(
+            'POST',
+            sprintf(
+                '%s://%s:%s/%s/sessionOpen',
+                $data['esc']['scheme'],
+                $data['esc']['dns'],
+                $data['esc']['port'],
+                $data['esc']['name']
+            ),
+            $options
+        );
+
+        $statusCode = $response->getStatusCode();
+        switch ($statusCode) {
+            case 400:
+            case 401:
+            case 404:
+            case 500:
+                $data['error']['code'] = $statusCode;
+                $data['error']['message'] = $response->getContent();
+                return $data;
+        }
+        $headers = $response->getHeaders();
+
+        if (empty($sessionId = $headers['esc-sessionid'][0] ?? [])) {
+            return [];
+        }
+
+        $data['userIdCmd'] = $headers['esc-useridcmd'][0];
+        $options['headers']['ESC-sessionId'] = $sessionId;
+        $options['headers']['ESC-ucsId'] = '';
+
+        $responseArchive = $this->client->request(
+            'POST',
+            sprintf('%sarchiveGet', $this->getUrlEsc()),
+            $options
+        );
+
+        $statusCode = $responseArchive->getStatusCode();
+        switch ($statusCode) {
+            case 400:
+            case 500:
+                return [];
+        }
+        $headersArchiveCreated = $responseArchive->getHeaders();
+        foreach ($headersArchiveCreated as $key => $item) {
+            if (strpos($key, 'esc-') !== false) {
+                $key = str_replace('esc-', '', $key);
+                $data[$key] = trim($item[0]);
+            }
+        }
+
+        return $data;
+    }
+
     /**
      * @return HttpClientInterface
      */

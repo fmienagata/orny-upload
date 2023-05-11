@@ -169,7 +169,14 @@ use UploadBundle\Controller\DocumentFileController;
                 )]
             )
         ),
-        new Get()
+        new Get(
+            uriTemplate: '/document_files/{id}',
+            name: '_upload_/document_files/{id}_get',
+            routeName: '_upload_/document_files/{id}_get',
+            controller: DocumentFileController::class,
+            normalizationContext: ['groups' => ['document_files:read']],
+            denormalizationContext: ['groups' => ['document_files:write']]
+        )
     ]
 )]
 class DocumentFile

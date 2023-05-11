@@ -2,6 +2,7 @@
 
 namespace UploadBundle\Controller;
 
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\File\File;
@@ -220,5 +221,19 @@ class DocumentFileController extends AbstractController
             'code' => Response::HTTP_BAD_REQUEST,
             'message' => 'Your file is not uploaded.',
         ], Response::HTTP_BAD_REQUEST);
+    }
+
+    #[Route(
+        '/upload/document_files/{id}',
+        name: '_upload_/document_files/{id}_get',
+        methods: ['GET'],
+        defaults: [
+            '_api_resource_class' => DocumentFile::class,
+            '_api_operation_name' => '_upload_/document_files/{id}_get',
+        ]
+    )]
+    public function Get(#[MapEntity(class: DocumentFile::class)] DocumentFile $documentFile)
+    {
+        return $this->json($documentFile, Response::HTTP_OK);
     }
 }
