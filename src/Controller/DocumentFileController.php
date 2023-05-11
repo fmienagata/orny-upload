@@ -205,6 +205,7 @@ class DocumentFileController extends AbstractController
                     true
                 );
                 $escResponse = $this->safeDepositBoxManager->sendDocument($data, $fileMoved);
+                $this->repository->saveDocumentFile($fileMoved, $escResponse);
             } catch (FileException $e) {
                 return $this->json([
                     'code' => $e->getCode(),
@@ -212,7 +213,7 @@ class DocumentFileController extends AbstractController
                 ], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
-            return $this->json($this->repository->saveDocumentFile($fileMoved, $escResponse), Response::HTTP_CREATED);
+            return $this->json($escResponse, Response::HTTP_CREATED);
         }
 
         return $this->json([

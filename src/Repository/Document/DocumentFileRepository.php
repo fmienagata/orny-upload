@@ -50,7 +50,7 @@ class DocumentFileRepository extends DocumentRepository
         foreach ($data as $key => $value) {
             $method = sprintf('set%s', ucfirst($key));
             if (method_exists(DocumentFile::class, $method) && $key != 'file') {
-                $documentFile->$method($value);
+                //$documentFile->$method($value);
             }
         }
 
