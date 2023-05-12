@@ -3,6 +3,7 @@
 namespace UploadBundle\Manager;
 
 use GuzzleHttp\Client;
+use setasign\Fpdi\Fpdi;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
@@ -216,6 +217,11 @@ class SafeDepositBoxManager
                 $data[$key] = trim($item[0]);
             }
         }
+        $pdf = new Fpdi();
+        $pagecount = $pdf->setSourceFile($file->getPathname());
+        $data['associatedDocuments'] = sprintf('E000000000000000/1/%s', $pagecount);
+        $data['location'] = sprintf('S/E//%s', $data['archiveid']);
+        $data['pages'] = $pagecount;
 
         return $data;
     }
