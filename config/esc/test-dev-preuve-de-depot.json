@@ -1,0 +1,14 @@
+{
+	"id_archive": "231f68c154944a60b2223d3fbb0a75c2",
+	"nom_fichier": "nomfichier.txt",
+	"libelle_archive": "nomexagere",
+	"archive_principale": true,
+	"id_ucs": "3a795d0f832a4559b77aa07b64dfd014",
+	"id_salle": "2f6f2d9fb46c4e558e8873a2ac7899ca",
+	"id_coffre": "c324f337acfd4fa4a93d124f58a6a260",
+	"date_depot": "2023-05-09T18:30:17.013+02:00",
+	"poids_octet": 0,
+	"config_horodatage": "XMLDSIG",
+	"hash": "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b",
+	"hash_type": "SHA384"
+}
