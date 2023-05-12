@@ -60,15 +60,13 @@ class SafeDepositBoxManager
 
         $filesystem = new Filesystem();
         $folder = sprintf('%s/%s', $this->parameterBag->get('kernel.cache_dir'), '9463');
-        $certificateFile = sprintf('%s/certificate.pem', $folder);
         $utilisateurSysteme = sprintf('%s/utilisateurSysteme.pem', $folder);
 
-        $pfx = sprintf('%s/certificate.pfx', $folder);
-        $jks = sprintf('%s/certificate.jks', $folder);
-        $p12 = sprintf('%s/certificate.p12', $folder);
         $filesystem->mkdir($folder);
-        if ($filesystem->exists($certificateFile)) {
-            $filesystem->remove($certificateFile);
+        if ($filesystem->exists($utilisateurSysteme)) {
+            /**
+             * @todo replace it
+             */
         }
 
         $options['local_cert'] = $utilisateurSysteme;
@@ -76,12 +74,16 @@ class SafeDepositBoxManager
         //Open session esc
         $response = $this->client->request(
             'POST',
-            //$this->getUrlEsc(),
-            'https://ESCNODE-410:4100/EscDgtt/sessionOpen',
+            sprintf(
+                '%s://%s:%s/%s/roomCreate',
+                $data['esc']['scheme'],
+                $data['esc']['dns'],
+                $data['esc']['port'],
+                $data['esc']['name']
+            ),
             $options
         );
 
-        $statusCode = $response->getStatusCode();
         $headers = $response->getHeaders();
 
         if (empty($sessionId = $headers['esc-sessionid'] ?? [])) {
@@ -91,15 +93,27 @@ class SafeDepositBoxManager
         $data['userIdCmd'] = $headers['esc-useridcmd'][0];
         $options['headers']['ESC-label'] = 'Vehicle';
         $options['headers']['ESC-sessionId'] = $headers['esc-sessionid'];
-        $body = fopen(sprintf('%s/config/esc/certificats/salle1.pem', $this->parameterBag->get('kernel.project_dir')), 'r');
+        /**
+         * @todo change to uploaded pem file
+         */
+        $body = fopen(sprintf(
+            '%s/config/esc/certificats/salle1.pem',
+            $this->parameterBag->get('kernel.project_dir')
+        ), 'r');
+
         $size = dump(fstat($body)['size'] ?? null);
         $options['headers']['Content-Disposition'] = "attachment; filename=file";
         $options['headers']['Content-Length'] = $size;
         //create room
         $responseRoom = $this->client->request(
             'POST',
-            //$this->getUrlEsc(),
-            'https://ESCNODE-410:4100/EscDgtt/roomCreate',
+            sprintf(
+                '%s://%s:%s/%s/roomCreate',
+                $data['esc']['scheme'],
+                $data['esc']['dns'],
+                $data['esc']['port'],
+                $data['esc']['name']
+            ),
             $options
         );
 
