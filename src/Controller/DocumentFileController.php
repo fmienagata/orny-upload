@@ -143,14 +143,11 @@ class DocumentFileController extends AbstractController
             return $file;
         }
 
-        //scan antivirus
-        if (($scanVirus = $this->antivirusManager->isFileSafe($file, true)) !== true) {
-            return $scanVirus;
-        }
+        $pdfToolsCkeck = true;
 
         //Check pdf and covert to pdf if needed
         $isPdf = false;
-        if ($scanVirus) {
+        if ($pdfToolsCkeck) {
             $isPdf = true;
         }
 
@@ -205,6 +202,10 @@ class DocumentFileController extends AbstractController
                     null,
                     true
                 );
+                //scan antivirus
+                if (($scanVirus = $this->antivirusManager->isFileSafe($fileMoved, true)) !== true) {
+                    return $scanVirus;
+                }
                 $escResponse = $this->safeDepositBoxManager->sendDocument($data, $fileMoved);
                 $this->repository->saveDocumentFile($fileMoved, $escResponse);
             } catch (FileException $e) {
