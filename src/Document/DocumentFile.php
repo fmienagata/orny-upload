@@ -55,6 +55,17 @@ use UploadBundle\Controller\DocumentFileController;
                                         'format' => 'binary'
                                     ],
                                     'fileName' => ['type' => 'string', 'example' => 'file.pdf'],
+                                    'esc' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'scheme' => ['type' => 'string', 'example' => 'https'],
+                                            'dns' => ['type' => 'string', 'example' => 'du0-aes-upload.demat.lan'],
+                                            'port' => ['type' => 'string', 'example' => '10443'],
+                                            'name' => ['type' => 'string', 'example' => 'ESCNODE_410'],
+                                            'room' => ['type' => 'string', 'example' => '2f6f2d9fb46c4e558e8873a2ac7899ca'],
+                                            'box' => ['type' => 'string', 'example' => 'c324f337acfd4fa4a93d124f58a6a260'],
+                                        ]
+                                    ],
                                     'paperless' => [
                                         'type' => 'object',
                                         'properties' => [
@@ -189,57 +200,57 @@ class DocumentFile
     private string $id;
 
     #[MongoDB\Field(type:"string")]
-    #[Groups(["document_files" =>"read", "document_files" => "write"])]
+    #[Groups(["document_files:read", "document_files:write"])]
     private string $originalName;
 
     #[MongoDB\Field(type:"string")]
-    #[Groups(["document_files" =>"read", "document_files" => "write"])]
+    #[Groups(["document_files:read", "document_files:write"])]
     private string $ticket;
 
     #[Gedmo\Timestampable(on: "create")]
     #[MongoDB\Field(type:"date")]
-    #[Groups(["document_files" =>"read", "document_files" => "write"])]
+    #[Groups(["document_files:read", "document_files:write"])]
     private \DateTime $uploadDate;
 
     #[MongoDB\Field(type:"int")]
-    #[Groups(["document_files" =>"read", "document_files" => "write"])]
+    #[Groups(["document_files:read", "document_files:write"])]
     private int $length;
 
     #[MongoDB\Field(type:"int")]
-    #[Groups(["document_files" =>"read", "document_files" => "write"])]
+    #[Groups(["document_files:read", "document_files:write"])]
     private int $chunkSize;
 
     #[MongoDB\Field(type:"raw")]
-    #[Groups(["document_files" =>"read", "document_files" => "write"])]
+    #[Groups(["document_files:read", "document_files:write"])]
     #[File\Metadata(targetDocument: DocumentMetaData::class)]
     private $metadata;
 
     #[ApiProperty(types: ['https://schema.org/file'])]
-    #[Groups(["document_files" =>"read", "document_files" => "write"])]
+    #[Groups(["document_files:read", "document_files:write"])]
     public \Symfony\Component\HttpFoundation\File\File|null $file = null;
 
     #[ApiProperty(types: ['https://schema.org/file'])]
-    #[Groups(["document_files" =>"read"])]
+    #[Groups(["document_files:read"])]
     public ?MediaObject $media = null;
 
     #[MongoDB\Field(type:"string")]
-    #[Groups(["document_files" =>"read", "document_files" => "write"])]
+    #[Groups(["document_files:read", "document_files:write"])]
     private string $archiveId;
 
     #[MongoDB\Field(type:"string")]
-    #[Groups(["document_files" =>"read", "document_files" => "write"])]
+    #[Groups(["document_files:read", "document_files:write"])]
     private string $ucsId;
 
     #[MongoDB\Field(type:"date")]
-    #[Groups(["document_files" =>"read", "document_files" => "write"])]
+    #[Groups(["document_files:read", "document_files:write"])]
     private string $timestamp;
 
     #[MongoDB\Field(type:"string")]
-    #[Groups(["document_files" =>"read", "document_files" => "write"])]
+    #[Groups(["document_files:read", "document_files:write"])]
     private string $escName;
 
     #[MongoDB\Field(type:"string")]
-    #[Groups(["document_files" =>"read", "document_files" => "write"])]
+    #[Groups(["document_files:read", "document_files:write"])]
     private string $userIdCmd;
 
     #[MongoDB\Field(type: 'date')]

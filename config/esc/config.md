@@ -2,14 +2,16 @@
 
 en local dans serveur upload du0-aes-upload.demat.lan 172.29.95.15
 
-URL : https://127.0.0.1:10443<br>
+URL : https://172.29.95.15:10443 ou https://du0-aes-upload.demat.lan:10443<br> 
 Salle : <b>2f6f2d9fb46c4e558e8873a2ac7899ca</b><br>
 Admin : <b>54267662bcd548cbaa8f35dd846922a6</b><br>
-Certificat admin : <b>/home/escnode/generationsCertificats/administrateurCLIENT.pem</b><br>
+Certificat admin : <b>/home/escnode/generationsCertificats/finalClient/administrateurCLIENT.pem</b><br>
 Coffre : <b>c324f337acfd4fa4a93d124f58a6a260</b><br>
 Nom du coffre : <b>CoffreDgtt</b><br>
 Gestionnaire : <b>8ea44c9fa08446afbde3f4edc25de648</b><br>
-Certificat admin : <b>/home/escnode/generationsCertificats/gestionnaireCLIENT.pem</b><br>
+Certificat admin : <b>/home/escnode/generationsCertificats/finalClient/gestionnaireCLIENT.pem</b><br>
+Lecteur : <b>adbca49080184c28ae14df8e3374ad26</b><br>
+Certificat admin : <b>/home/escnode/generationsCertificats/finalClient/lecteurCLIENT.pem</b><br>
 
 ## Création de la salle:
 Connexion à l'esc <b>ESCNODE_410</b> avec le certificate utilisateurSysteme.pem, pour généré un id de connexion
@@ -201,6 +203,80 @@ Mark bundle as not supporting multiuse
 < Content-Length: 0
 ```
 
+## Création de l'utilisateur lecteur
+C'est l'utilisateur qui permettra de faire les dépôts de fichiers dans le coffre.
+On utilise l'id de session de l'administrateur.
+
+On commence par se connecter avec l'utilisateur admin pour récupérer un id de session
+```
+curl -v -X POST -k \
+--cert "/home/escnode/generationsCertificats/finalClient/administrateurCLIENT.pem" https://127.0.0.1:10443/ESCNODE_410/sessionOpen
+```
+réponse:
+```
+Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Date: Mon May 15 16:33:40 CEST 2023
+< Server: ESCNODE_410 4.1.0_6c804
+< ESC-sessionId: 6f8be98cdd7a432aaf99c7fb5d223fd8
+< ESC-userType: ADMIN
+< ESC-userName: Administrateur
+< ESC-userId: 54267662bcd548cbaa8f35dd846922a6
+< ESC-timestamp: 2023-05-15T16:33:40.552+02:00
+< ESC-escName: ESCNODE_410
+< ESC-userIdCmd: 54267662bcd548cbaa8f35dd846922a6
+< Content-Length: 0
+```
+
+Id de session : <b>ESC-sessionId: 6f8be98cdd7a432aaf99c7fb5d223fd8</b>
+
+On crée l'utilisateur à l'aide de l'id de session admin
+```
+curl -v -X POST -k \
+--cert "/home/escnode/generationsCertificats/finalClient/administrateurCLIENT.pem" \
+--header "ESC-sessionId: 6f8be98cdd7a432aaf99c7fb5d223fd8" \
+--header "ESC-type: LECT" \
+--header "ESC-nom: Lecteur" \
+--data-binary "@/home/escnode/generationsCertificats/finalClient/lecteurCLIENT.pem" https://127.0.0.1:10443/ESCNODE_410/userAdd
+```
+réponse:
+```
+Mark bundle as not supporting multiuse
+< HTTP/1.1 100 Continue
+* We are completely uploaded and fine
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Date: Mon May 15 16:36:36 CEST 2023
+< Server: ESCNODE_410 4.1.0_6c804
+< ESC-userId: adbca49080184c28ae14df8e3374ad26
+< ESC-timestamp: 2023-05-15T16:36:36.020+02:00
+< ESC-escName: ESCNODE_410
+< ESC-userIdCmd: 54267662bcd548cbaa8f35dd846922a6
+< Content-Length: 0
+```
+
+On obtient d'id de l'utilisateur lecteur : <b>ESC-userId: adbca49080184c28ae14df8e3374ad26</b>
+
+on donne ensuite les droits à la salle de coffres
+```
+curl -v -X POST -k \
+--cert "/home/escnode/generationsCertificats/finalClient/administrateurCLIENT.pem" \
+--header "ESC-sessionId: 6f8be98cdd7a432aaf99c7fb5d223fd8" \
+--header "ESC-userId: adbca49080184c28ae14df8e3374ad26" https://127.0.0.1:10443/ESCNODE_410/2f6f2d9fb46c4e558e8873a2ac7899ca/roomRightAdd
+```
+réponse:
+```
+Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Date: Mon May 15 16:38:47 CEST 2023
+< Server: ESCNODE_410 4.1.0_6c804
+< ESC-rightId: 0ba943d2e0b4413493e0c7445717a71c
+< ESC-timestamp: 2023-05-15T16:38:47.825+02:00
+< ESC-escName: ESCNODE_410
+< ESC-userIdCmd: 54267662bcd548cbaa8f35dd846922a6
+< Content-Length: 0
+```
+
 ## Test de dépôt de fichier
 On se connecte avec le certificat gestionnaire
 ```
@@ -267,4 +343,56 @@ preuve de dépôt renvoyée par le coffre
     "hash": "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b",
     "hash_type": "SHA384"
 }
+```
+
+## Test de téléchargement de fichier
+On se connecte avec le certificat gestionnaire
+```
+curl -v -X POST -k \
+--cert "/home/escnode/generationsCertificats/finalClient/lecteurCLIENT.pem" https://172.29.95.15:10443/ESCNODE_410/sessionOpen
+```
+réponse:
+```
+Accept: */*
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Date: Tue Jun 06 18:19:34 CEST 2023
+< Server: ESCNODE_410 4.1.0_6c804
+< ESC-sessionId: 59022342f1c342ed8d0117e24f3bfe01
+< ESC-userType: LECT
+< ESC-userName: Lecteur
+< ESC-userId: adbca49080184c28ae14df8e3374ad26
+< ESC-timestamp: 2023-06-06T18:19:34.316+02:00
+< ESC-escName: ESCNODE_410
+< ESC-userIdCmd: adbca49080184c28ae14df8e3374ad26
+< Content-Length: 0
+```
+
+Téléchargement du fichier
+```
+curl -v -X POST -k \
+--cert "/home/escnode/generationsCertificats/finalClient/lecteurCLIENT.pem" \
+--header "ESC-sessionId: 59022342f1c342ed8d0117e24f3bfe01" \
+--header "ESC-archiveId: 231f68c154944a60b2223d3fbb0a75c2" \
+https://172.29.95.15:10443/ESCNODE_410/2f6f2d9fb46c4e558e8873a2ac7899ca/c324f337acfd4fa4a93d124f58a6a260/archiveGet
+```
+
+réponse:
+```
+Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Date: Tue Jun 06 18:23:52 CEST 2023
+< Server: ESCNODE_410 4.1.0_6c804
+< ESC-fileName: nomfichier.txt
+< ESC-label: nomexagere
+< ESC-archiveSize: 0
+< ESC-hashType: SHA384
+< ESC-archiveId: 231f68c154944a60b2223d3fbb0a75c2
+< ESC-hash: 38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b
+< ESC-timestamp: 2023-06-06T18:23:52.430+02:00
+< ESC-escName: ESCNODE_410
+< ESC-userIdCmd: adbca49080184c28ae14df8e3374ad26
+< Content-Length: 0
+< Content-Type: application/octet-stream
 ```

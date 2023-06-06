@@ -23,10 +23,10 @@ services:
       - 443
     volumes:
       - uploaddata:/data:rw
-      #- nfs-upload:/mnt/nfs-upload
+      - nfs-upload:/mnt/nfs-upload:rw
       - ./:/data/sites/api:rw
-      #- ./config/apache/api.conf:/etc/apache2/sites-available/api.conf
-      #- ./config/apache/apache2.conf:/etc/apache2/apache2.conf
+      - ./config/apache/api.conf:/etc/apache2/sites-available/api.conf
+      - ./config/apache/apache2.conf:/etc/apache2/apache2.conf
       - ./config/apache/php.ini:/etc/php.ini
       -  /sys/fs/cgroup:/sys/fs/cgroup:rw
       - .:/app:cached
@@ -35,28 +35,16 @@ services:
       - /run
       - /run/lock
       - /tmp
+    extra_hosts:
+      - "upload-bundle-local.demat.lan:127.0.0.1"
+      - "api-aes-local.demat.lan:172.22.0.23"
+      - "mongodb-local.demat.lan:172.22.0.1"
+      - "upload-bundle-local.demat.lan:172.22.0.20"
     networks:
       nginx-proxy:
         ipv4_address: 172.22.0.20
-    #command: ["sh", "-c", "
-    #    /usr/sbin/init;
-    #    /usr/bin/redis-server /etc/redis/redis.conf --daemonize yes;
-    #    /usr/bin/supervisord -c /etc/supervisor/supervisord.conf;
-    #    /usr/sbin/usermod -s /bin/bash www-data;
-    #    /usr/bin/chown -R www-data:www-data /data/sites;
-    #    /usr/bin/chmod -R 777 /data/sites/api/var;
-    #    /usr/bin/chmod -R 777 /data/logs;
-    #    export APACHE_LOG_DIR=/data/logs;
-    #    /usr/sbin/a2enmod rewrite;
-    #    /usr/sbin/a2ensite api;
-    #    /usr/sbin/a2dissite 000-default;
-    #    /usr/sbin/service apache2 reload;
-    #    /usr/bin/mongod -f /etc/mongod.conf --bind_ip 127.0.0.1 --fork;
-    #    /etc/init.d/clamav-daemon restart;
-    #    /usr/sbin/service apache2 restart;
-    #    /bin/bash;
-    #  "
-    #]
+    entrypoint:
+      - /lib/systemd/systemd
   esc410:
     privileged: true
     image: docaposte/ubuntu20-esc:4.1.0
@@ -93,10 +81,12 @@ services:
       - 80
       - 443
       - 3306
+      - 4010
+      - 4100
       - 10443
     hostname: safe-box-esc-local.demat.lan
     volumes:
-      - escnodedata:/home
+      - escnodedata:/home:rw
       - ./config/apache/apache2.conf:/etc/apache2/apache2.conf
       - ./config/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf
       - ./config/apache/php.ini:/etc/php.ini
@@ -112,6 +102,8 @@ services:
         ipv4_address: 172.22.0.21
     user: root:root
     working_dir: /home/escnode
+    entrypoint:
+      - /lib/systemd/systemd
 
 volumes:
   uploaddata:
@@ -120,8 +112,8 @@ volumes:
     driver: local
   databasedata:
     driver: local
-  #nfs-upload:
-  #  driver: local
+  nfs-upload:
+    driver: local
   #  driver_opts:
   #    type: "nfs"
   #    o: "addr=127.0.0.1,nolock,soft,rw"
