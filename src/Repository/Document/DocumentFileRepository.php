@@ -45,8 +45,6 @@ class DocumentFileRepository extends DocumentRepository
             $documentFile->getMedia()->setFilePath($data['file']['path']);
         }
 
-        $documentFile->setMetadata(new DocumentMetaData('application/pdf'));
-
         foreach ($data as $key => $value) {
             $method = sprintf('set%s', ucfirst($key));
             if (method_exists(DocumentFile::class, $method) &&
@@ -64,8 +62,12 @@ class DocumentFileRepository extends DocumentRepository
                     $documentFile->$method($v);
                 }
             }
+
+            if ($key == 'metadata') {
+                $documentFile->setMetadata(new DocumentMetaData('application/pdf', $value));
+            }
         }
-        
+
         $this->dm->persist($documentFile);
         $this->dm->flush();
 
