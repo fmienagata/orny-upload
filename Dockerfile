@@ -26,7 +26,7 @@ RUN apt -y update
 RUN apt -y install lsb-release ca-certificates apt-transport-https software-properties-common \
     apache2-bin apache2-utils apache2 default-jre
 RUN apt -y install nano hostname wget unzip zip git net-tools openssl sudo systemd supervisor \
-    clamav clamav-daemon tree
+    clamav clamav-daemon tree telnet
 # Gitflow installer
 COPY ./bin/gitflow-installer.sh /root/gitflow-installer.sh
 RUN chmod +x /root/gitflow-installer.sh
@@ -68,13 +68,14 @@ ENV PATH="/usr/local/bin/composer:${PATH}"
 RUN  apt-get -y install nano hostname wget unzip zip git net-tools sudo systemd supervisor \
     clamav clamav-daemon tree
 
-
 RUN usermod -a -G root,www-data -d /home/www-data www-data
 COPY --chown=www-data:www-data ./config/www-data/.ssh /home/www-data/.ssh
 COPY --chown=www-data:www-data ./config/www-data/.bashrc /home/www-data/.bashrc
 RUN mkdir -p /home/www-data/.composer && mkdir -p /home/www-data/.ssh && mkdir -p /data/sites/api && \
     mkdir -p /data/logs && chown -R www-data:www-data /home/www-data && chown -R www-data:www-data /data && \
     chmod -R 775 /data && mkdir -p /data/db && chown -R mongodb:mongodb /data/db
+
+RUN sed -E -i -e 's/www-data:x:33:33:www-data:\/home\/www-data:\/usr\/sbin\/nologin(.*)$/www-data:x:33:33:www-data:\/home\/www-data:\/bin\/bash\1/g' /etc/passwd
 
 RUN mkdir -p /run/php-fpm/ && mkdir -p /run/supervisor && chown -R www-data:www-data /run/php-fpm
 RUN sed -E -i -e 's/logfile=\/var\/log\/supervisor\/supervisord.log(.*)$/logfile=\/data\/logs\/supervisord.log \1/g' /etc/supervisor/supervisord.conf
@@ -102,6 +103,8 @@ RUN ufw allow from 172.22.0.0/32 to any port nfs
 
 ADD ./config/apache/api.conf /etc/apache2/sites-available/api.conf
 RUN a2enmod rewrite && a2dissite 000-default && a2ensite api
+ADD ./config/apache/ssl-api.conf /etc/apache2/sites-available/ssl-api.conf
+RUN a2enmod ssl && a2ensite ssl-api
 
 RUN systemctl enable apache2
 RUN systemctl enable mongod

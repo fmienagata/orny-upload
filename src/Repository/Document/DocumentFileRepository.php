@@ -49,11 +49,23 @@ class DocumentFileRepository extends DocumentRepository
 
         foreach ($data as $key => $value) {
             $method = sprintf('set%s', ucfirst($key));
-            if (method_exists(DocumentFile::class, $method) && $key != 'file') {
-                //$documentFile->$method($value);
+            if (method_exists(DocumentFile::class, $method) &&
+                $key != 'file' &&
+                !is_array($value) &&
+                $key != 'metadata' &&
+                $key != 'paperless' &&
+                $key != 'esc'
+            ) {
+                $documentFile->$method($value);
+            }
+
+            if (is_array($value) && $key != 'file' && $key != 'metadata' && $key != 'paperless' && $key != 'esc') {
+                foreach ($value as $v) {
+                    $documentFile->$method($v);
+                }
             }
         }
-
+        
         $this->dm->persist($documentFile);
         $this->dm->flush();
 

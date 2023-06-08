@@ -72,7 +72,7 @@ cat $1.crt $1.key > $2/$1.pem
 openssl x509 -text -in $2/$1.pem
 
 #suppression fichiers temporaire
-rm -f $1.key $1.csr $1.crt
+#rm -f $1.key $1.csr $1.crt
 }
 
 

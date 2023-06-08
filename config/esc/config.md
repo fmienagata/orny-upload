@@ -9,9 +9,9 @@ Certificat admin : <b>/home/escnode/generationsCertificats/finalClient/administr
 Coffre : <b>c324f337acfd4fa4a93d124f58a6a260</b><br>
 Nom du coffre : <b>ESCNODE_410</b><br>
 Gestionnaire : <b>8ea44c9fa08446afbde3f4edc25de648</b><br>
-Certificat admin : <b>/home/escnode/generationsCertificats/finalClient/gestionnaireCLIENT.pem</b><br>
+Certificat gestionnaire : <b>/home/escnode/generationsCertificats/finalClient/gestionnaireCLIENT.pem</b><br>
 Lecteur : <b>adbca49080184c28ae14df8e3374ad26</b><br>
-Certificat admin : <b>/home/escnode/generationsCertificats/finalClient/lecteurCLIENT.pem</b><br>
+Certificat lecteur : <b>/home/escnode/generationsCertificats/finalClient/lecteurCLIENT.pem</b><br>
 
 ## Création de la salle:
 Connexion à l'esc <b>ESCNODE_410</b> avec le certificate utilisateurSysteme.pem, pour généré un id de connexion

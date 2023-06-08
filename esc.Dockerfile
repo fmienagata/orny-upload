@@ -112,7 +112,7 @@ ARG MYSQL_HOST=localhost
 ARG MYSQL_PORT=3306
 ARG ESC_MYSQL_USER=escClient
 ARG ESC_MYSQL_PASSWORD=escClient1234
-ARG SSL_CERTIFICAT_SYSTEM_PEM=/home/escnode/generationsCertificats/finalSystem/sslSysteme.pem
+ARG SSL_CERTIFICAT_SYSTEM_PEM=(</home/escnode/generationsCertificats/finalSystem/sslSysteme.pem)
 
 ENV ESC_NAME=$ESC_NAME
 ENV ESC_VERSION=$ESC_VERSION
@@ -140,15 +140,22 @@ RUN chown -R escnode:escnode /data/logs/esc
 RUN chown -R escnode:escnode /data/esc
 
 RUN mkdir -p /home/escnode/esc
-#RUN mkdir -p /home/escnode/generationsCertificats
 ADD --chown=escnode:escnode ./config/esc/config.xml /home/escnode/esc/config.xml
-RUN sed -E -i -e 's/SSL_CERTIFICAT_SYSTEM_PEM(.*)$/$SSL_CERTIFICAT_SYSTEM_PEM\1/g' /home/escnode/esc/config.xml
 ADD --chown=escnode:escnode ./bin/esc/esc-${ESC_VERSION}/EscNode.jar /home/escnode/esc/EscNode.jar
 ADD --chown=escnode:escnode ./config/esc/logback.xml /home/escnode/esc/logback.xml
 ADD --chown=escnode:escnode ./bin/install_escnode.sh /home/escnode/esc/install_escnode.sh
 ADD --chown=escnode:escnode ./config/esc/certificats /home/escnode/generationsCertificats
 RUN bash /home/escnode/generationsCertificats/generateCertificats.sh
 RUN chmod +x /home/escnode/esc/install_escnode.sh
+#RUN sed -E -i -e "s/(.*)SSL_CERTIFICAT_SYSTEM_PEM(.*)$/$${SSL_CERTIFICAT_SYSTEM_PEM}\1/g" /home/escnode/esc/config.xml
+RUN sed -E -i -e "s/(.*)<esc name=\"ESC_NODE_NAME\">(.*)$/        <esc name=\"${ESC_NAME}\">\1/g" /home/escnode/esc/config.xml
+RUN sed -E -i -e "s/(.*)<hostname>ESC_MYSQL_HOST<\/hostname>(.*)$/                    <hostname>${MYSQL_HOST}<\/hostname>\1/g" /home/escnode/esc/config.xml
+RUN sed -E -i -e "s/(.*)<port>ESC_MYSQL_PORT<\/port>(.*)$/                    <port>${MYSQL_PORT}<\/port>\1/g" /home/escnode/esc/config.xml
+RUN sed -E -i -e "s/(.*)<user>ESC_MYSQL_USER<\/user>(.*)$/                    <user>${ESC_MYSQL_USER}<\/user>\1/g" /home/escnode/esc/config.xml
+RUN sed -E -i -e "s/(.*)<password>ESC_MYSQL_PASSWORD<\/password>(.*)$/                    <password>${ESC_MYSQL_PASSWORD}<\/password>\1/g" /home/escnode/esc/config.xml
+RUN rm -rf /home/escnode/generationsCertificats/*.key && \
+    rm -rf /home/escnode/generationsCertificats/*.crt
+
 ADD ./bin/escnode.service /home/escnode/esc/escnode.service
 ADD ./bin/escnode.service /lib/systemd/system/escnode.service
 RUN chmod 0644 /lib/systemd/system/escnode.service
@@ -158,8 +165,7 @@ RUN systemctl enable escnode
 RUN systemctl enable systemd-sysctl
 
 VOLUME ["/sys/fs/cgroup", "/tmp", "/run"]
-CMD ["/usr/sbin/init", "/lib/systemd/systemd", "/usr/sbin/service mysql start", "mysql -e \"CREATE USER IF NOT EXISTS 'escClient'@'%' IDENTIFIED BY 'escClient1234';\"", "mysql -e \"GRANT ALL PRIVILEGES ON *.* TO 'escClient'@'%';\""]
-#CMD /home/escnode/esc/install_escnode.sh
+CMD ["/usr/sbin/init", "/lib/systemd/systemd", "/usr/sbin/service mysql start", "mysql -e \"CREATE USER IF NOT EXISTS 'escClient'@'%' IDENTIFIED BY 'escClient1234';\"", "mysql -e \"GRANT ALL PRIVILEGES ON *.* TO 'escClient'@'%';\"", "/home/escnode/esc/install_escnode.sh"]
 
 EXPOSE 22
 EXPOSE 80

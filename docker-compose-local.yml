@@ -72,7 +72,7 @@ services:
       ESC_LOG_DIR: /data/logs/esc
     ports:
       - 4100:4100
-      - 4010:4010
+      - 4110:4110
       - 12000:80
       - 12443:443
       - 3309:3306
@@ -81,8 +81,8 @@ services:
       - 80
       - 443
       - 3306
-      - 4010
       - 4100
+      - 4110
       - 10443
     hostname: safe-box-esc-local.demat.lan
     volumes:
@@ -97,6 +97,9 @@ services:
       - /run
       - /run/lock
       - /tmp
+    extra_hosts:
+      - "safe-box-esc-local.demat.lan:127.0.0.1"
+      - "safe-box-esc-local.demat.lan:172.22.0.21"
     networks:
       nginx-proxy:
         ipv4_address: 172.22.0.21

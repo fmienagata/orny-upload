@@ -9,6 +9,9 @@ ESC_MYSQL_PASSWORD="escClient1234"
 SSL_CERTIFICAT_SYSTEM_PEM=$(</home/escnode/generationsCertificats/finalSystem/sslSysteme.pem)
 JAVA="/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java"
 
+mysql -e "CREATE USER IF NOT EXISTS 'escClient'@'%' IDENTIFIED BY 'escClient1234';"
+mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'escClient'@'%';"
+
 set -o errexit
 set -o nounset
 maxcounter=45
@@ -22,6 +25,7 @@ while ! mysql --host="$MYSQL_HOST" -u "$ESC_MYSQL_USER" -p"$ESC_MYSQL_PASSWORD" 
     fi;
 done
 
+sed -E -i -e "s/(.*)SSL_CERTIFICAT_SYSTEM_PEM(.*)$/${SSL_CERTIFICAT_SYSTEM_PEM}\1/g" /home/escnode/esc/config.xml
 cat /home/escnode/esc/config.xml
 
 # Create standard user and grant permissions
@@ -41,7 +45,7 @@ fi
 $JAVA -jar /home/escnode/esc/EscNode.jar \
 -name "$ESC_NAME" \
 -configPath "/home/escnode/esc/config.xml" \
--portNoSSL 4010 \
+-portNoSSL 4110 \
 -port 4100 \
 -logLevel TRACE \
 -typeNode MIXTE \
