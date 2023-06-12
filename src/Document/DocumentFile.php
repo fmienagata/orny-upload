@@ -28,7 +28,12 @@ use UploadBundle\Controller\DocumentFileController;
     normalizationContext: ['groups' => ['document_files:read']],
     denormalizationContext: ['groups' => ['document_files:write']],
     operations: [
-        new GetCollection(),
+        new GetCollection(
+            uriTemplate: '/document_files',
+            name: '_upload_/document_files_get_collection',
+            routeName: '_upload_/document_files_get_collection',
+            controller: DocumentFileController::class
+        ),
         new Post(
             uriTemplate: '/document_files',
             name: '_upload_/document_files_post',
