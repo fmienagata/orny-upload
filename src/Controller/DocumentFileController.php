@@ -4,6 +4,7 @@ namespace UploadBundle\Controller;
 
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -236,5 +237,59 @@ class DocumentFileController extends AbstractController
     public function Get(#[MapEntity(class: DocumentFile::class)] DocumentFile $documentFile)
     {
         return $this->json($documentFile, Response::HTTP_OK);
+    }
+
+    #[Route(
+        '/upload/document_files',
+        name: '_upload_/document_files_get_collection',
+        methods: ['GET'],
+        defaults: [
+            '_api_resource_class' => DocumentFile::class,
+            '_api_operation_name' => '_upload_/document_files_get_collection',
+        ]
+    )]
+    public function GetCollection(Request $request)
+    {
+        $headers = $request->headers->all();
+
+        if (!array_key_exists("esc", $headers)) {
+            $error = new BadRequestException("Missing 'esc' header");
+
+            return $this->json([
+                'code' => $error->getCode(),
+                'message' => $error->getMessage(),
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $data = array();
+        $data["esc"] = json_decode($headers['esc'][0], true);
+        $data["customerCode"] = $headers['customercode'][0];
+        $data["applicationCode"] = $headers['applicationcode'][0];
+
+        $this->safeDepositBoxManager->setUrlEsc($data['esc']);
+        $this->safeDepositBoxManager->setCertificate($data['esc']['certificate']);
+
+        $query = $request->query->all();
+        $typeResponse = null;
+        if (array_key_exists("type", $query)) {
+            $typeResponse = $query["type"];
+            unset($query["type"]);
+        }
+
+        $documentFiles = $this->repository->findBy($query);
+
+        if (count($documentFiles) == 1 && ($typeResponse == "pdf" || $typeResponse == "xml")) {
+            $data["archiveId"] = $documentFiles[0]->getArchiveId();
+            $data["type"] = $typeResponse;
+            $file = $this->safeDepositBoxManager->findDocument($data);
+
+            return  new Response($file->getContent(), 200, array(
+                // $response = new Response($visResponse->getBody()->getContents(), 200, array(
+                "Content-Type" => $data["type"] == "pdf" ? "application/pdf" : "application/xml",
+                'Content-Length' => $file->getHeaders()["content-length"][0]
+            ));
+        } else {
+            return $this->json($documentFiles);
+        }
     }
 }

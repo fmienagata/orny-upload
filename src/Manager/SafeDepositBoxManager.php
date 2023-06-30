@@ -236,6 +236,7 @@ class SafeDepositBoxManager
         $pagecount = $pdf->pages;
         $data['associatedDocuments'] = sprintf('E000000000000000/1/%s', $pagecount);
         $data['location'] = sprintf('S/E//%s', $data['archiveid']);
+        $data['archiveId'] = $data['archiveid'];
         $data['pages'] = $pagecount;
 
         return $data;
@@ -303,10 +304,16 @@ class SafeDepositBoxManager
         $data['userIdCmd'] = $headers['esc-useridcmd'][0];
         $options['headers']['ESC-sessionId'] = $sessionId;
         $options['headers']['ESC-ucsId'] = '';
+        $options['headers']['ESC-archiveId'] = $data["archiveId"];
+
+        $url = sprintf('%sarchiveGet', $this->getUrlEsc());
+        if ($data["type"] == "xml") {
+            $url = sprintf('%sarchiveEvidenceGet', $this->getUrlEsc());
+        }
 
         $responseArchive = $this->client->request(
             'POST',
-            sprintf('%sarchiveGet', $this->getUrlEsc()),
+            $url,
             $options
         );
 
@@ -317,6 +324,7 @@ class SafeDepositBoxManager
                 return [];
         }
         $headersArchiveCreated = $responseArchive->getHeaders();
+        dump($headersArchiveCreated);
         foreach ($headersArchiveCreated as $key => $item) {
             if (strpos($key, 'esc-') !== false) {
                 $key = str_replace('esc-', '', $key);
@@ -324,7 +332,7 @@ class SafeDepositBoxManager
             }
         }
 
-        return $data;
+        return $responseArchive;
     }
 
     /**
