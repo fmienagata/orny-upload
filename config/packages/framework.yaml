@@ -18,7 +18,7 @@ parameters:
     upload.resources_dir: '%kernel.project_dir%/src/Resources'
 
     upload.temporary_folder: '%env(UPLOAD_TEMP)%'
-    upload.antivirus_script: "%env(ANTIVIRUS_SCRIPT)% %kernel.logs_dir%/clamdscan-%kernel.environment%.log"
+    upload.antivirus_script: '%env(ANTIVIRUS_SCRIPT)% %kernel.logs_dir%/clamdscan-%kernel.environment%.log"'
 # see https://symfony.com/doc/current/reference/configuration/framework.html
 framework:
     secret: '%env(APP_SECRET)%'

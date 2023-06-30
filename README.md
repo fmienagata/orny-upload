@@ -1,5 +1,18 @@
 # Upload Bundle
 
+Documentation:
+https://github.com/howtomakeaturn/pdfinfo
+
+Installation librairie linux pdf :
+
+```
+sudo apt-get install poppler-utils
+```
+puis
+```
+cd /data/sites/api && composer require "howtomakeaturn/pdfinfo:1.*"
+```
+
 Module d'import de documents
 
 http://dw0-mut-auto10.demat.lan:13033/conversion/v1.0/rest

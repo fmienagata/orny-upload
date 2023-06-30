@@ -100,7 +100,7 @@ class DocumentFileRepository extends DocumentRepository
             if (method_exists(DocumentFile::class, $method) && $key != 'file') {
                 $this->documentFile->$method($value);
             }
-        }dump($this->documentFile);
+        }
 
         $this->dm->persist($this->documentFile);
         $this->dm->flush();

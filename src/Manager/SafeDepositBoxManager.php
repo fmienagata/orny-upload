@@ -3,6 +3,7 @@
 namespace UploadBundle\Manager;
 
 use GuzzleHttp\Client;
+use Howtomakeaturn\PDFInfo\PDFInfo;
 use setasign\Fpdi\Fpdi;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpClient\CurlHttpClient;
@@ -122,7 +123,7 @@ class SafeDepositBoxManager
             case 500:
                 return [];
         }
-        $headersRoomCreated = $responseRoom->getHeaders();dump($headersRoomCreated);
+        $headersRoomCreated = $responseRoom->getHeaders();
         if (empty($roomId = $headersRoomCreated['esc-roomid'] ?? [])) {
             return [];
         }
@@ -231,8 +232,8 @@ class SafeDepositBoxManager
                 $data[$key] = trim($item[0]);
             }
         }
-        $pdf = new Fpdi();
-        $pagecount = $pdf->setSourceFile($file->getPathname());
+        $pdf = new PDFInfo($file->getPathname());
+        $pagecount = $pdf->pages;
         $data['associatedDocuments'] = sprintf('E000000000000000/1/%s', $pagecount);
         $data['location'] = sprintf('S/E//%s', $data['archiveid']);
         $data['pages'] = $pagecount;

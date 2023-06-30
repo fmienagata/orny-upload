@@ -29,8 +29,18 @@ class AntivirusManager
      */
     public function isFileSafe(File $file, $removeUnsafe = false)
     {
-        $command = $this->command . ' "' . $file->getRealPath() . '"';
-        $process = Process::fromShellCommandline($command);
+        if (!file_exists($file->getRealPath())) {
+            return new Response(
+                json_encode([
+                    'code' => 0,
+                    'message' => sprintf('The file %s not exists.', $file->getRealPath()),
+                ]),
+                Response::HTTP_BAD_REQUEST,
+                ['content-type' => 'application/json']
+            );
+        }
+        $command = $this->command . ' ' . $file->getRealPath();
+        $process = new Process(['clamdscan', '--fdpass', $file->getRealPath()]);
         $process->setTimeout(30);
         $process->run();
 

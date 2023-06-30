@@ -18,6 +18,7 @@
     "doctrine/mongodb-odm-bundle": "^4.5",
     "fpdf/fpdf": "^1.85",
     "gedmo/doctrine-extensions": "^3.10",
+    "howtomakeaturn/pdfinfo": "1.*",
     "lexik/jwt-authentication-bundle": "^2.16",
     "mongodb/mongodb": "1.13.1",
     "nelmio/cors-bundle": "^2.2",
