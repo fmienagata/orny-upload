@@ -260,7 +260,7 @@ class DocumentFileController extends AbstractController
 
         $data = array();
         $data["esc"] = json_decode($headers['esc'][0], true);
-        $data["customerCode"] = $headers['customercode'][0];
+        $data["cc"] = $headers['cc'][0];
         $data["applicationCode"] = $headers['applicationcode'][0];
 
         $this->safeDepositBoxManager->setUrlEsc($data['esc']);

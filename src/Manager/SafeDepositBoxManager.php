@@ -138,13 +138,13 @@ class SafeDepositBoxManager
      */
     public function sendDocument(array $data = null, UploadedFile $file = null, bool $verifypeer = false)
     {
-        if ((!isset($data['customerCode'])) ||
-            (isset($data['customerCode']) && empty($data['customerCode']))
+        if ((!isset($data['cc'])) ||
+            (isset($data['cc']) && empty($data['cc']))
         ) {
-            return new JsonResponse([
+            return [
                 'code' => Response::HTTP_BAD_REQUEST,
                 'message' => 'No route found, empty uri found.'
-            ], Response::HTTP_BAD_REQUEST);
+            ];
         }
 
         $options = [
@@ -156,7 +156,7 @@ class SafeDepositBoxManager
         }
         if (isset($data['esc']['certificate'])) {
             $filesystem = new Filesystem();
-            $folder = sprintf('%s/%s', $this->parameterBag->get('kernel.cache_dir'), $data['customerCode']);
+            $folder = sprintf('%s/%s', $this->parameterBag->get('kernel.cache_dir'), $data['cc']);
             $certificateFile = sprintf('%s/certificate.pem', $folder);
             $filesystem->mkdir($folder);
             if ($filesystem->exists($certificateFile)) {
@@ -265,7 +265,7 @@ class SafeDepositBoxManager
         }
         if (isset($data['esc']['certificate'])) {
             $filesystem = new Filesystem();
-            $folder = sprintf('%s/%s', $this->parameterBag->get('kernel.cache_dir'), $data['customerCode']);
+            $folder = sprintf('%s/%s', $this->parameterBag->get('kernel.cache_dir'), $data['cc']);
             $certificateFile = sprintf('%s/reader.pem', $folder);
             $filesystem->mkdir($folder);
             if ($filesystem->exists($certificateFile)) {
