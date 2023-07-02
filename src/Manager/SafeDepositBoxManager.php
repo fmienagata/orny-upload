@@ -2,20 +2,13 @@
 
 namespace UploadBundle\Manager;
 
-use GuzzleHttp\Client;
 use Howtomakeaturn\PDFInfo\PDFInfo;
-use setasign\Fpdi\Fpdi;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\HttpClient\CurlHttpClient;
-use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Path;
 
 /**
  * Archive GET : /EscBO2/764265cb4b5c4682a77ecae8209a31ac/468a2dbad8854f149fc4236f7d864e17/archiveGet
@@ -242,15 +235,25 @@ class SafeDepositBoxManager
         return $data;
     }
 
+    /**
+     * @param array|null $data
+     * @param bool       $verifypeer
+     *
+     * @return array|JsonResponse|\Symfony\Contracts\HttpClient\ResponseInterface|null
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     */
     public function findDocument(array $data = null, bool $verifypeer = false)
     {
-        if ((!isset($data['customerCode'])) ||
-            (isset($data['customerCode']) && empty($data['customerCode']))
+        if ((!isset($data['cc'])) ||
+            (isset($data['cc']) && empty($data['cc']))
         ) {
-            return new JsonResponse([
+            return [
                 'code' => Response::HTTP_BAD_REQUEST,
                 'message' => 'No route found, empty uri found.'
-            ], Response::HTTP_BAD_REQUEST);
+            ];
         }
 
         $options = [
@@ -321,10 +324,13 @@ class SafeDepositBoxManager
         switch ($statusCode) {
             case 400:
             case 500:
-                return [];
+                return [
+                    'code' => $statusCode,
+                    'message' => 'The safe deposit bax return an error.',
+                ];
         }
         $headersArchiveCreated = $responseArchive->getHeaders();
-        dump($headersArchiveCreated);
+
         foreach ($headersArchiveCreated as $key => $item) {
             if (strpos($key, 'esc-') !== false) {
                 $key = str_replace('esc-', '', $key);

@@ -30,14 +30,10 @@ class AntivirusManager
     public function isFileSafe(File $file, $removeUnsafe = false)
     {
         if (!file_exists($file->getRealPath())) {
-            return new Response(
-                json_encode([
-                    'code' => 0,
-                    'message' => sprintf('The file %s not exists.', $file->getRealPath()),
-                ]),
-                Response::HTTP_BAD_REQUEST,
-                ['content-type' => 'application/json']
-            );
+            return [
+                'code' => 0,
+                'message' => sprintf('The file %s not exists.', $file->getRealPath()),
+            ];
         }
         $command = $this->command . ' ' . $file->getRealPath();
         $process = new Process(['clamdscan', '--fdpass', $file->getRealPath()]);
@@ -57,14 +53,10 @@ class AntivirusManager
 
             $tabError = explode('n', $process->getOutput());
 
-            return new Response(
-                json_encode([
-                    'code' => $process->getExitCode(),
-                    'message' => str_replace('\\n', '', explode('<br />', nl2br(trim($process->getOutput())))),
-                ]),
-                Response::HTTP_BAD_REQUEST,
-                ['content-type' => 'application/json']
-            );
+            return [
+                'code' => $process->getExitCode(),
+                'message' => str_replace('\\n', '', explode('<br />', nl2br(trim($process->getOutput())))),
+            ];
         }
 
         return $process->isSuccessful();

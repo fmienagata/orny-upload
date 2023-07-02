@@ -22,7 +22,7 @@ class UploadManager
             if (!mkdir($concurrentDirectory = $folderName, 0775) && !is_dir($concurrentDirectory)) {
                 $error = new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
 
-                return $this->JsonResponse($error);
+                return $this->JsonResponse($error, true);
             }
         }
 
@@ -39,7 +39,7 @@ class UploadManager
         if (!isset($data['fileName'])) {
             $error = new \RuntimeException("parameter 'fileName' was not found");
 
-            return $this->JsonResponse($error);
+            return $this->JsonResponse($error, true);
         }
 
         return [];
@@ -66,7 +66,7 @@ class UploadManager
                 sprintf("File '%s' was not found", $fileName)
             );
 
-            return $this->JsonResponse($error);
+            return $this->JsonResponse($error, true);
         }
 
         return new UploadedFile(sprintf('%s/%s', $folder, $fileName), $fileName, null, null, true);
@@ -122,9 +122,22 @@ class UploadManager
         return false;
     }
 
-    private function JsonResponse($error)
+    /**
+     * @param      $error
+     * @param bool $asArray
+     *
+     * @return array|Response
+     */
+    private function JsonResponse($error, bool $asArray = false)
     {
-        $response = new Response(
+        if ($asArray) {
+            return [
+                'code' => $error->getCode(),
+                'message' => $error->getMessage(),
+            ];
+        }
+
+        return new Response(
             json_encode([
                 'code' => $error->getCode(),
                 'message' => $error->getMessage(),
@@ -132,7 +145,5 @@ class UploadManager
             Response::HTTP_BAD_REQUEST,
             ['content-type' => 'application/json']
         );
-
-        return $response;
     }
 }

@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -15,13 +16,9 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use UploadBundle\Document\DocumentFile;
-use UploadBundle\Form\Type\DocumentFileType;
 use UploadBundle\Manager\AntivirusManager;
 use UploadBundle\Manager\SafeDepositBoxManager;
 use UploadBundle\Manager\UploadManager;
-use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Path;
 use UploadBundle\Repository\Document\DocumentFileRepository;
 use Uploadbundle\Trait\UploadTrait;
 
@@ -46,11 +43,11 @@ class DocumentFileController extends AbstractController
             '_api_operation_name' => '_upload_/document_files_post',
         ]
     )]
-    public function Post(Request $request, SluggerInterface $slugger): Response
+    public function Post(Request $request, SluggerInterface $slugger): JsonResponse
     {
         //check temporary folder
         if ($response = $this->uploadManager->checkTemporaryDirectory($this->getParameter('upload.temporary_folder'))) {
-            return $response;
+            return $this->json($response, Response::HTTP_BAD_REQUEST);
         }
 
         $data = \json_decode($request->getContent(), true);
@@ -66,7 +63,7 @@ class DocumentFileController extends AbstractController
 
         //check the fileName parameter in the request data
         if ($response = $this->uploadManager->checkFileName($data)) {
-            return $response;
+            return $this->json($response, Response::HTTP_BAD_REQUEST);
         }
 
         //check ticket
@@ -141,7 +138,7 @@ class DocumentFileController extends AbstractController
 
         $file = $this->uploadManager->checkFile($data['fileName'], $this->getParameter('upload.temporary_folder'));
         if (!$file instanceof UploadedFile) {
-            return $file;
+            return $this->json($file, Response::HTTP_BAD_REQUEST);
         }
 
         $pdfToolsCkeck = true;
@@ -205,7 +202,7 @@ class DocumentFileController extends AbstractController
                 );
                 //scan antivirus
                 if (($scanVirus = $this->antivirusManager->isFileSafe($fileMoved, true)) !== true) {
-                    return $scanVirus;
+                    return $this->json($scanVirus, Response::HTTP_BAD_REQUEST);
                 }
                 $escResponse = $this->safeDepositBoxManager->sendDocument($data, $fileMoved);
                 $this->repository->saveDocumentFile($fileMoved, $escResponse);
@@ -282,6 +279,9 @@ class DocumentFileController extends AbstractController
             $data["archiveId"] = $documentFiles[0]->getArchiveId();
             $data["type"] = $typeResponse;
             $file = $this->safeDepositBoxManager->findDocument($data);
+            if (is_array($file) && isset($file['code'])) {
+                return $this->json($file, Response::HTTP_BAD_REQUEST);
+            }
 
             return  new Response($file->getContent(), 200, array(
                 // $response = new Response($visResponse->getBody()->getContents(), 200, array(
