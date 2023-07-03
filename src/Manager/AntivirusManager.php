@@ -43,7 +43,12 @@ class AntivirusManager
         if (!$process->isSuccessful()) {
             // Erreur parce que la commande à executer est invalide ou parce qu'un virus a été détecté ?
             if (!strpos($process->getOutput(), 'SCAN SUMMARY')) {
-                throw new \RuntimeException("Unable to execute command : " . $command);
+                $error = new \RuntimeException("Unable to execute command : " . $command);
+
+                return [
+                    'code' => $error->getCode(),
+                    'message' => $error->getMessage(),
+                ];
             }
 
             // On supprime le fichier si virus détecté + demande explicite de suppression
@@ -76,23 +81,15 @@ class AntivirusManager
                 return [$scannedFile->getVirusName()];
             }
         } catch (SocketException $e) {
-            return new Response(
-                [
-                    'code' => $e->getCode(),
-                    'message' => $e->getMessage(),
-                ],
-                Response::HTTP_BAD_REQUEST,
-                ['content-type' => 'application/json']
-            );
+            return [
+                'code' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
         } catch (FileScanException $e) {
-            return new Response(
-                [
-                    'code' => $e->getCode(),
-                    'message' => $e->getMessage(),
-                ],
-                Response::HTTP_BAD_REQUEST,
-                ['content-type' => 'application/json']
-            );
+            return [
+                'code' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
         }
     }
 }
