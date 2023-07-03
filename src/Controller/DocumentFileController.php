@@ -47,7 +47,7 @@ class DocumentFileController extends AbstractController
     {
         //check temporary folder
         if ($response = $this->uploadManager->checkTemporaryDirectory($this->getParameter('upload.temporary_folder'))) {
-            return $this->json($response, Response::HTTP_BAD_REQUEST);
+            return $this->json($response, Response::HTTP_OK);
         }
 
         $data = \json_decode($request->getContent(), true);
@@ -63,7 +63,7 @@ class DocumentFileController extends AbstractController
 
         //check the fileName parameter in the request data
         if ($response = $this->uploadManager->checkFileName($data)) {
-            return $this->json($response, Response::HTTP_BAD_REQUEST);
+            return $this->json($response, Response::HTTP_OK);
         }
 
         //check ticket
@@ -77,7 +77,7 @@ class DocumentFileController extends AbstractController
                 return $this->json([
                     'code' => $error->getCode(),
                     'message' => $error->getMessage(),
-                ], Response::HTTP_BAD_REQUEST);
+                ], Response::HTTP_OK);
             }
 
             $data['ticketId'] = $data['ticket']['id'];
@@ -106,9 +106,9 @@ class DocumentFileController extends AbstractController
             $error = new BadRequestException('Empty data file found.');
 
             return $this->json([
-                'code' => $error->getCode(),
+                'code' => Response::HTTP_BAD_REQUEST,
                 'message' => $error->getMessage(),
-            ], Response::HTTP_BAD_REQUEST);
+            ], Response::HTTP_OK);
         }
 
         if (!isset($data['fileExtension']) || empty($data['fileExtension'])) {
@@ -118,14 +118,14 @@ class DocumentFileController extends AbstractController
 
         if (isset($data['fileExtension'])) {
             $temporaryFolder = sprintf('%s/%s', $this->getParameter('upload.temporary_folder'), $data['fileExtension']);
-            if (!file_exists($temporaryFolder)) {dump($temporaryFolder);
+            if (!file_exists($temporaryFolder)) {
                 if (!mkdir($temporaryFolder, 0775, true) && !is_dir($temporaryFolder)) {
                     $error = new \RuntimeException(sprintf('Directory "%s" was not created', $temporaryFolder));
 
                     return $this->json([
-                        'code' => $error->getCode(),
+                        'code' => Response::HTTP_BAD_REQUEST,
                         'message' => $error->getMessage(),
-                    ], Response::HTTP_BAD_REQUEST);
+                    ], Response::HTTP_OK);
                 }
             }
         }
@@ -138,7 +138,7 @@ class DocumentFileController extends AbstractController
 
         $file = $this->uploadManager->checkFile($data['fileName'], $this->getParameter('upload.temporary_folder'));
         if (!$file instanceof UploadedFile) {
-            return $this->json($file, Response::HTTP_BAD_REQUEST);
+            return $this->json($file, Response::HTTP_OK);
         }
 
         $pdfToolsCkeck = true;
@@ -158,7 +158,7 @@ class DocumentFileController extends AbstractController
             return $this->json([
                 'code' => $error->getCode(),
                 'message' => $error->getMessage(),
-            ], Response::HTTP_BAD_REQUEST);
+            ], Response::HTTP_OK);
         }
 
         //Send document to the safe-deposit box ESC
@@ -202,7 +202,7 @@ class DocumentFileController extends AbstractController
                 );
                 //scan antivirus
                 if (($scanVirus = $this->antivirusManager->isFileSafe($fileMoved, true)) !== true) {
-                    return $this->json($scanVirus, Response::HTTP_BAD_REQUEST);
+                    return $this->json($scanVirus, Response::HTTP_OK);
                 }
                 $escResponse = $this->safeDepositBoxManager->sendDocument($data, $fileMoved);
                 $this->repository->saveDocumentFile($fileMoved, $escResponse);
@@ -211,6 +211,10 @@ class DocumentFileController extends AbstractController
                     'code' => $e->getCode(),
                     'message' => $e->getMessage(),
                 ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+
+            if (isset($escResponse['code'])) {
+                return $this->json($escResponse, Response::HTTP_OK);
             }
 
             return $this->json($escResponse, Response::HTTP_CREATED);

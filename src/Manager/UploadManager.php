@@ -132,14 +132,14 @@ class UploadManager
     {
         if ($asArray) {
             return [
-                'code' => $error->getCode(),
+                'code' => Response::HTTP_BAD_REQUEST,
                 'message' => $error->getMessage(),
             ];
         }
 
         return new Response(
             json_encode([
-                'code' => $error->getCode(),
+                'code' => Response::HTTP_BAD_REQUEST,
                 'message' => $error->getMessage(),
             ]),
             Response::HTTP_BAD_REQUEST,

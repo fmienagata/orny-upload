@@ -31,7 +31,7 @@ class AntivirusManager
     {
         if (!file_exists($file->getRealPath())) {
             return [
-                'code' => 0,
+                'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
                 'message' => sprintf('The file %s not exists.', $file->getRealPath()),
             ];
         }
@@ -46,7 +46,7 @@ class AntivirusManager
                 $error = new \RuntimeException("Unable to execute command : " . $command);
 
                 return [
-                    'code' => $error->getCode(),
+                    'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
                     'message' => $error->getMessage(),
                 ];
             }
@@ -59,7 +59,7 @@ class AntivirusManager
             $tabError = explode('n', $process->getOutput());
 
             return [
-                'code' => $process->getExitCode(),
+                'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
                 'message' => str_replace('\\n', '', explode('<br />', nl2br(trim($process->getOutput())))),
             ];
         }
@@ -82,12 +82,12 @@ class AntivirusManager
             }
         } catch (SocketException $e) {
             return [
-                'code' => $e->getCode(),
+                'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
                 'message' => $e->getMessage(),
             ];
         } catch (FileScanException $e) {
             return [
-                'code' => $e->getCode(),
+                'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
                 'message' => $e->getMessage(),
             ];
         }

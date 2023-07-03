@@ -44,8 +44,7 @@ use UploadBundle\Controller\DocumentFileController;
                 'json' => ['application/json'],
             ],
             outputFormats: [
-                'json' => ['application/json'],
-                'html' => [ 'text/html' ],
+                'json' => ['application/json']
             ],
             deserialize: false,
             openapi: new Model\Operation(

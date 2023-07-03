@@ -38,7 +38,7 @@ class DrawerController extends AbstractController
         }
 
         try {
-            $dataWithRoom = $this->safeDepositBoxManager->createRoom($data);dump($dataWithRoom);
+            $dataWithRoom = $this->safeDepositBoxManager->createRoom($data);
             $drawer = $this->repository->saveDrawer($dataWithRoom);
         } catch (MongoDBException $mongoDBException) {
             return $this->json([

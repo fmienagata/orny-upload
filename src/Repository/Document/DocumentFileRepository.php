@@ -96,7 +96,7 @@ class DocumentFileRepository extends DocumentRepository
         $this->documentFile->setMetadata(new DocumentMetaData('application/pdf'));
 
         foreach ($data as $key => $value) {
-            $method = sprintf('set%s', ucfirst($key));dump($method);
+            $method = sprintf('set%s', ucfirst($key));
             if (method_exists(DocumentFile::class, $method) && $key != 'file') {
                 $this->documentFile->$method($value);
             }
