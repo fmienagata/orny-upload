@@ -341,6 +341,105 @@ class SafeDepositBoxManager
         return $responseArchive;
     }
 
+    public function saveLog(array $data = null, bool $verifypeer = false) {
+        if ((!isset($data['cc'])) ||
+            (isset($data['cc']) && empty($data['cc']))
+        ) {
+            return [
+                'code' => Response::HTTP_BAD_REQUEST,
+                'message' => 'No route found, empty uri found.'
+            ];
+        }
+
+        if ((!isset($data['moduleName'])) ||
+            (isset($data['moduleName']) && empty($data['moduleName']))
+        ) {
+            return [
+                'code' => Response::HTTP_BAD_REQUEST,
+                'message' => 'Missing Parameters moduleName'
+            ];
+        }
+
+        if ((!isset($data['text'])) ||
+            (isset($data['text']) && empty($data['text']))
+        ) {
+            return [
+                'code' => Response::HTTP_BAD_REQUEST,
+                'message' => 'Missing Parameters moduleName'
+            ];
+        }
+
+        $options = [
+            'verify_peer' => $verifypeer,
+            'verify_host' =>  $verifypeer,
+        ];
+        if (isset($data['version'])) {
+            $options['query']['version'] = $data['version'];
+        }
+        if (isset($data['esc']['certificate'])) {
+            $filesystem = new Filesystem();
+            $folder = sprintf('%s/%s', $this->parameterBag->get('kernel.cache_dir'), $data['cc']);
+            $certificateFile = sprintf('%s/reader.pem', $folder);
+            $filesystem->mkdir($folder);
+            if ($filesystem->exists($certificateFile)) {
+                $filesystem->remove($certificateFile);
+            }
+            $filesystem->touch($certificateFile);
+            $filesystem->appendToFile($certificateFile, $data['esc']['certificate']);
+            $options['local_cert'] = $certificateFile;
+        }
+
+        $response = $this->client->request(
+            'POST',
+            sprintf(
+                '%s://%s:%s/%s/sessionOpen',
+                $data['esc']['scheme'],
+                $data['esc']['dns'],
+                $data['esc']['port'],
+                $data['esc']['name']
+            ),
+            $options
+        );
+
+        $statusCode = $response->getStatusCode();
+        switch ($statusCode) {
+            case 400:
+            case 401:
+            case 404:
+            case 500:
+                $data['error']['code'] = $statusCode;
+                $data['error']['message'] = $response->getContent();
+                return $data;
+        }
+        $headers = $response->getHeaders();
+
+        if (empty($sessionId = $headers['esc-sessionid'][0] ?? [])) {
+            return [];
+        }
+
+        $data['userIdCmd'] = $headers['esc-useridcmd'][0];
+        $options['headers']['ESC-sessionId'] = $sessionId;
+        $options['headers']['ESC-ucsId'] = '';
+        $options['headers']['ESC-archiveId'] = isset($data["archiveId"]) ?? $data["archiveId"];
+        $options['headers']['ESC-moduleName'] = $data["moduleName"];
+        $options['headers']['ESC-text'] = $data["text"];
+
+        $url = sprintf('%slogLifeCycleInject', $this->getUrlEsc());
+
+        $responseArchive = $this->client->request(
+            'POST',
+            $url,
+            $options
+        );
+
+        $statusCode = $responseArchive->getStatusCode();
+
+        return [
+            'code' => $statusCode,
+            'message' => $responseArchive->getContent(),
+        ];
+    }
+
     /**
      * @return HttpClientInterface
      */
