@@ -26,7 +26,6 @@ class LogLifeCycleInjectController extends AbstractController
     )]
     public function Post(Request $request, SluggerInterface $slugger): JsonResponse
     {
-        dump($request);
         $data = \json_decode($request->getContent(), true);
         if ($request->getContentTypeFormat() === 'form') {
             $data = $request->request->all();
@@ -37,7 +36,7 @@ class LogLifeCycleInjectController extends AbstractController
                 }
             }
         }
-        dump($data);
+
         $this->safeDepositBoxManager->setUrlEsc($data['esc']);
         $this->safeDepositBoxManager->setCertificate($data['esc']['certificate']);
 

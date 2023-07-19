@@ -95,7 +95,6 @@ class SafeDepositBoxManager
             $this->parameterBag->get('kernel.project_dir')
         ), 'r');
 
-        $size = dump(fstat($body)['size'] ?? null);
         $options['headers']['Content-Disposition'] = "attachment; filename=file";
         $options['headers']['Content-Length'] = $size;
         //create room
