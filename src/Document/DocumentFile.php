@@ -247,7 +247,7 @@ class DocumentFile
 
     #[MongoDB\Field(type:"date")]
     #[Groups(["document_files:read", "document_files:write"])]
-    private string $timestamp;
+    private \DateTime $timestamp;
 
     #[MongoDB\Field(type:"string")]
     #[Groups(["document_files:read", "document_files:write"])]
@@ -495,20 +495,23 @@ class DocumentFile
     }
 
     /**
-     * @return string
+     * @return \DateTime
      */
-    public function getTimestamp(): string
+    public function getTimestamp(): \DateTime
     {
         return $this->timestamp;
     }
 
     /**
-     * @param string $timestamp
+     * @param \DateTime|string $timestamp
      *
      * @return $this
      */
-    public function setTimestamp(string $timestamp): self
+    public function setTimestamp(\DateTime|string $timestamp): self
     {
+        if(is_string($timestamp)) {
+            $timestamp = new \DateTime($timestamp);
+        }
         $this->timestamp = $timestamp;
 
         return $this;

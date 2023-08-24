@@ -7,6 +7,8 @@ parameters:
     env(MONGODB_URL): '%env(resolve:MONGODB_URL)%'
     env(MONGODB_DB): '%env(resolve:MONGODB_DB)%'
     files_directory: '%env(resolve:FILES_UPLOAD_PATH)%'
+    path_certificate_admin_client: '%env(resolve:PATH_CERTIFICATE_ADMIN_CLIENT)%'
+    path_certificate_user_system: '%env(resolve:PATH_CERTIFICATE_USER_SYSTEM)%'
 
 services:
     # default configuration for services in *this* file
