@@ -582,6 +582,8 @@ class SafeDepositBoxManager
     }
 
     private function createCertificate($domaine, $instance) {
+        shell_exec('mkdir '. $this->parameterBag->get('kernel.cache_dir') .'/certificat');
+
         shell_exec('password=Docapass2023 && \
             domaine=' . $domaine . '_aes_' . $instance . ' && \
             openssl genrsa -passout pass:$password -aes128 2048 > '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.key && \
@@ -763,6 +765,7 @@ class SafeDepositBoxManager
         foreach ($datas as $data) {
             if ($data["nom"] != "SYSTEM") {
                 $coffre["room"] = $data["id_salle"];
+                break;
             }
         }
 
