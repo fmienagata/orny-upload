@@ -3,6 +3,19 @@
 Documentation:
 https://github.com/howtomakeaturn/pdfinfo
 
+
+### SSL cetificates site
+```bash
+password=Docapass2023 && \
+domaine=upload-bundle-local.demat.lan && \
+openssl genrsa -passout pass:$password -aes128 2048 > /etc/ssl/private/$domaine.key && \
+openssl rsa -passout pass:$password -passin pass:$password -in /etc/ssl/private/$domaine.key -out /etc/ssl/private/$domaine.key && \
+openssl req -passout pass:$password -utf8 -new -key /etc/ssl/private/$domaine.key -out /etc/ssl/certs/$domaine.csr -subj "/C=FR/ST=IDF/L=Paris/O=ORSID PRODUCTION/OU=API/CN=$domaine/emailAddress=no-reply@docaposte.fr" && \
+openssl x509 -in /etc/ssl/certs/$domaine.csr -out /etc/ssl/certs/$domaine.crt -req -signkey /etc/ssl/private/$domaine.key -days 36500 && \
+cat /etc/ssl/certs/$domaine.crt /etc/ssl/private/$domaine.key > /etc/ssl/certs/$domaine.pem
+
+```
+
 Installation librairie linux pdf :
 
 ```

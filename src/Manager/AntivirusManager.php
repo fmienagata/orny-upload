@@ -60,7 +60,11 @@ class AntivirusManager
 
             return [
                 'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
-                'message' => str_replace('\\n', '', explode('<br />', nl2br(trim($process->getOutput())))),
+                'message' => str_replace(
+                    '\\\\n',
+                    '',
+                    explode('<br />', nl2br(trim($process->getOutput())))
+                ),
             ];
         }
 

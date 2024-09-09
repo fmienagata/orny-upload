@@ -2,6 +2,8 @@
 
 namespace UploadBundle\Controller;
 
+use Doctrine\Bundle\MongoDBBundle\ArgumentResolver\DocumentValueResolver;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -235,9 +237,61 @@ class DocumentFileController extends AbstractController
             '_api_operation_name' => '_upload_/document_files/{id}_get',
         ]
     )]
-    public function Get(#[MapEntity(class: DocumentFile::class)] DocumentFile $documentFile)
-    {
+    public function Get(
+        #[MapEntity(
+            class: DocumentFile::class,
+            resolver: DocumentValueResolver::class, id: 'id'
+        )] DocumentFile $documentFile
+    ) {
         return $this->json($documentFile, Response::HTTP_OK);
+    }
+
+    #[Route(
+        '/upload/document_files/{id}/evidence',
+        name: '_upload_/document_files/{id}/evidence_get',
+        methods: ['GET'],
+        defaults: [
+            '_api_resource_class' => DocumentFile::class,
+            '_api_operation_name' => '_upload_/document_files/{id}/evidence_get',
+        ]
+    )]
+    public function GetEvidence(
+        #[MapEntity(
+            class: DocumentFile::class,
+            resolver: DocumentValueResolver::class, id: 'id'
+        )] DocumentFile $documentFile,
+        Request $request
+    ) {
+        $headers = $request->headers->all();
+
+        if (!array_key_exists("esc", $headers)) {
+            $error = new BadRequestException("Missing 'esc' header");
+
+            return $this->json([
+                'code' => $error->getCode(),
+                'message' => $error->getMessage(),
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $data = array();
+        $data["esc"] = json_decode($headers['esc'][0], true);
+        $data["cc"] = $headers['cc'][0];
+        $data["applicationCode"] = $headers['applicationcode'][0];
+
+        $this->safeDepositBoxManager->setUrlEsc($data['esc']);
+        $this->safeDepositBoxManager->setCertificate($data['esc']['certificate']);
+
+        $data["archiveId"] = $documentFile->getArchiveId();
+        $data["type"] = 'xml';
+        $file = $this->safeDepositBoxManager->findDocument($data);
+        if (is_array($file) && isset($file['code'])) {
+            return $this->json($file, Response::HTTP_BAD_REQUEST);
+        }
+
+        return  new Response($file->getContent(), Response::HTTP_OK, [
+            'Content-Type' => 'application/xml',
+            'Content-Length' => $file->getHeaders()['content-length'][0],
+        ]);
     }
 
     #[Route(
@@ -292,8 +346,8 @@ class DocumentFileController extends AbstractController
                 "Content-Type" => $data["type"] == "pdf" ? "application/pdf" : "application/xml",
                 'Content-Length' => $file->getHeaders()["content-length"][0]
             ));
-        } else {
-            return $this->json($documentFiles);
         }
+
+        return $this->json($documentFiles);
     }
 }

@@ -191,6 +191,21 @@ use UploadBundle\Controller\DocumentFileController;
             controller: DocumentFileController::class,
             normalizationContext: ['groups' => ['document_files:read']],
             denormalizationContext: ['groups' => ['document_files:write']]
+        ),
+        new Get(
+            uriTemplate: '/document_files/{id}/evidence',
+            name: '_upload_/document_files/{id}/evidence_get',
+            routeName: '_upload_/document_files/{id}/evidence_get',
+            controller: DocumentFileController::class,
+            normalizationContext: ['groups' => ['document_files:read']],
+            denormalizationContext: ['groups' => ['document_files:write']],
+            inputFormats: [
+                'json' => ['application/json'],
+            ],
+            outputFormats: [
+                'json' => ['application/json'],
+                'xml' => ['application/xml'],
+            ],
         )
     ]
 )]
@@ -198,10 +213,11 @@ class DocumentFile
 {
     use TimestampableDocument;
 
-    #[ApiProperty(identifier:true)]
+    #[ApiProperty(identifier:true, readable: true)]
     #[Groups(["document_files:read"])]
-    #[MongoDB\Id]
-    private string $id;
+    #[MongoDB\Field(type:"string")]
+    #[MongoDB\Id(type: 'string', strategy: "auto")]
+    private ?string $id;
 
     #[MongoDB\Field(type:"string")]
     #[Groups(["document_files:read", "document_files:write"])]
@@ -247,7 +263,7 @@ class DocumentFile
 
     #[MongoDB\Field(type:"date")]
     #[Groups(["document_files:read", "document_files:write"])]
-    private string $timestamp;
+    private string|\DateTime $timestamp;
 
     #[MongoDB\Field(type:"string")]
     #[Groups(["document_files:read", "document_files:write"])]
@@ -282,11 +298,11 @@ class DocumentFile
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getId(): string
+    public function getId(): ?string
     {
-        return $this->id;
+        return $this->id ?? null;
     }
 
     /**
@@ -495,11 +511,11 @@ class DocumentFile
     }
 
     /**
-     * @return string
+     * @return string|\DateTime
      */
-    public function getTimestamp(): string
+    public function getTimestamp(): string|\DateTime
     {
-        return $this->timestamp;
+        return $this->timestamp instanceof \DateTime ? $this->timestamp->format('Y-m-d H:i:s') : $this->timestamp;
     }
 
     /**

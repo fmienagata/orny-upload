@@ -26,6 +26,7 @@ services:
       - nfs-upload:/mnt/nfs-upload:rw
       - ./:/data/sites/api:rw
       - ./config/apache/api.conf:/etc/apache2/sites-available/api.conf
+      - ./config/apache/ssl-api.conf:/etc/apache2/sites-available/ssl-api.conf
       - ./config/apache/apache2.conf:/etc/apache2/apache2.conf
       - ./config/apache/php.ini:/etc/php.ini
       -  /sys/fs/cgroup:/sys/fs/cgroup:rw
