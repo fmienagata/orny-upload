@@ -263,11 +263,7 @@ class DocumentFile
 
     #[MongoDB\Field(type:"date")]
     #[Groups(["document_files:read", "document_files:write"])]
-<<<<<<< HEAD
     private string|\DateTime $timestamp;
-=======
-    private \DateTime $timestamp;
->>>>>>> 09dcf5436abb9d70e21218256613f30931d0b73b
 
     #[MongoDB\Field(type:"string")]
     #[Groups(["document_files:read", "document_files:write"])]
@@ -515,15 +511,9 @@ class DocumentFile
     }
 
     /**
-<<<<<<< HEAD
      * @return string|\DateTime
      */
     public function getTimestamp(): string|\DateTime
-=======
-     * @return \DateTime
-     */
-    public function getTimestamp(): \DateTime
->>>>>>> 09dcf5436abb9d70e21218256613f30931d0b73b
     {
         return $this->timestamp instanceof \DateTime ? $this->timestamp->format('Y-m-d H:i:s') : $this->timestamp;
     }

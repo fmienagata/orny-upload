@@ -6,11 +6,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use UploadBundle\Manager\SafeDepositBoxManager;
-use UploadBundle\Manager\UploadManager;
 
+#[AsController]
 class LogLifeCycleInjectController extends AbstractController
 {
     use \UploadBundle\Trait\UploadTrait;
