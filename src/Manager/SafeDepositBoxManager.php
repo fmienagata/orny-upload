@@ -4,9 +4,13 @@ namespace UploadBundle\Manager;
 
 use Howtomakeaturn\PDFInfo\PDFInfo;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\Multipart\FormDataPart;
+use Symfony\Component\Process\Process;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -95,7 +99,6 @@ class SafeDepositBoxManager
             $this->parameterBag->get('kernel.project_dir')
         ), 'r');
 
-        $size = dump(fstat($body)['size'] ?? null);
         $options['headers']['Content-Disposition'] = "attachment; filename=file";
         $options['headers']['Content-Length'] = $size;
         //create room
@@ -123,6 +126,243 @@ class SafeDepositBoxManager
         $data['roomId'] = $roomId[0];
 
         return $data;
+    }
+
+    public function createBox($coffre, $instance, $verifypeer = false) {
+        $options = [
+            'verify_peer' => $verifypeer,
+            'verify_host' =>  $verifypeer,
+        ];
+
+        $options['local_cert'] = $this->parameterBag->get('path_certificate_admin_client');
+
+        $response = $this->client->request(
+            'POST',
+            sprintf(
+                '%s://%s:%s/%s/sessionOpen',
+                $coffre['deposit_scheme'],
+                $coffre['deposit_dns'],
+                $coffre['deposit_port'],
+                $coffre['deposit_name']
+            ),
+            $options
+        );
+
+        $statusCode = $response->getStatusCode();
+        switch ($statusCode) {
+            case 400:
+            case 401:
+            case 404:
+            case 500:
+                $data['error']['code'] = $statusCode;
+                $data['error']['message'] = $response->getContent();
+                return $data;
+        }
+
+        $headers = $response->getHeaders();
+
+        if (empty($sessionId = $headers['esc-sessionid'][0] ?? [])) {
+            return [];
+        }
+
+        $data['userIdCmd'] = $headers['esc-useridcmd'][0];
+        $options['headers']['ESC-sessionId'] = $sessionId;
+        $options['headers']['ESC-ucsId'] = '';
+
+        $optionsSafeCreate = $options;
+
+        $pathCertificateSafe = $this->createCertificate("salle", $instance);
+
+        $optionsSafeCreate['headers']["ESC-label"] = $instance;
+
+        $formFields = [
+            'file' => DataPart::fromPath($pathCertificateSafe),
+        ];
+
+        $formDataSafeCreate = new FormDataPart($formFields);
+        $optionsSafeCreate['body'] = $formDataSafeCreate->bodyToString();
+
+        $response = $this->client->request(
+            'POST',
+            sprintf(
+                '%s://%s:%s/%s/%s/safeCreate',
+                $coffre['deposit_scheme'],
+                $coffre['deposit_dns'],
+                $coffre['deposit_port'],
+                $coffre['deposit_name'],
+                $coffre['room']
+            ),
+            $optionsSafeCreate
+        );
+
+        $statusCode = $response->getStatusCode();
+        switch ($statusCode) {
+            case 400:
+            case 401:
+            case 404:
+            case 500:
+                $data['error']['code'] = $statusCode;
+                $data['error']['message'] = $response->getContent();
+                return $data;
+        }
+
+        $headers = $response->getHeaders();
+
+        $safeId = $headers['esc-safeid'][0];
+
+        $optionsUserAddGestionnaire = $options;
+
+        $optionsUserAddGestionnaire["headers"]["ESC-type"] = "GEST";
+        $optionsUserAddGestionnaire["headers"]["ESC-nom"] = "Gestionnaire";
+
+        $pathCertificateGestionnaire = $this->createCertificate("gestionnaire", $instance);
+
+        $formFields = [
+            'file' => DataPart::fromPath($pathCertificateGestionnaire),
+        ];
+
+        $formDataAddGestionnaire= new FormDataPart($formFields);
+        $optionsUserAddGestionnaire['body'] = $formDataAddGestionnaire->bodyToString();
+
+        $response = $this->client->request(
+            'POST',
+            sprintf(
+                '%s://%s:%s/%s/userAdd',
+                $coffre['deposit_scheme'],
+                $coffre['deposit_dns'],
+                $coffre['deposit_port'],
+                $coffre['deposit_name']
+            ),
+            $optionsUserAddGestionnaire
+        );
+
+        $statusCode = $response->getStatusCode();
+        switch ($statusCode) {
+            case 400:
+            case 401:
+            case 404:
+            case 500:
+                $data['error']['code'] = $statusCode;
+                $data['error']['message'] = $response->getContent();
+                return $data;
+        }
+
+        $certificateGestionnaire = new File($pathCertificateGestionnaire);
+
+        $headers = $response->getHeaders();
+
+        $optionsRoomRightAddGestionnaire = $options;
+
+        $userId = $headers['esc-userid'][0];
+
+        $optionsRoomRightAddGestionnaire["headers"]["ESC-userId"] = $userId;
+
+        $response = $this->client->request(
+            'POST',
+            sprintf(
+                '%s://%s:%s/%s/%s/roomRightAdd',
+                $coffre['deposit_scheme'],
+                $coffre['deposit_dns'],
+                $coffre['deposit_port'],
+                $coffre['deposit_name'],
+                $coffre['room']
+            ),
+            $optionsRoomRightAddGestionnaire
+        );
+
+        $statusCode = $response->getStatusCode();
+        switch ($statusCode) {
+            case 400:
+            case 401:
+            case 404:
+            case 500:
+                $data['error']['code'] = $statusCode;
+                $data['error']['message'] = $response->getContent();
+                return $data;
+        }
+
+        $optionsUserAddLecteur = $options;
+
+        $optionsUserAddLecteur["headers"]["ESC-type"] = "LECT";
+        $optionsUserAddLecteur["headers"]["ESC-nom"] = "Lecteur";
+
+        $pathCertificateLecteur = $this->createCertificate("lecteur", $instance);
+
+        $formFields = [
+            'file' => DataPart::fromPath($pathCertificateLecteur),
+        ];
+
+        $formDataAddLecteur = new FormDataPart($formFields);
+        $optionsUserAddLecteur['body'] = $formDataAddLecteur->bodyToString();
+
+        $response = $this->client->request(
+            'POST',
+            sprintf(
+                '%s://%s:%s/%s/userAdd',
+                $coffre['deposit_scheme'],
+                $coffre['deposit_dns'],
+                $coffre['deposit_port'],
+                $coffre['deposit_name']
+            ),
+            $optionsUserAddLecteur
+        );
+
+        $statusCode = $response->getStatusCode();
+        switch ($statusCode) {
+            case 400:
+            case 401:
+            case 404:
+            case 500:
+                $data['error']['code'] = $statusCode;
+                $data['error']['message'] = $response->getContent();
+                return $data;
+        }
+
+        $certificateLecteur = new File($pathCertificateLecteur);
+
+        $headers = $response->getHeaders();
+
+        $optionsRoomRightAddLecteur = $options;
+
+        $userId = $headers['esc-userid'][0];
+
+        $optionsRoomRightAddLecteur["headers"]["ESC-userId"] = $userId;
+
+        $response = $this->client->request(
+            'POST',
+            sprintf(
+                '%s://%s:%s/%s/%s/roomRightAdd',
+                $coffre['deposit_scheme'],
+                $coffre['deposit_dns'],
+                $coffre['deposit_port'],
+                $coffre['deposit_name'],
+                $coffre['room']
+            ),
+            $optionsRoomRightAddLecteur
+        );
+
+        $statusCode = $response->getStatusCode();
+        switch ($statusCode) {
+            case 400:
+            case 401:
+            case 404:
+            case 500:
+                $data['error']['code'] = $statusCode;
+                $data['error']['message'] = $response->getContent();
+                return $data;
+        }
+
+        return [
+            "certificateLecteur" => $certificateLecteur->getContent(),
+            "certificateGestionnaire" => $certificateGestionnaire->getContent(),
+            "box" => $safeId,
+            "dns" => $coffre['deposit_dns'],
+            "name" => $coffre['deposit_name'],
+            "port" => $coffre['deposit_port'],
+            "room" => $coffre['room'],
+            "scheme"=> $coffre['deposit_scheme'],
+            "type"=> "DEPOSITESC"
+        ];
     }
 
     /**
@@ -339,6 +579,197 @@ class SafeDepositBoxManager
         }
 
         return $responseArchive;
+    }
+
+    private function createCertificate($domaine, $instance) {
+        shell_exec('mkdir '. $this->parameterBag->get('kernel.cache_dir') .'/certificat');
+
+        shell_exec('password=Docapass2023 && \
+            domaine=' . $domaine . '_aes_' . $instance . ' && \
+            openssl genrsa -passout pass:$password -aes128 2048 > '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.key && \
+            openssl rsa -passout pass:$password -passin pass:$password -in '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.key -out '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.key && \
+            openssl req -passout pass:$password -utf8 -new -key '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.key -out '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.csr -subj "/C=FR/ST=IDF/L=Paris/O=ORSID PRODUCTION/OU=API/CN=$domaine/emailAddress=no-reply@docaposte.fr" && \
+            openssl x509 -in '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.csr -out '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.crt -req -signkey '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.key -days 36500 && \
+            cat '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.crt '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.key > '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.pem'
+        );
+
+        return $this->parameterBag->get('kernel.cache_dir') .'/certificat/'. $domaine . '_aes_' . $instance .'.pem';
+    }
+
+    public function saveLog(array $data = null, bool $verifypeer = false) {
+        if ((!isset($data['cc'])) ||
+            (isset($data['cc']) && empty($data['cc']))
+        ) {
+            return [
+                'code' => Response::HTTP_BAD_REQUEST,
+                'message' => 'No route found, empty uri found.'
+            ];
+        }
+
+        if ((!isset($data['moduleName'])) ||
+            (isset($data['moduleName']) && empty($data['moduleName']))
+        ) {
+            return [
+                'code' => Response::HTTP_BAD_REQUEST,
+                'message' => 'Missing Parameters moduleName'
+            ];
+        }
+
+        if ((!isset($data['text'])) ||
+            (isset($data['text']) && empty($data['text']))
+        ) {
+            return [
+                'code' => Response::HTTP_BAD_REQUEST,
+                'message' => 'Missing Parameters moduleName'
+            ];
+        }
+
+        $options = [
+            'verify_peer' => $verifypeer,
+            'verify_host' =>  $verifypeer,
+        ];
+        if (isset($data['version'])) {
+            $options['query']['version'] = $data['version'];
+        }
+        if (isset($data['esc']['certificate'])) {
+            $filesystem = new Filesystem();
+            $folder = sprintf('%s/%s', $this->parameterBag->get('kernel.cache_dir'), $data['cc']);
+            $certificateFile = sprintf('%s/reader.pem', $folder);
+            $filesystem->mkdir($folder);
+            if ($filesystem->exists($certificateFile)) {
+                $filesystem->remove($certificateFile);
+            }
+            $filesystem->touch($certificateFile);
+            $filesystem->appendToFile($certificateFile, $data['esc']['certificate']);
+            $options['local_cert'] = $certificateFile;
+        }
+
+        $response = $this->client->request(
+            'POST',
+            sprintf(
+                '%s://%s:%s/%s/sessionOpen',
+                $data['esc']['scheme'],
+                $data['esc']['dns'],
+                $data['esc']['port'],
+                $data['esc']['name']
+            ),
+            $options
+        );
+
+        $statusCode = $response->getStatusCode();
+        switch ($statusCode) {
+            case 400:
+            case 401:
+            case 404:
+            case 500:
+                $data['error']['code'] = $statusCode;
+                $data['error']['message'] = $response->getContent();
+                return $data;
+        }
+        $headers = $response->getHeaders();
+
+        if (empty($sessionId = $headers['esc-sessionid'][0] ?? [])) {
+            return [];
+        }
+
+        $data['userIdCmd'] = $headers['esc-useridcmd'][0];
+        $options['headers']['ESC-sessionId'] = $sessionId;
+        $options['headers']['ESC-ucsId'] = '';
+        $options['headers']['ESC-archiveId'] = isset($data["archiveId"]) ? $data["archiveId"] : false;
+        $options['headers']['ESC-moduleName'] = $data["moduleName"];
+        $options['headers']['ESC-text'] = $data["text"];
+
+        $url = sprintf('%slogLifeCycleInject', $this->getUrlEsc());
+
+        $responseArchive = $this->client->request(
+            'POST',
+            $url,
+            $options
+        );
+
+        $statusCode = $responseArchive->getStatusCode();
+
+        return [
+            'code' => $statusCode,
+            'message' => $responseArchive->getContent(),
+        ];
+    }
+
+    public function getRoomId($coffre, $verifypeer = false) {
+        $options = [
+            'verify_peer' => $verifypeer,
+            'verify_host' =>  $verifypeer,
+        ];
+
+        $options['local_cert'] = $this->parameterBag->get('path_certificate_user_system');
+
+        $response = $this->client->request(
+            'POST',
+            sprintf(
+                '%s://%s:%s/%s/sessionOpen',
+                $coffre['deposit_scheme'],
+                $coffre['deposit_dns'],
+                $coffre['deposit_port'],
+                $coffre['deposit_name'],
+            ),
+            $options
+        );
+
+        $statusCode = $response->getStatusCode();
+        switch ($statusCode) {
+            case 400:
+            case 401:
+            case 404:
+            case 500:
+                $data['error']['code'] = $statusCode;
+                $data['error']['message'] = $response->getContent();
+                return $data;
+        }
+
+        $headers = $response->getHeaders();
+
+        if (empty($sessionId = $headers['esc-sessionid'][0] ?? [])) {
+            return [];
+        }
+
+        $data['userIdCmd'] = $headers['esc-useridcmd'][0];
+        $options['headers']['ESC-sessionId'] = $sessionId;
+        $options['headers']['ESC-ucsId'] = '';
+
+        $response = $this->client->request(
+            'POST',
+            sprintf(
+                '%s://%s:%s/%s/roomList',
+                $coffre['deposit_scheme'],
+                $coffre['deposit_dns'],
+                $coffre['deposit_port'],
+                $coffre['deposit_name'],
+            ),
+            $options
+        );
+
+        switch ($statusCode) {
+            case 400:
+            case 401:
+            case 404:
+            case 500:
+                $data['error']['code'] = $statusCode;
+                $data['error']['message'] = $response->getContent();
+                return $data;
+        }
+
+        $content = $response->getContent();
+
+        $datas = json_decode($content, true);
+
+        foreach ($datas as $data) {
+            if ($data["nom"] != "SYSTEM") {
+                $coffre["room"] = $data["id_salle"];
+                break;
+            }
+        }
+
+        return $coffre;
     }
 
     /**

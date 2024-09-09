@@ -318,7 +318,7 @@ class DocumentFileController extends AbstractController
 
         $data = array();
         $data["esc"] = json_decode($headers['esc'][0], true);
-        $data["cc"] = $headers['cc'][0];
+        $data["cc"] = array_key_exists("cc", $headers) ? $headers['cc'][0] : $headers['customercode'][0];
         $data["applicationCode"] = $headers['applicationcode'][0];
 
         $this->safeDepositBoxManager->setUrlEsc($data['esc']);
@@ -336,6 +336,7 @@ class DocumentFileController extends AbstractController
         if (count($documentFiles) == 1 && ($typeResponse == "pdf" || $typeResponse == "xml")) {
             $data["archiveId"] = $documentFiles[0]->getArchiveId();
             $data["type"] = $typeResponse;
+
             $file = $this->safeDepositBoxManager->findDocument($data);
             if (is_array($file) && isset($file['code'])) {
                 return $this->json($file, Response::HTTP_BAD_REQUEST);
