@@ -207,7 +207,12 @@ class DocumentFileController extends AbstractController
                     return $this->json($scanVirus, Response::HTTP_OK);
                 }
                 $escResponse = $this->safeDepositBoxManager->sendDocument($data, $fileMoved);
-                $this->repository->saveDocumentFile($fileMoved, $escResponse);
+                $associatedDocument = $this->repository->saveDocumentFile($fileMoved, $escResponse);
+                $escResponse['associatedDocuments'] = str_replace(
+                    '000000000000000', 
+                    $associatedDocument->getId(), 
+                    $escResponse['associatedDocuments']
+                );
             } catch (FileException $e) {
                 return $this->json([
                     'code' => $e->getCode(),

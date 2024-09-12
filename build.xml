@@ -18,9 +18,6 @@
             unless="clean.done"
             description="Cleanup build artifacts">
         <delete dir="${basedir}/build/logs"/>
-        <delete dir="${basedir}/vendor/composer"/>
-        <delete dir="${basedir}/vendor/lexik"/>
-        <delete dir="${basedir}/vendor/symfony"/>
         <delete>
             <fileset dir="." includes="**/*.log"/>
         </delete>
