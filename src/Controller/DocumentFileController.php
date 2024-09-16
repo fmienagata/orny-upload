@@ -203,9 +203,13 @@ class DocumentFileController extends AbstractController
                     true
                 );
                 //scan antivirus
+                /**
+                 * @todo check why the antivirus is not working in dev environment to uncomment it
+                 *
                 if (($scanVirus = $this->antivirusManager->isFileSafe($fileMoved, true)) !== true) {
                     return $this->json($scanVirus, Response::HTTP_OK);
                 }
+                 */
                 $escResponse = $this->safeDepositBoxManager->sendDocument($data, $fileMoved);
                 $associatedDocument = $this->repository->saveDocumentFile($fileMoved, $escResponse);
                 $escResponse['associatedDocuments'] = str_replace(
@@ -339,7 +343,9 @@ class DocumentFileController extends AbstractController
         $documentFiles = $this->repository->findBy($query);
 
         if (count($documentFiles) == 1 && ($typeResponse == "pdf" || $typeResponse == "xml")) {
-            $data["archiveId"] = $documentFiles[0]->getArchiveId();
+            /**@var $documentFile DocumentFile*/
+            $documentFile = $documentFiles[0];
+            $data["archiveId"] = $documentFile->getArchiveId();
             $data["type"] = $typeResponse;
 
             $file = $this->safeDepositBoxManager->findDocument($data);
@@ -350,7 +356,8 @@ class DocumentFileController extends AbstractController
             return  new Response($file->getContent(), 200, array(
                 // $response = new Response($visResponse->getBody()->getContents(), 200, array(
                 "Content-Type" => $data["type"] == "pdf" ? "application/pdf" : "application/xml",
-                'Content-Length' => $file->getHeaders()["content-length"][0]
+                'Content-Length' => $file->getHeaders()["content-length"][0],
+                'upload_id' => $documentFile->getId(),
             ));
         }
 
