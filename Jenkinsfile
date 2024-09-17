@@ -4,6 +4,9 @@ pipeline {
     environment {
         BASEDIR = "${env.WORKSPACE}"
         VERSION = "${env.BUILD_DISPLAY_NAME}"
+        VERSION_MAJOR = "${env.API_VERSION_MAJOR}"
+        VERSION_MINOR = "${env.API_VERSION_MINOR}"
+        VERSION_PATCH = "${env.API_VERSION_PATCH}"
         BUILD = "${env.BUILD_NUMBER}"
         PHP_PATH = "/opt/remi/php82/root/bin/php"
         RECIPIENTS = 'charles.bezo@docaposte.fr'
@@ -35,7 +38,7 @@ pipeline {
             steps {
                 echo 'Building version...'
                 sh '''
-                ${BASEDIR}/bin/build.sh -v ${VERSION} -b ${BUILD}
+                ${BASEDIR}/bin/build.sh -v ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH} -b ${BUILD}
                 '''
             }
         }
