@@ -12,6 +12,13 @@ pipeline {
         RECIPIENTS = 'charles.bezo@docaposte.fr'
     }
 
+    parameters {
+        string(name: 'VERSION', defaultValue: '1.0.0', description: 'Version number')
+        string(name: 'MINOR_VERSION', defaultValue: '0', description: 'Minor version')
+        string(name: 'PATCH_VERSION', defaultValue: '0', description: 'Patch version')
+        string(name: 'BUILD_VERSION', defaultValue: '10', description: 'Build version')
+    }
+
     stages {
         stage('Clean') {
             steps {
@@ -34,11 +41,113 @@ pipeline {
             }
         }
 
-        stage('Build Version') {
+        stage('Parse Version') {
             steps {
-                echo 'Building version...'
+                script {
+                    IFS = '.'
+                    def versionParts = "${params.VERSION}".split('-')[-1].split('\\.')
+                    UPLOAD_VERSION_MAJOR = versionParts[0]
+                    UPLOAD_VERSION_MINOR = versionParts.length > 1 ? versionParts[1] : "0"
+                    UPLOAD_VERSION_PATCH = versionParts.length > 2 ? versionParts[2] : "0"
+                    UPLOAD_VERSION_BUILD = "${params.BUILD_VERSION}"
+
+                    echo "Major: ${UPLOAD_VERSION_MAJOR}, Minor: ${UPLOAD_VERSION_MINOR}, Patch: ${UPLOAD_VERSION_PATCH}, Build: ${UPLOAD_VERSION_BUILD}"
+
+                    // Default to current workspace if not set
+                    if (env.WORKSPACE == null || env.WORKSPACE == '') {
+                        env.WORKSPACE_DIR = "."
+                    }
+                }
+            }
+        }
+
+        stage('Update CHANGELOG.md') {
+            steps {
+                script {
+                    sh '''
+                    i=1
+                    while IFS= read -r line; do
+                        sed -i "s/VERSION_MAJOR/${UPLOAD_VERSION_MAJOR}/g" ${WORKSPACE_DIR}/CHANGELOG.md
+                        sed -i "s/VERSION_MINOR/${UPLOAD_VERSION_MINOR}/g" ${WORKSPACE_DIR}/CHANGELOG.md
+                        sed -i "s/VERSION_PATCH/${UPLOAD_VERSION_PATCH}/g" ${WORKSPACE_DIR}/CHANGELOG.md
+                        sed -i "s/VERSION_BUILD/${UPLOAD_VERSION_BUILD}/g" ${WORKSPACE_DIR}/CHANGELOG.md
+                        ((i++))
+                        if [[ $i -eq 10 ]]; then break; fi
+                    done < ${WORKSPACE_DIR}/CHANGELOG.md
+                    '''
+                }
+            }
+        }
+
+        stage('Check CHANGELOG.md Changes') {
+            steps {
                 sh '''
-                ${BASEDIR}/bin/build.sh -v ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH} -b ${BUILD}
+                l=1
+                while IFS= read -r line; do
+                    echo "$line"
+                    ((l++))
+                    if [[ $l -eq 10 ]]; then break; fi
+                done < ${WORKSPACE_DIR}/CHANGELOG.md
+                '''
+            }
+        }
+
+        stage('Update framework.yaml') {
+            steps {
+                script {
+                    sh '''
+                    i=1
+                    while IFS= read -r line; do
+                        sed -i "s/upload.version.number: 0.1.0/upload.version.number: ${UPLOAD_VERSION_MAJOR}.${UPLOAD_VERSION_MINOR}.${UPLOAD_VERSION_PATCH}.${UPLOAD_VERSION_BUILD}/g" ${WORKSPACE_DIR}/config/packages/framework.yaml
+                        sed -i "s/upload.version.major: 0/upload.version.major: ${UPLOAD_VERSION_MAJOR}/g" ${WORKSPACE_DIR}/config/packages/framework.yaml
+                        sed -i "s/upload.version.minor: 0/upload.version.minor: ${UPLOAD_VERSION_MINOR}/g" ${WORKSPACE_DIR}/config/packages/framework.yaml
+                        sed -i "s/upload.version.patch: 0/upload.version.patch: ${UPLOAD_VERSION_PATCH}/g" ${WORKSPACE_DIR}/config/packages/framework.yaml
+                        sed -i "s/upload.version.build: 10/upload.version.build: ${UPLOAD_VERSION_BUILD}/g" ${WORKSPACE_DIR}/config/packages/framework.yaml
+                        ((i++))
+                        if [[ $i -eq 22 ]]; then break; fi
+                    done < ${WORKSPACE_DIR}/config/packages/framework.yaml
+                    '''
+                }
+            }
+        }
+
+        stage('Check framework.yaml Changes') {
+            steps {
+                sh '''
+                l=1
+                while IFS= read -r line; do
+                    echo "$line"
+                    ((l++))
+                    if [[ $l -eq 22 ]]; then break; fi
+                done < ${WORKSPACE_DIR}/config/packages/framework.yaml
+                '''
+            }
+        }
+
+        stage('Update api_platform.yaml') {
+            steps {
+                script {
+                    sh '''
+                    i=1
+                    while IFS= read -r line; do
+                        sed -i "s/version: '1.0.0'/version: '${UPLOAD_VERSION_MAJOR}.${UPLOAD_VERSION_MINOR}.${UPLOAD_VERSION_PATCH}.${UPLOAD_VERSION_BUILD}'/g" ${WORKSPACE_DIR}/config/packages/api_platform.yaml
+                        ((i++))
+                        if [[ $i -eq 20 ]]; then break; fi
+                    done < ${WORKSPACE_DIR}/config/packages/api_platform.yaml
+                    '''
+                }
+            }
+        }
+
+        stage('Check api_platform.yaml Changes') {
+            steps {
+                sh '''
+                l=1
+                while IFS= read -r line; do
+                    echo "$line"
+                    ((l++))
+                    if [[ $l -eq 20 ]]; then break; fi
+                done < ${WORKSPACE_DIR}/config/packages/api_platform.yaml
                 '''
             }
         }
