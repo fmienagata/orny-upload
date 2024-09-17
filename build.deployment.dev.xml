@@ -35,57 +35,57 @@
     </target>
     <target name="deployment" description="Deployment script">
         <exec executable="sh" failonerror="true">
-            <arg value="cd ${basedir};rsync -e ssh -avz --delete --exclude 'build/packages' --exclude 'var' . www-data@172.29.95.15:/data/sites/upload-${version}" />
+            <arg value="cd ${basedir};/bin/rsync -e ssh -avz --delete --exclude 'build/packages' --exclude 'var' . www-data@172.29.95.15:/data/sites/upload-${version}" />
         </exec>
         <exec executable="sh" failonerror="true">
-            <arg value="cd ${basedir};ssh www-data@172.29.95.15 'mkdir -p /data/sites/upload-${version}/var/cache'" />
+            <arg value="/bin/cd ${basedir};/bin/ssh www-data@172.29.95.15 '/bin/mkdir -p /data/sites/upload-${version}/var/cache'" />
         </exec>
         <exec executable="sh" failonerror="true">
-            <arg value="cd ${basedir};ssh www-data@172.29.95.15 'mkdir -p /data/sites/upload-${version}/var/log'" />
+            <arg value="/bin/cd ${basedir};/bin/ssh www-data@172.29.95.15 'mkdir -p /data/sites/upload-${version}/var/log'" />
         </exec>
         <exec executable="sh" failonerror="true">
-            <arg value="cd ${basedir};ssh www-data@172.29.95.15 'chmod -R 755 /data/sites/upload-${version}/vendor'" />
+            <arg value="/bin/cd ${basedir};/bin/ssh www-data@172.29.95.15 'chmod -R 755 /data/sites/upload-${version}/vendor'" />
         </exec>
         <exec executable="sh" failonerror="true">
-            <arg value="cd ${basedir};ssh www-data@172.29.95.15 'chmod -R 775 /data/sites/upload-${version}/var'" />
+            <arg value="/bin/cd ${basedir};/bin/ssh www-data@172.29.95.15 'chmod -R 775 /data/sites/upload-${version}/var'" />
         </exec>
         <exec executable="sh" failonerror="true">
-            <arg value="cd ${basedir};ssh www-data@172.29.95.15 'cd /data/sites/upload-${version};composer dump-autoload --optimize --classmap-authoritative'" />
+            <arg value="/bin/cd ${basedir};/bin/ssh www-data@172.29.95.15 'cd /data/sites/upload-${version};composer dump-autoload --optimize --classmap-authoritative'" />
         </exec>
         <exec executable="sh" failonerror="true">
-            <arg value="cd ${basedir};ssh www-data@172.29.95.15 'cp -f /data/sites/api/.env.local.php $DIR/upload-${version}/.env.local.php'" />
+            <arg value="/bin/cd ${basedir};/bin/ssh www-data@172.29.95.15 'cp -f /data/sites/api/.env.local.php $DIR/upload-${version}/.env.local.php'" />
         </exec>
         <exec executable="sh" failonerror="true">
-            <arg value="cd ${basedir};ssh www-data@172.29.95.15 'ln -sfn /data/sites/upload-$version /data/sites/api'" />
+            <arg value="/bin/cd ${basedir};/bin/ssh www-data@172.29.95.15 'ln -sfn /data/sites/upload-$version /data/sites/api'" />
         </exec>
         <exec executable="sh" failonerror="true">
-            <arg value="cd ${basedir};ssh www-data@172.29.95.15 'redis-cli flushall'" />
+            <arg value="/bin/cd ${basedir};/bin/ssh www-data@172.29.95.15 'redis-cli flushall'" />
         </exec>
     </target>
     <target name="package-deployment" description="Deployment from package">
         <exec executable="scp" failonerror="true">
             <arg value="${basedir}/backup.api.tar.gz" />
-            <arg value="www-data@${server1}:/${target_dir}/${version}" />
+            <arg value="www-data@${server1}:/${target_dir}/upload-${version}" />
         </exec>
         <exec executable="ssh" failonerror="true">
             <arg value="www-data@${server1}" />
-            <arg value="'tar -xvf ${target_dir}/backup.api.tar.gz -C ${target_dir}/${version}'" />
+            <arg value="'tar -xvf ${target_dir}/backup.api.tar.gz -C ${target_dir}/upload-${version}'" />
         </exec>
         <exec executable="ssh" failonerror="true">
             <arg value="www-data@${server1}" />
-            <arg value="'mkdir -p ${target_dir}/${version}/var/cache;mkdir -p ${target_dir}/${version}/var/log;chmod -R 777 ${target_dir}/${version}/var'" />
+            <arg value="'mkdir -p ${target_dir}/upload-${version}/var/cache;mkdir -p ${target_dir}/upload-${version}/var/log;chmod -R 777 ${target_dir}/upload-${version}/var'" />
         </exec>
         <exec executable="scp" failonerror="true">
             <arg value="${basedir}/backup.api.tar.gz" />
-            <arg value="www-data@${server1}:/${target_dir}/${version}" />
+            <arg value="www-data@${server1}:/${target_dir}/upload-${version}" />
         </exec>
         <exec executable="ssh" failonerror="true">
             <arg value="www-data@${server1}" />
-            <arg value="'tar -xvf ${target_dir}/backup.api.tar.gz -C ${target_dir}/${version}'" />
+            <arg value="'tar -xvf ${target_dir}/backup.api.tar.gz -C ${target_dir}/upload-${version}'" />
         </exec>
         <exec executable="ssh" failonerror="true">
             <arg value="www-data@${server1}" />
-            <arg value="'mkdir -p ${target_dir}/${version}/var/cache;mkdir -p ${target_dir}/${version}/var/log;chmod -R 777 ${target_dir}/${version}/var'" />
+            <arg value="'mkdir -p ${target_dir}/upload-${version}/var/cache;mkdir -p ${target_dir}/upload-${version}/var/log;chmod -R 777 ${target_dir}/upload-${version}/var'" />
         </exec>
     </target>
 </project>
