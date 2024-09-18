@@ -283,7 +283,7 @@ pipeline {
         stage('Tagging Git API') {
             when {
                 expression {
-                    return env.MY_ENV_VAR == 'true'
+                    return env.TAG == 'true'
                 }
             }
             steps {
