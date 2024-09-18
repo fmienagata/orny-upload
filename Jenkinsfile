@@ -173,9 +173,14 @@ pipeline {
                     --exclude=backup.api.tar.gz \
                     --exclude=backup.${BUILD}.api.tar.gz \
                     --exclude=${BUILD}.api.tar.gz \
-                    --exclude=.env.local.php \
                     --exclude=tests \
                     --exclude=*.tar.gz \
+                    --exclude=Jenkinsfile \
+                    --exclude=composer* \
+                    --exclude=codeception* \
+                    --exclude=.php-cs-fixer* \
+                    --exclude=.env.* \
+                    --exclude=phpunit.xml.dist \
                     -zcvf ${BASEDIR}/build/packages/upload-${VERSION_TAR}.tar.gz .
                 '''
             }
@@ -186,7 +191,10 @@ pipeline {
                 script {
                     echo 'Copying files to remote server...'
                     sh '''
-                    rsync -e ssh -avz --delete --exclude 'build/packages' --exclude 'var' ${BASEDIR}/. ${REMOTE_USER}@${SERVER_IP}:${DIR}/upload-${VERSION}
+                    rsync -e ssh -avz --delete --exclude 'build' --exclude 'var' --exclude 'tests' \
+                    --exclude '.env.test' exclude 'phpunit.xml.dist' --exclude 'codeception.yml' \
+                    --exclude 'Jenkinsfile' --exclude '.php-cs-fixer.dist.php' --exclude '.git' \
+                    ${BASEDIR}/. ${REMOTE_USER}@${SERVER_IP}:${DIR}/upload-${VERSION}
                     '''
                 }
             }
