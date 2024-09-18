@@ -191,9 +191,9 @@ pipeline {
                 script {
                     echo 'Copying files to remote server...'
                     sh '''
-                    rsync -e ssh -avz --delete --exclude 'build' --exclude 'var' --exclude 'tests' \
-                    --exclude '.env.test' exclude 'phpunit.xml.dist' --exclude 'codeception.yml' \
-                    --exclude 'Jenkinsfile' --exclude '.php-cs-fixer.dist.php' --exclude '.git' \
+                    rsync -e ssh -avz --delete --exclude='build' --exclude='var' --exclude='tests' \
+                    --exclude='.env.test' exclude='phpunit.xml.dist' --exclude='codeception.yml' \
+                    --exclude='Jenkinsfile' --exclude='.php-cs-fixer.dist.php' --exclude='.git' \
                     ${BASEDIR}/. ${REMOTE_USER}@${SERVER_IP}:${DIR}/upload-${VERSION}
                     '''
                 }
