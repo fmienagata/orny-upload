@@ -192,8 +192,10 @@ pipeline {
                     echo 'Copying files to remote server...'
                     sh '''
                     rsync -e ssh -avz --delete --exclude='build' --exclude='var' --exclude='tests' \
-                    --exclude='.env.test' exclude='phpunit.xml.dist' --exclude='codeception.yml' \
+                    --exclude='.env.test' --exclude='phpunit.xml.dist' --exclude='codeception.yml' \
                     --exclude='Jenkinsfile' --exclude='.php-cs-fixer.dist.php' --exclude='.git' \
+                    --exclude='build.deployment.dev.xml' --exclude='build.xml' --exclude='.env.local.php' \
+                    --exclude='.gitignore' --exclude='bin/PAC.Coffre.1.1.0' \
                     ${BASEDIR}/. ${REMOTE_USER}@${SERVER_IP}:${DIR}/upload-${VERSION}
                     '''
                 }
