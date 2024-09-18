@@ -252,7 +252,7 @@ pipeline {
                 script {
                     echo 'Copying logo-header.svg to the new release...'
                     sh '''
-                    ssh ${REMOTE_USER}@${SERVER_IP} "cp -f ${DIR}/api/templates/icon/ ${DIR}/upload-${VERSION}/.env.local.php"
+                    ssh ${REMOTE_USER}@${SERVER_IP} "cp -f ${DIR}/upload-${VERSION}/templates/icon/logo-header.svg ${DIR}/upload-${VERSION}/public/bundles/apiplatform/logo-header.svg"
                     '''
                 }
             }
