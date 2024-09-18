@@ -3,21 +3,28 @@ pipeline {
 
     environment {
         BASEDIR = "${env.WORKSPACE}"
-        VERSION = "${env.BUILD_DISPLAY_NAME}"
         VERSION_MAJOR = "${env.API_VERSION_MAJOR}"
         VERSION_MINOR = "${env.API_VERSION_MINOR}"
         VERSION_PATCH = "${env.API_VERSION_PATCH}"
         BUILD = "${env.BUILD_NUMBER}"
         PHP_PATH = "/opt/remi/php82/root/bin/php"
         RECIPIENTS = 'charles.bezo@docaposte.fr'
+        SERVER_IP = "172.29.95.15"
+        REMOTE_USER = "www-data"
+        VERSION = "${env.API_VERSION_MAJOR}.${env.API_VERSION_MINOR}.${env.API_VERSION_PATCH}#${env.BUILD_NUMBER}"  // Pass the version as a parameter to Jenkins
+        VERSION_TAR = "${env.API_VERSION_MAJOR}.${env.API_VERSION_MINOR}.${env.API_VERSION_PATCH}_${env.BUILD_NUMBER}"
+        DIR = "/path/to/your/directory"  // Define the directory on the remote server
     }
 
+    /**
+    * Deprecated
     parameters {
         string(name: 'VERSION', defaultValue: '1.0.0', description: 'Version number')
         string(name: 'MINOR_VERSION', defaultValue: '0', description: 'Minor version')
         string(name: 'PATCH_VERSION', defaultValue: '0', description: 'Patch version')
         string(name: 'BUILD_VERSION', defaultValue: '10', description: 'Build version')
     }
+    */
 
     stages {
         stage('Clean') {
@@ -41,36 +48,16 @@ pipeline {
             }
         }
 
-        stage('Parse Version') {
-            steps {
-                script {
-                    IFS = '.'
-                    def versionParts = "${params.VERSION}".split('-')[-1].split('\\.')
-                    UPLOAD_VERSION_MAJOR = versionParts[0]
-                    UPLOAD_VERSION_MINOR = versionParts.length > 1 ? versionParts[1] : "0"
-                    UPLOAD_VERSION_PATCH = versionParts.length > 2 ? versionParts[2] : "0"
-                    UPLOAD_VERSION_BUILD = "${params.BUILD_VERSION}"
-
-                    echo "Major: ${UPLOAD_VERSION_MAJOR}, Minor: ${UPLOAD_VERSION_MINOR}, Patch: ${UPLOAD_VERSION_PATCH}, Build: ${UPLOAD_VERSION_BUILD}"
-
-                    // Default to current workspace if not set
-                    if (env.WORKSPACE == null || env.WORKSPACE == '') {
-                        env.WORKSPACE_DIR = "."
-                    }
-                }
-            }
-        }
-
         stage('Update CHANGELOG.md') {
             steps {
                 script {
                     sh '''
                     i=1
                     while IFS= read -r line; do
-                        sed -i "s/VERSION_MAJOR/${UPLOAD_VERSION_MAJOR}/g" ${BASEDIR}/CHANGELOG.md
-                        sed -i "s/VERSION_MINOR/${UPLOAD_VERSION_MINOR}/g" ${BASEDIR}/CHANGELOG.md
-                        sed -i "s/VERSION_PATCH/${UPLOAD_VERSION_PATCH}/g" ${BASEDIR}/CHANGELOG.md
-                        sed -i "s/VERSION_BUILD/${UPLOAD_VERSION_BUILD}/g" ${BASEDIR}/CHANGELOG.md
+                        sed -i "s/VERSION_MAJOR/${VERSION_MAJOR}/g" ${BASEDIR}/CHANGELOG.md
+                        sed -i "s/VERSION_MINOR/${VERSION_MINOR}/g" ${BASEDIR}/CHANGELOG.md
+                        sed -i "s/VERSION_PATCH/${VERSION_PATCH}/g" ${BASEDIR}/CHANGELOG.md
+                        sed -i "s/VERSION_BUILD/${BUILD}/g" ${BASEDIR}/CHANGELOG.md
                         ((i++))
                         if [[ $i -eq 10 ]]; then break; fi
                     done < ${BASEDIR}/CHANGELOG.md
@@ -98,11 +85,11 @@ pipeline {
                     sh '''
                     i=1
                     while IFS= read -r line; do
-                        sed -i "s/upload.version.number: 0.1.0/upload.version.number: ${UPLOAD_VERSION_MAJOR}.${UPLOAD_VERSION_MINOR}.${UPLOAD_VERSION_PATCH}.${UPLOAD_VERSION_BUILD}/g" ${BASEDIR}/config/packages/framework.yaml
-                        sed -i "s/upload.version.major: 0/upload.version.major: ${UPLOAD_VERSION_MAJOR}/g" ${BASEDIR}/config/packages/framework.yaml
-                        sed -i "s/upload.version.minor: 0/upload.version.minor: ${UPLOAD_VERSION_MINOR}/g" ${BASEDIR}/config/packages/framework.yaml
-                        sed -i "s/upload.version.patch: 0/upload.version.patch: ${UPLOAD_VERSION_PATCH}/g" ${BASEDIR}/config/packages/framework.yaml
-                        sed -i "s/upload.version.build: 10/upload.version.build: ${UPLOAD_VERSION_BUILD}/g" ${BASEDIR}/config/packages/framework.yaml
+                        sed -i "s/upload.version.number: 0.1.0/upload.version.number: ${VERSION}/g" ${BASEDIR}/config/packages/framework.yaml
+                        sed -i "s/upload.version.major: 0/upload.version.major: ${VERSION_MAJOR}/g" ${BASEDIR}/config/packages/framework.yaml
+                        sed -i "s/upload.version.minor: 0/upload.version.minor: ${VERSION_MINOR}/g" ${BASEDIR}/config/packages/framework.yaml
+                        sed -i "s/upload.version.patch: 0/upload.version.patch: ${VERSION_PATCH}/g" ${BASEDIR}/config/packages/framework.yaml
+                        sed -i "s/upload.version.build: 10/upload.version.build: ${BUILD}/g" ${BASEDIR}/config/packages/framework.yaml
                         ((i++))
                         if [[ $i -eq 22 ]]; then break; fi
                     done < ${BASEDIR}/config/packages/framework.yaml
@@ -130,7 +117,7 @@ pipeline {
                     sh '''
                     i=1
                     while IFS= read -r line; do
-                        sed -i "s/version: '1.0.0'/version: '${UPLOAD_VERSION_MAJOR}.${UPLOAD_VERSION_MINOR}.${UPLOAD_VERSION_PATCH}.${UPLOAD_VERSION_BUILD}'/g" ${BASEDIR}/config/packages/api_platform.yaml
+                        sed -i "s/version: '1.0.0'/version: '${VERSION}'/g" ${BASEDIR}/config/packages/api_platform.yaml
                         ((i++))
                         if [[ $i -eq 20 ]]; then break; fi
                     done < ${BASEDIR}/config/packages/api_platform.yaml
@@ -186,8 +173,90 @@ pipeline {
                     --exclude=backup.api.tar.gz \
                     --exclude=backup.${BUILD}.api.tar.gz \
                     --exclude=${BUILD}.api.tar.gz \
-                    -zcvf build/packages/${VERSION}.api.tar.gz .
+                    --exclude=.env.local.php \
+                    --exclude=tests \
+                    --exclude=*.tar.gz \
+                    -zcvf ${BASEDIR}/build/packages/upload-${VERSION_TAR}.tar.gz .
                 '''
+            }
+        }
+
+        stage('Copy Files to Remote Server') {
+            steps {
+                script {
+                    echo 'Copying files to remote server...'
+                    sh '''
+                    rsync -e ssh -avz --delete --exclude 'build/packages' --exclude 'var' ${BASEDIR}/. ${REMOTE_USER}@${SERVER_IP}:${DIR}/upload-${VERSION}
+                    '''
+                }
+            }
+        }
+
+        stage('Prepare Directories on Remote Server') {
+            steps {
+                script {
+                    echo 'Preparing directories on remote server...'
+                    sh '''
+                    ssh ${REMOTE_USER}@${SERVER_IP} "mkdir -p ${DIR}/upload-${VERSION}/var/cache"
+                    ssh ${REMOTE_USER}@${SERVER_IP} "mkdir -p ${DIR}/upload-${VERSION}/var/log"
+                    '''
+                }
+            }
+        }
+
+        stage('Set Permissions') {
+            steps {
+                script {
+                    echo 'Setting permissions on remote server...'
+                    sh '''
+                    ssh ${REMOTE_USER}@${SERVER_IP} "chmod -R 755 ${DIR}/upload-${VERSION}/vendor"
+                    ssh ${REMOTE_USER}@${SERVER_IP} "chmod -R 775 ${DIR}/upload-${VERSION}/var"
+                    '''
+                }
+            }
+        }
+
+        stage('Run Composer Autoload') {
+            steps {
+                script {
+                    echo 'Running Composer dump-autoload on remote server...'
+                    sh '''
+                    ssh ${REMOTE_USER}@${SERVER_IP} "cd ${DIR}/upload-${VERSION} && composer dump-autoload --optimize --classmap-authoritative"
+                    '''
+                }
+            }
+        }
+
+        stage('Copy .env.local.php') {
+            steps {
+                script {
+                    echo 'Copying .env.local.php to the new release...'
+                    sh '''
+                    ssh ${REMOTE_USER}@${SERVER_IP} "cp -f ${DIR}/api/.env.local.php ${DIR}/upload-${VERSION}/.env.local.php"
+                    '''
+                }
+            }
+        }
+
+        stage('Update Symlink') {
+            steps {
+                script {
+                    echo 'Updating symbolic link to the new release...'
+                    sh '''
+                    ssh ${REMOTE_USER}@${SERVER_IP} "ln -sfn ${DIR}/upload-${VERSION} ${DIR}/api"
+                    '''
+                }
+            }
+        }
+
+        stage('Flush Redis Cache') {
+            steps {
+                script {
+                    echo 'Flushing Redis cache on the remote server...'
+                    sh '''
+                    ssh ${REMOTE_USER}@${SERVER_IP} "redis-cli flushall"
+                    '''
+                }
             }
         }
     }
