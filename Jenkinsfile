@@ -67,13 +67,13 @@ pipeline {
                     sh '''
                     i=1
                     while IFS= read -r line; do
-                        sed -i "s/VERSION_MAJOR/${UPLOAD_VERSION_MAJOR}/g" ${WORKSPACE_DIR}/CHANGELOG.md
-                        sed -i "s/VERSION_MINOR/${UPLOAD_VERSION_MINOR}/g" ${WORKSPACE_DIR}/CHANGELOG.md
-                        sed -i "s/VERSION_PATCH/${UPLOAD_VERSION_PATCH}/g" ${WORKSPACE_DIR}/CHANGELOG.md
-                        sed -i "s/VERSION_BUILD/${UPLOAD_VERSION_BUILD}/g" ${WORKSPACE_DIR}/CHANGELOG.md
+                        sed -i "s/VERSION_MAJOR/${UPLOAD_VERSION_MAJOR}/g" ${BASEDIR}/CHANGELOG.md
+                        sed -i "s/VERSION_MINOR/${UPLOAD_VERSION_MINOR}/g" ${BASEDIR}/CHANGELOG.md
+                        sed -i "s/VERSION_PATCH/${UPLOAD_VERSION_PATCH}/g" ${BASEDIR}/CHANGELOG.md
+                        sed -i "s/VERSION_BUILD/${UPLOAD_VERSION_BUILD}/g" ${BASEDIR}/CHANGELOG.md
                         ((i++))
                         if [[ $i -eq 10 ]]; then break; fi
-                    done < ${WORKSPACE_DIR}/CHANGELOG.md
+                    done < ${BASEDIR}/CHANGELOG.md
                     '''
                 }
             }
@@ -87,7 +87,7 @@ pipeline {
                     echo "$line"
                     ((l++))
                     if [[ $l -eq 10 ]]; then break; fi
-                done < ${WORKSPACE_DIR}/CHANGELOG.md
+                done < ${BASEDIR}/CHANGELOG.md
                 '''
             }
         }
@@ -98,14 +98,14 @@ pipeline {
                     sh '''
                     i=1
                     while IFS= read -r line; do
-                        sed -i "s/upload.version.number: 0.1.0/upload.version.number: ${UPLOAD_VERSION_MAJOR}.${UPLOAD_VERSION_MINOR}.${UPLOAD_VERSION_PATCH}.${UPLOAD_VERSION_BUILD}/g" ${WORKSPACE_DIR}/config/packages/framework.yaml
-                        sed -i "s/upload.version.major: 0/upload.version.major: ${UPLOAD_VERSION_MAJOR}/g" ${WORKSPACE_DIR}/config/packages/framework.yaml
-                        sed -i "s/upload.version.minor: 0/upload.version.minor: ${UPLOAD_VERSION_MINOR}/g" ${WORKSPACE_DIR}/config/packages/framework.yaml
-                        sed -i "s/upload.version.patch: 0/upload.version.patch: ${UPLOAD_VERSION_PATCH}/g" ${WORKSPACE_DIR}/config/packages/framework.yaml
-                        sed -i "s/upload.version.build: 10/upload.version.build: ${UPLOAD_VERSION_BUILD}/g" ${WORKSPACE_DIR}/config/packages/framework.yaml
+                        sed -i "s/upload.version.number: 0.1.0/upload.version.number: ${UPLOAD_VERSION_MAJOR}.${UPLOAD_VERSION_MINOR}.${UPLOAD_VERSION_PATCH}.${UPLOAD_VERSION_BUILD}/g" ${BASEDIR}/config/packages/framework.yaml
+                        sed -i "s/upload.version.major: 0/upload.version.major: ${UPLOAD_VERSION_MAJOR}/g" ${BASEDIR}/config/packages/framework.yaml
+                        sed -i "s/upload.version.minor: 0/upload.version.minor: ${UPLOAD_VERSION_MINOR}/g" ${BASEDIR}/config/packages/framework.yaml
+                        sed -i "s/upload.version.patch: 0/upload.version.patch: ${UPLOAD_VERSION_PATCH}/g" ${BASEDIR}/config/packages/framework.yaml
+                        sed -i "s/upload.version.build: 10/upload.version.build: ${UPLOAD_VERSION_BUILD}/g" ${BASEDIR}/config/packages/framework.yaml
                         ((i++))
                         if [[ $i -eq 22 ]]; then break; fi
-                    done < ${WORKSPACE_DIR}/config/packages/framework.yaml
+                    done < ${BASEDIR}/config/packages/framework.yaml
                     '''
                 }
             }
@@ -119,7 +119,7 @@ pipeline {
                     echo "$line"
                     ((l++))
                     if [[ $l -eq 22 ]]; then break; fi
-                done < ${WORKSPACE_DIR}/config/packages/framework.yaml
+                done < ${BASEDIR}/config/packages/framework.yaml
                 '''
             }
         }
@@ -130,10 +130,10 @@ pipeline {
                     sh '''
                     i=1
                     while IFS= read -r line; do
-                        sed -i "s/version: '1.0.0'/version: '${UPLOAD_VERSION_MAJOR}.${UPLOAD_VERSION_MINOR}.${UPLOAD_VERSION_PATCH}.${UPLOAD_VERSION_BUILD}'/g" ${WORKSPACE_DIR}/config/packages/api_platform.yaml
+                        sed -i "s/version: '1.0.0'/version: '${UPLOAD_VERSION_MAJOR}.${UPLOAD_VERSION_MINOR}.${UPLOAD_VERSION_PATCH}.${UPLOAD_VERSION_BUILD}'/g" ${BASEDIR}/config/packages/api_platform.yaml
                         ((i++))
                         if [[ $i -eq 20 ]]; then break; fi
-                    done < ${WORKSPACE_DIR}/config/packages/api_platform.yaml
+                    done < ${BASEDIR}/config/packages/api_platform.yaml
                     '''
                 }
             }
@@ -147,7 +147,7 @@ pipeline {
                     echo "$line"
                     ((l++))
                     if [[ $l -eq 20 ]]; then break; fi
-                done < ${WORKSPACE_DIR}/config/packages/api_platform.yaml
+                done < ${BASEDIR}/config/packages/api_platform.yaml
                 '''
             }
         }
