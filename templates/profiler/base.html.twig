@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="{{ _charset }}" />
+        <meta name="robots" content="noindex,nofollow" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>{% block title %}Symfony Profiler{% endblock %}</title>
+
+        {% set request_collector = profile is defined ? profile.collectors.request|default(null) : null %}
+        {% set status_code = request_collector is not null ? request_collector.statuscode|default(0) : 0 %}
+        {% set favicon_color = status_code > 399 ? 'b41939' : status_code > 299 ? 'af8503' : '000000' %}
+        <link rel="icon" href="./../../../images/favicon.ico" id="favicon">
+        {% block head %}
+            {% block stylesheets %}
+                <style{% if csp_style_nonce is defined and csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %}>
+                    {{ include('@WebProfiler/Profiler/profiler.css.twig') }}
+                </style>
+            {% endblock %}
+
+            {% block javascripts %}
+            {% endblock %}
+        {% endblock %}
+    </head>
+    <body>
+        <script{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>
+            if (null === localStorage.getItem('symfony/profiler/theme') || 'theme-auto' === localStorage.getItem('symfony/profiler/theme')) {
+                document.body.classList.add((matchMedia('(prefers-color-scheme: dark)').matches ? 'theme-dark' : 'theme-light'));
+                // needed to respond dynamically to OS changes without having to refresh the page
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                    document.body.classList.remove('theme-light', 'theme-dark');
+                    document.body.classList.add(e.matches ? 'theme-dark' : 'theme-light');
+                });
+            } else {
+                document.body.classList.add(localStorage.getItem('symfony/profiler/theme'));
+            }
+
+            document.body.classList.add(localStorage.getItem('symfony/profiler/width') || 'width-normal');
+
+            document.body.classList.add(
+                (navigator.appVersion.indexOf('Win') !== -1) ? 'windows' : (navigator.appVersion.indexOf('Mac') !== -1) ? 'macos' : 'linux'
+            );
+        </script>
+
+        {% block body '' %}
+    </body>
+</html>

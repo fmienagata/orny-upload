@@ -7,24 +7,23 @@ pipeline {
         VERSION_MINOR = "${env.API_VERSION_MINOR}"
         VERSION_PATCH = "${env.API_VERSION_PATCH}"
         BUILD = "${env.BUILD_NUMBER}"
+        TAG = "${params.TAGGING}"
+        NEXUS_PUSH = "${params.NEXUS_PUSH}"
         PHP_PATH = "/opt/remi/php82/root/bin/php"
         RECIPIENTS = 'charles.bezo@docaposte.fr'
         SERVER_IP = "172.29.95.15"
         REMOTE_USER = "www-data"
         VERSION = "${env.API_VERSION_MAJOR}.${env.API_VERSION_MINOR}.${env.API_VERSION_PATCH}#${env.BUILD_NUMBER}"  // Pass the version as a parameter to Jenkins
         VERSION_TAR = "${env.API_VERSION_MAJOR}.${env.API_VERSION_MINOR}.${env.API_VERSION_PATCH}_${env.BUILD_NUMBER}"
+        VERSION_TAG = "${env.API_VERSION_MAJOR}.${env.API_VERSION_MINOR}.${env.API_VERSION_PATCH}"
         DIR = "/data/sites"  // Define the directory on the remote server
+        API_REPO_URL = "https://outils.docapost.tech/gitlab/groupe-pac-p-le-applications-clients/adp/bvrh/backend/bvrh6.2.git"
     }
 
-    /**
-    * Deprecated
     parameters {
-        string(name: 'VERSION', defaultValue: '1.0.0', description: 'Version number')
-        string(name: 'MINOR_VERSION', defaultValue: '0', description: 'Minor version')
-        string(name: 'PATCH_VERSION', defaultValue: '0', description: 'Patch version')
-        string(name: 'BUILD_VERSION', defaultValue: '10', description: 'Build version')
+        booleanParam(name: 'TAGGING', defaultValue: false, description: 'Build must be tagged or not ?')
+        booleanParam(name: 'NEXUS_PUSH', defaultValue: false, description: 'Build must be tagged or not ?')
     }
-    */
 
     stages {
         stage('Clean') {
@@ -248,6 +247,17 @@ pipeline {
             }
         }
 
+        stage('Copy logo-header.svg') {
+            steps {
+                script {
+                    echo 'Copying logo-header.svg to the new release...'
+                    sh '''
+                    ssh ${REMOTE_USER}@${SERVER_IP} "cp -f ${DIR}/api/templates/icon/ ${DIR}/upload-${VERSION}/.env.local.php"
+                    '''
+                }
+            }
+        }
+
         stage('Update Symlink') {
             steps {
                 script {
@@ -266,6 +276,50 @@ pipeline {
                     sh '''
                     ssh ${REMOTE_USER}@${SERVER_IP} "redis-cli flushall"
                     '''
+                }
+            }
+        }
+
+        stage('Tagging Git API') {
+            when {
+                expression {
+                    return env.MY_ENV_VAR == 'true'
+                }
+            }
+            steps {
+                script {
+                    withCredentials([gitUsernamePassword(credentialsId: 'GITLAB_GROUP_TOKEN', gitToolName: 'Git')]) {
+                        sh """
+                            cd ${BASEDIR}
+                            rm -rf .git
+                            git init
+                            git remote add origin ${API_REPO_URL}
+                            git fetch
+                            git reset --hard origin/master
+                            git reset --hard origin/develop
+                            git fetch --tags
+                            if [ -z \$(git tag | grep ${VERSION_TAG}) ]; then
+                                git tag ${VERSION_TAG}
+                                git push origin --tags
+                            fi
+                            git push origin master
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Copie et Archivage du livrable dans le repo nexus') {
+            when {
+                expression {
+                    return env.NEXUS_PUSH == 'true'
+                }
+            }
+            steps {
+                script {
+                    sh """
+                        ls -l ${BASEDIR}/build/packages/
+                    """
                 }
             }
         }
