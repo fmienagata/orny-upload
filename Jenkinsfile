@@ -17,7 +17,7 @@ pipeline {
         VERSION_TAR = "${env.API_VERSION_MAJOR}.${env.API_VERSION_MINOR}.${env.API_VERSION_PATCH}_${env.BUILD_NUMBER}"
         VERSION_TAG = "${env.API_VERSION_MAJOR}.${env.API_VERSION_MINOR}.${env.API_VERSION_PATCH}"
         DIR = "/data/sites"  // Define the directory on the remote server
-        API_REPO_URL = "https://outils.docapost.tech/gitlab/groupe-pac-p-le-applications-clients/adp/bvrh/backend/bvrh6.2.git"
+        API_REPO_URL = "https://outils.docapost.tech/gitlab/groupe-pac-p-le-applications-clients/aes/ornithorynque/Upload_Bundle.git"
     }
 
     parameters {
