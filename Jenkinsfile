@@ -13,7 +13,7 @@ pipeline {
         REMOTE_USER = "www-data"
         VERSION = "${env.API_VERSION_MAJOR}.${env.API_VERSION_MINOR}.${env.API_VERSION_PATCH}#${env.BUILD_NUMBER}"  // Pass the version as a parameter to Jenkins
         VERSION_TAR = "${env.API_VERSION_MAJOR}.${env.API_VERSION_MINOR}.${env.API_VERSION_PATCH}_${env.BUILD_NUMBER}"
-        DIR = "/path/to/your/directory"  // Define the directory on the remote server
+        DIR = "/data/sites"  // Define the directory on the remote server
     }
 
     /**
