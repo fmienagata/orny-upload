@@ -124,6 +124,7 @@
     "codeception/module-phpbrowser": "^3.0",
     "codeception/module-rest": "*",
     "codeception/module-symfony": "*",
+    "pdepend/pdepend": "^2.16",
     "phploc/phploc": "^7.0",
     "phpstan/phpstan": "^1.12",
     "phpunit/phpunit": "^9.5",
