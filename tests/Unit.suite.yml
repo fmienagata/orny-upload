@@ -17,7 +17,7 @@ modules:
               cleanup: false # run populator before each test
         - Asserts
         - Mockery
-        - \Aes\Tests\Helper\Unit
+        - \UploadBundle\Tests\Helper\Unit
 params:
     username: "username"
     password: "password"

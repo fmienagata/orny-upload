@@ -13,7 +13,7 @@ modules:
     - Symfony:
         app_path: 'src'
         environment: 'test'
-        kernel_class: 'Aes\Kernel'
+        kernel_class: 'UploadBundle\Kernel'
         debug: true
     - MongoDb:
         dsn: 'mongodb://user_upload_aes_test:user_upload_aes_test@127.0.0.1:27017/upload-aes-db-test?authSource=upload-aes-db-test'

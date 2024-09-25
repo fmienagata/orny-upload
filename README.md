@@ -3,6 +3,13 @@
 Documentation:
 https://github.com/howtomakeaturn/pdfinfo
 
+# MongoDb
+
+## Creation utilisateur test
+
+```bash
+db.createUser({user:"user_upload_aes_test",pwd:"user_upload_aes_test",roles: [{"role":"readWrite","db":"upload-aes-db-test"}]});
+```
 
 ### SSL cetificates site
 ```bash

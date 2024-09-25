@@ -114,6 +114,7 @@ pipeline {
                         echo 'Installing vendors...'
                         sh '''
                         whoami
+                        export no_proxy="localhost,127.0.0.1,172.22.0.,172.29.95.,.demat.lan"
                         ${PHP82} -d memory_limit=-1 ${BASEDIR}/composer.phar update
                         ${PHP82} -d memory_limit=-1 ${BASEDIR}/composer.phar dump-autoload --optimize --classmap-authoritative
                         '''

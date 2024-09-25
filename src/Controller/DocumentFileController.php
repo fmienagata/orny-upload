@@ -20,7 +20,7 @@ use UploadBundle\Manager\AntivirusManager;
 use UploadBundle\Manager\SafeDepositBoxManager;
 use UploadBundle\Manager\UploadManager;
 use UploadBundle\Repository\Document\DocumentFileRepository;
-use Uploadbundle\Trait\UploadTrait;
+use UploadBundle\Trait\UploadTrait;
 
 #[AsController]
 class DocumentFileController extends AbstractController

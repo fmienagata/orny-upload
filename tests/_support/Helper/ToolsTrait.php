@@ -1,6 +1,6 @@
 <?php
 
-namespace Aes\Tests\Helper;
+namespace UploadBundle\Tests\Helper;
 
 trait ToolsTrait
 {
