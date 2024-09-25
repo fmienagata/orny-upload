@@ -13,9 +13,6 @@ class DocumentFileRepository extends DocumentRepository
 {
     private DocumentFile $documentFile;
 
-    /**
-     * @param DocumentManager $dm
-     */
     public function __construct(DocumentManager $dm)
     {
         $uow = $dm->getUnitOfWork();
@@ -24,13 +21,7 @@ class DocumentFileRepository extends DocumentRepository
         parent::__construct($dm, $uow, $classMetadata);
     }
 
-    /**
-     * @param File  $file
-     * @param array $data
-     *
-     * @return DocumentFile
-     */
-    public function saveDocumentFile(File $file, array $data = []) :  DocumentFile
+    public function saveDocumentFile(File $file, array $data = []): DocumentFile
     {
         $documentFile = new DocumentFile($file);
         if (isset($data['ticketId'])) {
@@ -47,23 +38,23 @@ class DocumentFileRepository extends DocumentRepository
 
         foreach ($data as $key => $value) {
             $method = sprintf('set%s', ucfirst($key));
-            if (method_exists(DocumentFile::class, $method) &&
-                $key != 'file' &&
-                !is_array($value) &&
-                $key != 'metadata' &&
-                $key != 'paperless' &&
-                $key != 'esc'
+            if (method_exists(DocumentFile::class, $method)
+                && 'file' != $key
+                && !is_array($value)
+                && 'metadata' != $key
+                && 'paperless' != $key
+                && 'esc' != $key
             ) {
                 $documentFile->$method($value);
             }
 
-            if (is_array($value) && $key != 'file' && $key != 'metadata' && $key != 'paperless' && $key != 'esc') {
+            if (is_array($value) && 'file' != $key && 'metadata' != $key && 'paperless' != $key && 'esc' != $key) {
                 foreach ($value as $v) {
                     $documentFile->$method($v);
                 }
             }
 
-            if ($key == 'metadata') {
+            if ('metadata' == $key) {
                 $documentFile->setMetadata(new DocumentMetaData('application/pdf', $value));
             }
         }
@@ -74,12 +65,7 @@ class DocumentFileRepository extends DocumentRepository
         return $documentFile;
     }
 
-    /**
-     * @param array $data
-     *
-     * @return void
-     */
-    private function persistDocumentFile(array $data = []) : void
+    private function persistDocumentFile(array $data = []): void
     {
         if (isset($data['ticketId'])) {
             $this->documentFile->setTicket($data['ticketId']);
@@ -97,7 +83,7 @@ class DocumentFileRepository extends DocumentRepository
 
         foreach ($data as $key => $value) {
             $method = sprintf('set%s', ucfirst($key));
-            if (method_exists(DocumentFile::class, $method) && $key != 'file') {
+            if (method_exists(DocumentFile::class, $method) && 'file' != $key) {
                 $this->documentFile->$method($value);
             }
         }

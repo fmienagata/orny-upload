@@ -6,9 +6,6 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Path;
 
 class UploadManager
 {
@@ -17,7 +14,7 @@ class UploadManager
      */
     public function checkTemporaryDirectory(string $folderName = '')
     {
-        //check temporary folder
+        // check temporary folder
         if (!file_exists($folderName)) {
             if (!mkdir($concurrentDirectory = $folderName, 0775) && !is_dir($concurrentDirectory)) {
                 $error = new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
@@ -30,8 +27,6 @@ class UploadManager
     }
 
     /**
-     * @param array $data
-     *
      * @return JsonResponse|void
      */
     public function checkFileName(array $data = [])
@@ -46,9 +41,6 @@ class UploadManager
     }
 
     /**
-     * @param string $fileName
-     * @param string $folder
-     *
      * @return void
      */
     public function checkFile(string $fileName = '', string $folder = '', string $extension = '')
@@ -58,9 +50,9 @@ class UploadManager
         } elseif (!empty($fileName) && empty($extension)) {
             $tabFileName = explode('.', $fileName);
             $nb = count($tabFileName);
-            $folder = sprintf('%s/%s', $folder, $tabFileName[$nb-1]);
+            $folder = sprintf('%s/%s', $folder, $tabFileName[$nb - 1]);
         }
-        
+
         if (!file_exists(sprintf('%s/%s', $folder, $fileName)) || empty($fileName)) {
             $error = new \RuntimeException(
                 sprintf("File '%s' was not found", $fileName)
@@ -72,15 +64,9 @@ class UploadManager
         return new UploadedFile(sprintf('%s/%s', $folder, $fileName), $fileName, null, null, true);
     }
 
-    /**
-     * @param array $data
-     * @param File  $file
-     *
-     * @return array
-     */
-    public function populateMedata(array &$data, File $file) :array
+    public function populateMedata(array &$data, File $file): array
     {
-        /**
+        /*
          * aTime: 2023-03-24 11:58:24
          * mTime: 2023-03-24 11:58:24
          * cTime: 2023-03-24 11:58:24
@@ -98,34 +84,20 @@ class UploadManager
         return $data;
     }
 
-    /**
-     * @param File $file
-     *
-     * @return bool|File
-     */
-    public function isPdf(File $file) : bool|File
+    public function isPdf(File $file): bool|File
     {
-        if ($file->getExtension() !== 'pdf') {
-
+        if ('pdf' !== $file->getExtension()) {
         }
 
         return true;
     }
 
-    /**
-     * @param File $file
-     *
-     * @return bool|array
-     */
-    public function scanVirus(File $file) : bool|array
+    public function scanVirus(File $file): bool|array
     {
         return false;
     }
 
     /**
-     * @param      $error
-     * @param bool $asArray
-     *
      * @return array|Response
      */
     private function JsonResponse($error, bool $asArray = false)

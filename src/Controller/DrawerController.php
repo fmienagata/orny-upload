@@ -3,7 +3,6 @@
 namespace UploadBundle\Controller;
 
 use Doctrine\ODM\MongoDB\MongoDBException;
-use MongoDB\Exception\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,8 +17,9 @@ class DrawerController extends AbstractController
 {
     public function __construct(
         private DrawerRepository $repository,
-        private SafeDepositBoxManager $safeDepositBoxManager
-    ) {}
+        private SafeDepositBoxManager $safeDepositBoxManager,
+    ) {
+    }
 
     #[Route(
         '/upload/drawers',
@@ -33,7 +33,7 @@ class DrawerController extends AbstractController
     public function Post(Request $request)
     {
         $data = \json_decode($request->getContent(), true);
-        if ($request->getContentTypeFormat() === 'form') {
+        if ('form' === $request->getContentTypeFormat()) {
             $data = $request->request->all();
         }
 

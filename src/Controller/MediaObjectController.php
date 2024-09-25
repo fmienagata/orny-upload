@@ -2,11 +2,11 @@
 
 namespace UploadBundle\Controller;
 
-use UploadBundle\Document\MediaObject;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use UploadBundle\Document\MediaObject;
 
 #[AsController]
 class MediaObjectController extends AbstractController

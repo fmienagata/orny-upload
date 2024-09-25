@@ -9,7 +9,14 @@ pipeline {
         BUILD = "${env.BUILD_NUMBER}"
         TAG = "${params.TAGGING}"
         NEXUS_PUSH = "${params.NEXUS_PUSH}"
-        PHP_PATH = "/opt/remi/php82/root/bin/php"
+        RUN_TESTS = "${params.RUN_TESTS}"
+        PHP82 = "/opt/remi/php82/root/bin/php"
+        PDEPEND = "${env.WORKSPACE}/vendor/bin/pdepend"
+        PHPCPD = "${env.WORKSPACE}/vendor/bin/phpcpd"
+        PHPCS = "${env.WORKSPACE}/vendor/bin/php-cs-fixer"
+        PHPLOC = "${env.WORKSPACE}/vendor/bin/phploc"
+        PHPMD = "${env.WORKSPACE}/vendor/bin/phpmd"
+        CODECEPTION = "${env.WORKSPACE}/vendor/bin/codecept"
         RECIPIENTS = 'charles.bezo@docaposte.fr'
         SERVER_IP = "172.29.95.15"
         REMOTE_USER = "www-data"
@@ -23,6 +30,7 @@ pipeline {
     parameters {
         booleanParam(name: 'TAGGING', defaultValue: false, description: 'Build must be tagged or not ?')
         booleanParam(name: 'NEXUS_PUSH', defaultValue: false, description: 'Build must be tagged or not ?')
+        booleanParam(name: 'RUN_TESTS', defaultValue: true, description: 'Run tests or not ?')
     }
 
     stages {
@@ -41,8 +49,8 @@ pipeline {
             steps {
                 echo 'Preparing directories...'
                 sh '''
-                mkdir -p ${BASEDIR}/build/logs
-                mkdir -p ${BASEDIR}/build/packages
+                mkdir -p ${BASEDIR}/build/api ${BASEDIR}/build/coverage ${BASEDIR}/build/logs
+                mkdir -p ${BASEDIR}/build/pdepend ${BASEDIR}/build/code-browser ${BASEDIR}/build/packages
                 '''
             }
         }
@@ -65,19 +73,6 @@ pipeline {
             }
         }
 
-        stage('Check CHANGELOG.md Changes') {
-            steps {
-                sh '''
-                l=1
-                while IFS= read -r line; do
-                    echo "$line"
-                    ((l++))
-                    if [[ $l -eq 10 ]]; then break; fi
-                done < ${BASEDIR}/CHANGELOG.md
-                '''
-            }
-        }
-
         stage('Update framework.yaml') {
             steps {
                 script {
@@ -97,19 +92,6 @@ pipeline {
             }
         }
 
-        stage('Check framework.yaml Changes') {
-            steps {
-                sh '''
-                l=1
-                while IFS= read -r line; do
-                    echo "$line"
-                    ((l++))
-                    if [[ $l -eq 22 ]]; then break; fi
-                done < ${BASEDIR}/config/packages/framework.yaml
-                '''
-            }
-        }
-
         stage('Update api_platform.yaml') {
             steps {
                 script {
@@ -125,25 +107,92 @@ pipeline {
             }
         }
 
-        stage('Check api_platform.yaml Changes') {
+        stage('Install Vendors') {
             steps {
-                sh '''
-                l=1
-                while IFS= read -r line; do
-                    echo "$line"
-                    ((l++))
-                    if [[ $l -eq 20 ]]; then break; fi
-                done < ${BASEDIR}/config/packages/api_platform.yaml
-                '''
+                script {
+                    ansiColor('xterm') {
+                        echo 'Installing vendors...'
+                        sh '''
+                        whoami
+                        ${PHP82} -d memory_limit=-1 ${BASEDIR}/composer.phar update
+                        ${PHP82} -d memory_limit=-1 ${BASEDIR}/composer.phar dump-autoload --optimize --classmap-authoritative
+                        '''
+                    }
+                }
             }
         }
 
-        stage('Install Vendors') {
+        stage('Static Analysis') {
+            parallel {
+                stage('Lint') {
+                    steps {
+                        script {
+                            ansiColor('xterm') {
+                                echo 'Running Lint static analysis...'
+                                sh '''
+                                ${PHP82} -l ${BASEDIR}/src/**/*.php
+                                ${PHP82} -l ${BASEDIR}/tests/**/*.php
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage('PHPLOC') {
+                    steps {
+                        script {
+                            ansiColor('xterm') {
+                                echo 'Running PHPLOC static analysis...'
+                                sh '''
+                                ${PHP82} ${PHPLOC} --count-tests ${BASEDIR}/src ${BASEDIR}/tests
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage('PDEPEND') {
+                    steps {
+                        script {
+                            ansiColor('xterm') {
+                                echo 'Running PDEPEND static analysis...'
+                                sh '''
+                                ${PHP82} ${PDEPEND} --jdepend-xml=${BASEDIR}/build/logs/jdepend.xml --jdepend-chart=${BASEDIR}/build/pdepend/dependencies.svg --overview-pyramid=${BASEDIR}/build/pdepend/overview-pyramid.svg ${BASEDIR}/src
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage('PHPCS') {
+                    steps {
+                        script {
+                            ansiColor('xterm') {
+                                echo 'Running PHPCS static analysis...'
+                                sh '''
+                                ${PHP82} ${PHPCS} check ${BASEDIR}/src
+                                '''
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Run Tests') {
+            when {
+                expression {
+                    return env.RUN_TESTS == 'true'
+                }
+            }
             steps {
-                echo 'Installing vendors...'
-                sh '''
-                ${PHP_PATH} -d memory_limit=-1 ${BASEDIR}/composer.phar update --no-plugins --no-scripts --optimize-autoloader --classmap-authoritative
-                '''
+                script {
+                    ansiColor('xterm') {
+                        echo 'Running tests...'
+                        sh '''
+                        whoami
+                        export no_proxy="localhost,127.0.0.1,172.29.95.,.demat.lan"
+                        ${PHP82} ${CODECEPTION} run --steps
+                        '''
+                    }
+                }
             }
         }
 
@@ -330,7 +379,9 @@ pipeline {
             echo 'Cleaning up after the build...'
         }
         success {
-            echo 'Build succeeded!'
+            echo 'Build completed successfully.'
+            echo 'Deployment api doc link : https://du0-aes-upload.demat.lan/upload/.'
+            echo 'Deployment profiler link : https://du0-aes-upload.demat.lan/_profiler/.'
         }
         failure {
             echo 'Build failed!'

@@ -2,30 +2,27 @@
 
 namespace UploadBundle\Manager;
 
-use Sineflow\ClamAV\Scanner;
 use Sineflow\ClamAV\Exception\FileScanException;
 use Sineflow\ClamAV\Exception\SocketException;
+use Sineflow\ClamAV\Scanner;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Process\Process;
 
 class AntivirusManager
 {
-    /**
-     * @param Scanner $scanner
-     * @param string  $command
-     */
     public function __construct(
         private Scanner $scanner,
-        private string $command = ''
-    ) {}
+        private string $command = '',
+    ) {
+    }
 
     /**
-     * Check the file integrity
+     * Check the file integrity.
      *
-     * @param string $filePath      Chemin du fichier à contrôler
-     * @param bool   $removeUnsafe  Supprimer automatiquement le fichier si celui-ci n'est pas sûr
-     * @return boolean
+     * @param bool $removeUnsafe Supprimer automatiquement le fichier si celui-ci n'est pas sûr
+     *
+     * @return bool
      */
     public function isFileSafe(File $file, $removeUnsafe = false)
     {
@@ -35,7 +32,7 @@ class AntivirusManager
                 'message' => sprintf('The file %s not exists.', $file->getRealPath()),
             ];
         }
-        $command = $this->command . ' ' . $file->getRealPath();
+        $command = $this->command.' '.$file->getRealPath();
         $process = new Process(['clamdscan', '--fdpass', $file->getRealPath()]);
         $process->setTimeout(30);
         $process->run();
@@ -43,7 +40,7 @@ class AntivirusManager
         if (!$process->isSuccessful()) {
             // Erreur parce que la commande à executer est invalide ou parce qu'un virus a été détecté ?
             if (!strpos($process->getOutput(), 'SCAN SUMMARY')) {
-                $error = new \RuntimeException("Unable to execute command : " . $command);
+                $error = new \RuntimeException('Unable to execute command : '.$command);
 
                 return [
                     'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
@@ -72,9 +69,6 @@ class AntivirusManager
     }
 
     /**
-     * @param File $file
-     * @param      $removeUnsafe
-     *
      * @return array|Response|void
      */
     public function scanner(File $file, $removeUnsafe = false)

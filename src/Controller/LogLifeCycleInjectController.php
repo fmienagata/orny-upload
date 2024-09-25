@@ -17,8 +17,9 @@ class LogLifeCycleInjectController extends AbstractController
     use \UploadBundle\Trait\UploadTrait;
 
     public function __construct(
-        private SafeDepositBoxManager $safeDepositBoxManager
-    ) {}
+        private SafeDepositBoxManager $safeDepositBoxManager,
+    ) {
+    }
 
     #[Route(
         '/upload/log_lifecycle_inject',
@@ -28,10 +29,10 @@ class LogLifeCycleInjectController extends AbstractController
     public function Post(Request $request, SluggerInterface $slugger): JsonResponse
     {
         $data = \json_decode($request->getContent(), true);
-        if ($request->getContentTypeFormat() === 'form') {
+        if ('form' === $request->getContentTypeFormat()) {
             $data = $request->request->all();
             foreach ($data as $k => $v) {
-                if (($k == 'paperless' || $k == 'ticket' || $k == 'esc') && is_string($v)) {
+                if (('paperless' == $k || 'ticket' == $k || 'esc' == $k) && is_string($v)) {
                     $data[$k] = is_string($v) ? $this->jsonMinify($v) : $v;
                     $data[$k] = \json_decode($data[$k], true);
                 }
@@ -43,7 +44,7 @@ class LogLifeCycleInjectController extends AbstractController
 
         $saveLog = $this->safeDepositBoxManager->saveLog($data);
 
-        if ($saveLog["code"] != 200) {
+        if (200 != $saveLog['code']) {
             return $this->json([
                 'code' => Response::HTTP_BAD_REQUEST,
                 'message' => $saveLog['message'],

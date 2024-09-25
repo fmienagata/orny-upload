@@ -1,6 +1,5 @@
 <?php
 
-
 namespace UploadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -11,9 +10,7 @@ use Symfony\Component\Validator\Constraints\File;
 use UploadBundle\Document\DocumentFile;
 
 /**
- * Class DocumentFileType
- *
- * @package UploadBundle\Form
+ * Class DocumentFileType.
  */
 class DocumentFileType extends AbstractType
 {
@@ -40,7 +37,7 @@ class DocumentFileType extends AbstractType
                             'application/x-pdf',
                         ],
                         'mimeTypesMessage' => 'Please upload a valid PDF document',
-                    ])
+                    ]),
                 ],
             ])
         ;

@@ -2,25 +2,24 @@
 
 namespace UploadBundle\Document;
 
-use Doctrine\ODM\MongoDB\Mapping\Annotations\File;
-use Doctrine\ODM\MongoDB\Mapping\Annotations\Id;
-use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique as MongoDBUnique;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\OpenApi\Model;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-use Doctrine\ODM\MongoDB\PersistentCollection;
-use Symfony\Component\Validator\Constraints as Assert;
-use ApiPlatform\Metadata\{ApiResource, ApiProperty};
-use Symfony\Component\Serializer\Annotation\Groups;
+use Doctrine\ODM\MongoDB\Mapping\Annotations\Id;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
-use ApiPlatform\Metadata\{GetCollection, Get, Patch, Post, Delete, Put};
-use Doctrine\Common\Collections\{ArrayCollection, Collection};
-use ApiPlatform\OpenApi\Model;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use UploadBundle\Controller\MediaObjectController;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[Vich\Uploadable]
 #[MongoDB\Document(
-    collection: "media_objects",
+    collection: 'media_objects',
     repositoryClass: "UploadBundle\Repository\Document\MediaObjectRepository"
 )]
 #[ApiResource(
@@ -42,48 +41,48 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
                                 'properties' => [
                                     'file' => [
                                         'type' => 'string',
-                                        'format' => 'binary'
-                                    ]
-                                ]
-                            ]
-                        ]
+                                        'format' => 'binary',
+                                    ],
+                                ],
+                            ],
+                        ],
                     ])
                 )
             )
-        )
+        ),
     ]
 )]
 class MediaObject
 {
     use TimestampableEntity;
 
-    #[ApiProperty(identifier:true)]
-    #[Groups(["media_objects:read"])]
-    #[MongoDB\Id]
+    #[ApiProperty(identifier: true)]
+    #[Groups(['media_objects:read'])]
+    #[Id]
     private string $id;
 
     #[ApiProperty(types: ['https://schema.org/contentUrl'])]
-    #[Groups(['media_objects:read', "document_files" =>"read"])]
+    #[Groups(['media_objects:read', 'document_files' => 'read'])]
     public ?string $contentUrl = null;
 
-    #[Vich\UploadableField(mapping: "media_object", fileNameProperty: "filePath")]
+    #[Vich\UploadableField(mapping: 'media_object', fileNameProperty: 'filePath')]
     #[Assert\NotNull(groups: ['media_object_create'])]
     public ?\Symfony\Component\HttpFoundation\File\File $file = null;
 
-    #[MongoDB\Field(type:"string")]
-    #[Groups(["media_objects" =>"read", "media_object_create", "document_files" =>"read"])]
+    #[MongoDB\Field(type: 'string')]
+    #[Groups(['media_objects' => 'read', 'media_object_create', 'document_files' => 'read'])]
     public ?string $filePath = null;
 
     #[Assert\NotBlank()]
-    #[Gedmo\Timestampable(on: "create")]
+    #[Gedmo\Timestampable(on: 'create')]
     #[MongoDB\Field(type: 'date')]
-    #[Groups(["media_objects:read", "document_files" =>"read"])]
+    #[Groups(['media_objects:read', 'document_files' => 'read'])]
     protected $createdAt;
 
     #[Assert\NotBlank()]
-    #[Gedmo\Timestampable(on: "update", field: "updatedAt")]
+    #[Gedmo\Timestampable(on: 'update', field: 'updatedAt')]
     #[MongoDB\Field(type: 'date')]
-    #[Groups(["media_objects:read", "document_files" =>"read"])]
+    #[Groups(['media_objects:read', 'document_files' => 'read'])]
     protected $updatedAt;
 
     public function getId(): ?string
@@ -91,17 +90,12 @@ class MediaObject
         return $this->id;
     }
 
-    /**
-     * @return string|null
-     */
     public function getContentUrl(): ?string
     {
         return $this->contentUrl;
     }
 
     /**
-     * @param string|null $contentUrl
-     *
      * @return $this
      */
     public function setContentUrl(?string $contentUrl): self
@@ -111,17 +105,12 @@ class MediaObject
         return $this;
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\File\File|null
-     */
     public function getFile(): ?\Symfony\Component\HttpFoundation\File\File
     {
         return $this->file;
     }
 
     /**
-     * @param \Symfony\Component\HttpFoundation\File\File|null $file
-     *
      * @return $this
      */
     public function setFile(?\Symfony\Component\HttpFoundation\File\File $file): self
@@ -131,17 +120,12 @@ class MediaObject
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getFilePath(): ?string
     {
         return $this->filePath;
     }
 
     /**
-     * @param string|null $filePath
-     *
      * @return $this
      */
     public function setFilePath(?string $filePath): self

@@ -7,5 +7,4 @@ use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 #[\Attribute]
 class MediaObjectRepository extends DocumentRepository
 {
-
 }

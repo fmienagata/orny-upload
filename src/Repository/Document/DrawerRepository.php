@@ -9,9 +9,6 @@ use UploadBundle\Document\Drawer;
 #[\Attribute]
 class DrawerRepository extends DocumentRepository
 {
-    /**
-     * @param DocumentManager $dm
-     */
     public function __construct(DocumentManager $dm)
     {
         $uow = $dm->getUnitOfWork();
@@ -21,13 +18,9 @@ class DrawerRepository extends DocumentRepository
     }
 
     /**
-     * @param array       $data
-     * @param Drawer|null $drawer
-     *
-     * @return Drawer
      * @throws \Doctrine\ODM\MongoDB\MongoDBException
      */
-    public function saveDrawer(array $data = [], Drawer $drawer = null) : Drawer
+    public function saveDrawer(array $data = [], ?Drawer $drawer = null): Drawer
     {
         if (empty($data)) {
             return $drawer;
@@ -51,9 +44,9 @@ class DrawerRepository extends DocumentRepository
         }
 
         foreach ($data as $property => $value) {
-            $method = sprintf('set%s' , ucfirst($property));
+            $method = sprintf('set%s', ucfirst($property));
             if (method_exists(Drawer::class, $method)) {
-                if ($property === 'timestamp') {
+                if ('timestamp' === $property) {
                     $value = new \DateTime($value);
                 }
                 $drawer->$method($value);

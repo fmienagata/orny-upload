@@ -3,10 +3,8 @@
 namespace UploadBundle\Controller;
 
 use Doctrine\Bundle\MongoDBBundle\ArgumentResolver\DocumentValueResolver;
-use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -27,14 +25,15 @@ use Uploadbundle\Trait\UploadTrait;
 #[AsController]
 class DocumentFileController extends AbstractController
 {
-    use \UploadBundle\Trait\UploadTrait;
+    use UploadTrait;
 
     public function __construct(
         private UploadManager $uploadManager,
         private DocumentFileRepository $repository,
         private AntivirusManager $antivirusManager,
-        private SafeDepositBoxManager $safeDepositBoxManager
-    ) {}
+        private SafeDepositBoxManager $safeDepositBoxManager,
+    ) {
+    }
 
     #[Route(
         '/upload/document_files',
@@ -47,33 +46,33 @@ class DocumentFileController extends AbstractController
     )]
     public function Post(Request $request, SluggerInterface $slugger): JsonResponse
     {
-        //check temporary folder
+        // check temporary folder
         if ($response = $this->uploadManager->checkTemporaryDirectory($this->getParameter('upload.temporary_folder'))) {
             return $this->json($response, Response::HTTP_OK);
         }
 
         $data = \json_decode($request->getContent(), true);
-        if ($request->getContentTypeFormat() === 'form') {
+        if ('form' === $request->getContentTypeFormat()) {
             $data = $request->request->all();
             foreach ($data as $k => $v) {
-                if (($k == 'paperless' || $k == 'ticket' || $k == 'esc') && is_string($v)) {
+                if (('paperless' == $k || 'ticket' == $k || 'esc' == $k) && is_string($v)) {
                     $data[$k] = is_string($v) ? $this->jsonMinify($v) : $v;
                     $data[$k] = \json_decode($data[$k], true);
                 }
             }
         }
 
-        //check the fileName parameter in the request data
+        // check the fileName parameter in the request data
         if ($response = $this->uploadManager->checkFileName($data)) {
             return $this->json($response, Response::HTTP_OK);
         }
 
-        //check ticket
+        // check ticket
         if (!isset($data['ticketId'])) {
             if (!isset($data['ticket']['id'])) {
                 $error = new HttpException(
                     Response::HTTP_BAD_REQUEST,
-                    "The ticketId must be set, please check your request datas."
+                    'The ticketId must be set, please check your request datas.'
                 );
 
                 return $this->json([
@@ -85,7 +84,7 @@ class DocumentFileController extends AbstractController
             $data['ticketId'] = $data['ticket']['id'];
         }
 
-        //check file in temporary folder
+        // check file in temporary folder
         if ($content = $request->get('fileContent')) {
             // from scanner
             $content = base64_decode($content);
@@ -102,7 +101,7 @@ class DocumentFileController extends AbstractController
             );
         } elseif ($request->files->count()) {
             // from drag&drop
-            /**@var File $file*/
+            /** @var File $file */
             $file = $request->files->get('file');
         } else {
             $error = new BadRequestException('Empty data file found.');
@@ -145,7 +144,7 @@ class DocumentFileController extends AbstractController
 
         $pdfToolsCkeck = true;
 
-        //Check pdf and covert to pdf if needed
+        // Check pdf and covert to pdf if needed
         $isPdf = false;
         if ($pdfToolsCkeck) {
             $isPdf = true;
@@ -154,7 +153,7 @@ class DocumentFileController extends AbstractController
         if (!isset($data['esc'])) {
             $error = new HttpException(
                 Response::HTTP_BAD_REQUEST,
-                "The safe-deposit box must be set, please check your request datas."
+                'The safe-deposit box must be set, please check your request datas.'
             );
 
             return $this->json([
@@ -163,7 +162,7 @@ class DocumentFileController extends AbstractController
             ], Response::HTTP_OK);
         }
 
-        //Send document to the safe-deposit box ESC
+        // Send document to the safe-deposit box ESC
         if ($isPdf) {
             $this->safeDepositBoxManager->setUrlEsc($data['esc']);
             $this->safeDepositBoxManager->setCertificate($data['esc']['certificate']);
@@ -202,19 +201,19 @@ class DocumentFileController extends AbstractController
                     null,
                     true
                 );
-                //scan antivirus
+                // scan antivirus
                 /**
                  * @todo check why the antivirus is not working in dev environment to uncomment it
                  *
-                if (($scanVirus = $this->antivirusManager->isFileSafe($fileMoved, true)) !== true) {
-                    return $this->json($scanVirus, Response::HTTP_OK);
-                }
+                 * if (($scanVirus = $this->antivirusManager->isFileSafe($fileMoved, true)) !== true) {
+                 * return $this->json($scanVirus, Response::HTTP_OK);
+                 * }
                  */
                 $escResponse = $this->safeDepositBoxManager->sendDocument($data, $fileMoved);
                 $associatedDocument = $this->repository->saveDocumentFile($fileMoved, $escResponse);
                 $escResponse['associatedDocuments'] = str_replace(
-                    '000000000000000', 
-                    $associatedDocument->getId(), 
+                    '000000000000000',
+                    $associatedDocument->getId(),
                     $escResponse['associatedDocuments']
                 );
             } catch (FileException $e) {
@@ -250,7 +249,7 @@ class DocumentFileController extends AbstractController
         #[MapEntity(
             class: DocumentFile::class,
             resolver: DocumentValueResolver::class, id: 'id'
-        )] DocumentFile $documentFile
+        )] DocumentFile $documentFile,
     ) {
         return $this->json($documentFile, Response::HTTP_OK);
     }
@@ -269,11 +268,11 @@ class DocumentFileController extends AbstractController
             class: DocumentFile::class,
             resolver: DocumentValueResolver::class, id: 'id'
         )] DocumentFile $documentFile,
-        Request $request
+        Request $request,
     ) {
         $headers = $request->headers->all();
 
-        if (!array_key_exists("esc", $headers)) {
+        if (!array_key_exists('esc', $headers)) {
             $error = new BadRequestException("Missing 'esc' header");
 
             return $this->json([
@@ -282,22 +281,22 @@ class DocumentFileController extends AbstractController
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        $data = array();
-        $data["esc"] = json_decode($headers['esc'][0], true);
-        $data["cc"] = $headers['cc'][0];
-        $data["applicationCode"] = $headers['applicationcode'][0];
+        $data = [];
+        $data['esc'] = json_decode($headers['esc'][0], true);
+        $data['cc'] = $headers['cc'][0];
+        $data['applicationCode'] = $headers['applicationcode'][0];
 
         $this->safeDepositBoxManager->setUrlEsc($data['esc']);
         $this->safeDepositBoxManager->setCertificate($data['esc']['certificate']);
 
-        $data["archiveId"] = $documentFile->getArchiveId();
-        $data["type"] = 'xml';
+        $data['archiveId'] = $documentFile->getArchiveId();
+        $data['type'] = 'xml';
         $file = $this->safeDepositBoxManager->findDocument($data);
         if (is_array($file) && isset($file['code'])) {
             return $this->json($file, Response::HTTP_BAD_REQUEST);
         }
 
-        return  new Response($file->getContent(), Response::HTTP_OK, [
+        return new Response($file->getContent(), Response::HTTP_OK, [
             'Content-Type' => 'application/xml',
             'Content-Length' => $file->getHeaders()['content-length'][0],
         ]);
@@ -316,7 +315,7 @@ class DocumentFileController extends AbstractController
     {
         $headers = $request->headers->all();
 
-        if (!array_key_exists("esc", $headers)) {
+        if (!array_key_exists('esc', $headers)) {
             $error = new BadRequestException("Missing 'esc' header");
 
             return $this->json([
@@ -325,40 +324,40 @@ class DocumentFileController extends AbstractController
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        $data = array();
-        $data["esc"] = json_decode($headers['esc'][0], true);
-        $data["cc"] = array_key_exists("cc", $headers) ? $headers['cc'][0] : $headers['customercode'][0];
-        $data["applicationCode"] = $headers['applicationcode'][0];
+        $data = [];
+        $data['esc'] = json_decode($headers['esc'][0], true);
+        $data['cc'] = array_key_exists('cc', $headers) ? $headers['cc'][0] : $headers['customercode'][0];
+        $data['applicationCode'] = $headers['applicationcode'][0];
 
         $this->safeDepositBoxManager->setUrlEsc($data['esc']);
         $this->safeDepositBoxManager->setCertificate($data['esc']['certificate']);
 
         $query = $request->query->all();
         $typeResponse = null;
-        if (array_key_exists("type", $query)) {
-            $typeResponse = $query["type"];
-            unset($query["type"]);
+        if (array_key_exists('type', $query)) {
+            $typeResponse = $query['type'];
+            unset($query['type']);
         }
 
         $documentFiles = $this->repository->findBy($query);
 
-        if (count($documentFiles) == 1 && ($typeResponse == "pdf" || $typeResponse == "xml")) {
-            /**@var $documentFile DocumentFile*/
+        if (1 == count($documentFiles) && ('pdf' == $typeResponse || 'xml' == $typeResponse)) {
+            /** @var $documentFile DocumentFile */
             $documentFile = $documentFiles[0];
-            $data["archiveId"] = $documentFile->getArchiveId();
-            $data["type"] = $typeResponse;
+            $data['archiveId'] = $documentFile->getArchiveId();
+            $data['type'] = $typeResponse;
 
             $file = $this->safeDepositBoxManager->findDocument($data);
             if (is_array($file) && isset($file['code'])) {
                 return $this->json($file, Response::HTTP_BAD_REQUEST);
             }
 
-            return  new Response($file->getContent(), 200, array(
+            return new Response($file->getContent(), 200, [
                 // $response = new Response($visResponse->getBody()->getContents(), 200, array(
-                "Content-Type" => $data["type"] == "pdf" ? "application/pdf" : "application/xml",
-                'Content-Length' => $file->getHeaders()["content-length"][0],
+                'Content-Type' => 'pdf' == $data['type'] ? 'application/pdf' : 'application/xml',
+                'Content-Length' => $file->getHeaders()['content-length'][0],
                 'upload_id' => $documentFile->getId(),
-            ));
+            ]);
         }
 
         return $this->json($documentFiles);

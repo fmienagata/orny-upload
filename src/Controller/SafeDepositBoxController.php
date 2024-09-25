@@ -7,14 +7,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\String\Slugger\SluggerInterface;
 use UploadBundle\Manager\SafeDepositBoxManager;
 
 class SafeDepositBoxController extends AbstractController
 {
     public function __construct(
-        private SafeDepositBoxManager $safeDepositBoxManager
-    ) {}
+        private SafeDepositBoxManager $safeDepositBoxManager,
+    ) {
+    }
 
     #[Route(
         '/upload/safe_deposit_box',
@@ -25,14 +25,14 @@ class SafeDepositBoxController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        $instance = $data["instance"];
-        $coffre = $data["ESC"];
+        $instance = $data['instance'];
+        $coffre = $data['ESC'];
 
         $coffre = $this->safeDepositBoxManager->getRoomId($coffre);
 
         $data = $this->safeDepositBoxManager->createBox($coffre, $instance);
 
-        if (array_key_exists("error", $data)) {
+        if (array_key_exists('error', $data)) {
             return $this->json($data, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 

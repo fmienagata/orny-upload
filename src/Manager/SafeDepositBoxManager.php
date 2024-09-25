@@ -4,19 +4,18 @@ namespace UploadBundle\Manager;
 
 use Howtomakeaturn\PDFInfo\PDFInfo;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
-use Symfony\Component\Process\Process;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Archive GET : /EscBO2/764265cb4b5c4682a77ecae8209a31ac/468a2dbad8854f149fc4236f7d864e17/archiveGet
- * Archive POST : /EscBO2/764265cb4b5c4682a77ecae8209a31ac/ed66215af90c4f77b90c0e254879272e/archivePutNoControl
+ * Archive POST : /EscBO2/764265cb4b5c4682a77ecae8209a31ac/ed66215af90c4f77b90c0e254879272e/archivePutNoControl.
  */
 class SafeDepositBoxManager
 {
@@ -24,33 +23,32 @@ class SafeDepositBoxManager
         private HttpClientInterface $client,
         private ParameterBagInterface $parameterBag,
         private string $urlEsc = '',
-        private string $certificate = ''
-    ) {}
+        private string $certificate = '',
+    ) {
+    }
 
     /**
-     * @param array|null $data
-     * @param bool       $verifypeer
-     *
      * @return array|\string[][]|JsonResponse
+     *
      * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
-    public function createRoom(array $data = null, bool $verifypeer = false)
+    public function createRoom(?array $data = null, bool $verifypeer = false)
     {
-        if ((!isset($data['escName'])) ||
-            (isset($data['escName']) && empty($data['escName']))
+        if ((!isset($data['escName']))
+            || (isset($data['escName']) && empty($data['escName']))
         ) {
             return new JsonResponse([
                 'code' => Response::HTTP_BAD_REQUEST,
-                'message' => 'No route found, empty uri found.'
+                'message' => 'No route found, empty uri found.',
             ], Response::HTTP_BAD_REQUEST);
         }
 
         $options = [
             'verify_peer' => $verifypeer,
-            'verify_host' =>  $verifypeer,
+            'verify_host' => $verifypeer,
         ];
         if (isset($data['version'])) {
             $options['query']['version'] = $data['version'];
@@ -62,14 +60,14 @@ class SafeDepositBoxManager
 
         $filesystem->mkdir($folder);
         if ($filesystem->exists($utilisateurSysteme)) {
-            /**
+            /*
              * @todo replace it
              */
         }
 
         $options['local_cert'] = $utilisateurSysteme;
 
-        //Open session esc
+        // Open session esc
         $response = $this->client->request(
             'POST',
             sprintf(
@@ -99,9 +97,9 @@ class SafeDepositBoxManager
             $this->parameterBag->get('kernel.project_dir')
         ), 'r');
 
-        $options['headers']['Content-Disposition'] = "attachment; filename=file";
+        $options['headers']['Content-Disposition'] = 'attachment; filename=file';
         $options['headers']['Content-Length'] = $size;
-        //create room
+        // create room
         $responseRoom = $this->client->request(
             'POST',
             sprintf(
@@ -128,10 +126,11 @@ class SafeDepositBoxManager
         return $data;
     }
 
-    public function createBox($coffre, $instance, $verifypeer = false) {
+    public function createBox($coffre, $instance, $verifypeer = false)
+    {
         $options = [
             'verify_peer' => $verifypeer,
-            'verify_host' =>  $verifypeer,
+            'verify_host' => $verifypeer,
         ];
 
         $options['local_cert'] = $this->parameterBag->get('path_certificate_admin_client');
@@ -156,6 +155,7 @@ class SafeDepositBoxManager
             case 500:
                 $data['error']['code'] = $statusCode;
                 $data['error']['message'] = $response->getContent();
+
                 return $data;
         }
 
@@ -171,9 +171,9 @@ class SafeDepositBoxManager
 
         $optionsSafeCreate = $options;
 
-        $pathCertificateSafe = $this->createCertificate("salle", $instance);
+        $pathCertificateSafe = $this->createCertificate('salle', $instance);
 
-        $optionsSafeCreate['headers']["ESC-label"] = $instance;
+        $optionsSafeCreate['headers']['ESC-label'] = $instance;
 
         $formFields = [
             'file' => DataPart::fromPath($pathCertificateSafe),
@@ -203,6 +203,7 @@ class SafeDepositBoxManager
             case 500:
                 $data['error']['code'] = $statusCode;
                 $data['error']['message'] = $response->getContent();
+
                 return $data;
         }
 
@@ -212,16 +213,16 @@ class SafeDepositBoxManager
 
         $optionsUserAddGestionnaire = $options;
 
-        $optionsUserAddGestionnaire["headers"]["ESC-type"] = "GEST";
-        $optionsUserAddGestionnaire["headers"]["ESC-nom"] = "Gestionnaire";
+        $optionsUserAddGestionnaire['headers']['ESC-type'] = 'GEST';
+        $optionsUserAddGestionnaire['headers']['ESC-nom'] = 'Gestionnaire';
 
-        $pathCertificateGestionnaire = $this->createCertificate("gestionnaire", $instance);
+        $pathCertificateGestionnaire = $this->createCertificate('gestionnaire', $instance);
 
         $formFields = [
             'file' => DataPart::fromPath($pathCertificateGestionnaire),
         ];
 
-        $formDataAddGestionnaire= new FormDataPart($formFields);
+        $formDataAddGestionnaire = new FormDataPart($formFields);
         $optionsUserAddGestionnaire['body'] = $formDataAddGestionnaire->bodyToString();
 
         $response = $this->client->request(
@@ -244,6 +245,7 @@ class SafeDepositBoxManager
             case 500:
                 $data['error']['code'] = $statusCode;
                 $data['error']['message'] = $response->getContent();
+
                 return $data;
         }
 
@@ -255,7 +257,7 @@ class SafeDepositBoxManager
 
         $userId = $headers['esc-userid'][0];
 
-        $optionsRoomRightAddGestionnaire["headers"]["ESC-userId"] = $userId;
+        $optionsRoomRightAddGestionnaire['headers']['ESC-userId'] = $userId;
 
         $response = $this->client->request(
             'POST',
@@ -278,15 +280,16 @@ class SafeDepositBoxManager
             case 500:
                 $data['error']['code'] = $statusCode;
                 $data['error']['message'] = $response->getContent();
+
                 return $data;
         }
 
         $optionsUserAddLecteur = $options;
 
-        $optionsUserAddLecteur["headers"]["ESC-type"] = "LECT";
-        $optionsUserAddLecteur["headers"]["ESC-nom"] = "Lecteur";
+        $optionsUserAddLecteur['headers']['ESC-type'] = 'LECT';
+        $optionsUserAddLecteur['headers']['ESC-nom'] = 'Lecteur';
 
-        $pathCertificateLecteur = $this->createCertificate("lecteur", $instance);
+        $pathCertificateLecteur = $this->createCertificate('lecteur', $instance);
 
         $formFields = [
             'file' => DataPart::fromPath($pathCertificateLecteur),
@@ -315,6 +318,7 @@ class SafeDepositBoxManager
             case 500:
                 $data['error']['code'] = $statusCode;
                 $data['error']['message'] = $response->getContent();
+
                 return $data;
         }
 
@@ -326,7 +330,7 @@ class SafeDepositBoxManager
 
         $userId = $headers['esc-userid'][0];
 
-        $optionsRoomRightAddLecteur["headers"]["ESC-userId"] = $userId;
+        $optionsRoomRightAddLecteur['headers']['ESC-userId'] = $userId;
 
         $response = $this->client->request(
             'POST',
@@ -349,47 +353,46 @@ class SafeDepositBoxManager
             case 500:
                 $data['error']['code'] = $statusCode;
                 $data['error']['message'] = $response->getContent();
+
                 return $data;
         }
 
         return [
-            "certificateLecteur" => $certificateLecteur->getContent(),
-            "certificateGestionnaire" => $certificateGestionnaire->getContent(),
-            "box" => $safeId,
-            "dns" => $coffre['deposit_dns'],
-            "name" => $coffre['deposit_name'],
-            "port" => $coffre['deposit_port'],
-            "room" => $coffre['room'],
-            "scheme"=> $coffre['deposit_scheme'],
-            "type"=> "DEPOSITESC"
+            'certificateLecteur' => $certificateLecteur->getContent(),
+            'certificateGestionnaire' => $certificateGestionnaire->getContent(),
+            'box' => $safeId,
+            'dns' => $coffre['deposit_dns'],
+            'name' => $coffre['deposit_name'],
+            'port' => $coffre['deposit_port'],
+            'room' => $coffre['room'],
+            'scheme' => $coffre['deposit_scheme'],
+            'type' => 'DEPOSITESC',
         ];
     }
 
     /**
-     * @param array      $credentials
-     * @param array|null $data
-     *
      * @return array|mixed|JsonResponse
+     *
      * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
-    public function sendDocument(array $data = null, UploadedFile $file = null, bool $verifypeer = false)
+    public function sendDocument(?array $data = null, ?UploadedFile $file = null, bool $verifypeer = false)
     {
-        if ((!isset($data['cc'])) ||
-            (isset($data['cc']) && empty($data['cc']))
+        if ((!isset($data['cc']))
+            || (isset($data['cc']) && empty($data['cc']))
         ) {
             return [
                 'code' => Response::HTTP_BAD_REQUEST,
-                'message' => 'No route found, empty uri found.'
+                'message' => 'No route found, empty uri found.',
             ];
         }
 
         $options = [
             'verify_peer' => $verifypeer,
-            'verify_host' =>  $verifypeer,
+            'verify_host' => $verifypeer,
         ];
         if (isset($data['version'])) {
             $options['query']['version'] = $data['version'];
@@ -427,6 +430,7 @@ class SafeDepositBoxManager
             case 500:
                 $data['error']['code'] = $statusCode;
                 $data['error']['message'] = $response->getContent();
+
                 return $data;
         }
         $headers = $response->getHeaders();
@@ -443,7 +447,7 @@ class SafeDepositBoxManager
         $body = fopen($file->getPathname(), 'r');
         $size = fstat($body)['size'] ?? null;
         $options['body'] = $body;
-        $options['headers']['Content-Disposition'] = "attachment; filename=" . $file->getFilename();
+        $options['headers']['Content-Disposition'] = 'attachment; filename='.$file->getFilename();
         $options['headers']['Content-Length'] = $size;
 
         $responseArchive = $this->client->request(
@@ -460,7 +464,7 @@ class SafeDepositBoxManager
         }
         $headersArchiveCreated = $responseArchive->getHeaders();
         foreach ($headersArchiveCreated as $key => $item) {
-            if (strpos($key, 'esc-') !== false) {
+            if (false !== strpos($key, 'esc-')) {
                 $key = str_replace('esc-', '', $key);
                 $data[$key] = trim($item[0]);
             }
@@ -476,29 +480,27 @@ class SafeDepositBoxManager
     }
 
     /**
-     * @param array|null $data
-     * @param bool       $verifypeer
-     *
      * @return array|JsonResponse|\Symfony\Contracts\HttpClient\ResponseInterface|null
+     *
      * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
-    public function findDocument(array $data = null, bool $verifypeer = false)
+    public function findDocument(?array $data = null, bool $verifypeer = false)
     {
-        if ((!isset($data['cc'])) ||
-            (isset($data['cc']) && empty($data['cc']))
+        if ((!isset($data['cc']))
+            || (isset($data['cc']) && empty($data['cc']))
         ) {
             return [
                 'code' => Response::HTTP_BAD_REQUEST,
-                'message' => 'No route found, empty uri found.'
+                'message' => 'No route found, empty uri found.',
             ];
         }
 
         $options = [
             'verify_peer' => $verifypeer,
-            'verify_host' =>  $verifypeer,
+            'verify_host' => $verifypeer,
         ];
         if (isset($data['version'])) {
             $options['query']['version'] = $data['version'];
@@ -536,6 +538,7 @@ class SafeDepositBoxManager
             case 500:
                 $data['error']['code'] = $statusCode;
                 $data['error']['message'] = $response->getContent();
+
                 return $data;
         }
         $headers = $response->getHeaders();
@@ -547,10 +550,10 @@ class SafeDepositBoxManager
         $data['userIdCmd'] = $headers['esc-useridcmd'][0];
         $options['headers']['ESC-sessionId'] = $sessionId;
         $options['headers']['ESC-ucsId'] = '';
-        $options['headers']['ESC-archiveId'] = $data["archiveId"];
+        $options['headers']['ESC-archiveId'] = $data['archiveId'];
 
         $url = sprintf('%sarchiveGet', $this->getUrlEsc());
-        if ($data["type"] == "xml") {
+        if ('xml' == $data['type']) {
             $url = sprintf('%sarchiveEvidenceGet', $this->getUrlEsc());
         }
 
@@ -572,7 +575,7 @@ class SafeDepositBoxManager
         $headersArchiveCreated = $responseArchive->getHeaders();
 
         foreach ($headersArchiveCreated as $key => $item) {
-            if (strpos($key, 'esc-') !== false) {
+            if (false !== strpos($key, 'esc-')) {
                 $key = str_replace('esc-', '', $key);
                 $data[$key] = trim($item[0]);
             }
@@ -581,52 +584,54 @@ class SafeDepositBoxManager
         return $responseArchive;
     }
 
-    private function createCertificate($domaine, $instance) {
-        shell_exec('mkdir '. $this->parameterBag->get('kernel.cache_dir') .'/certificat');
+    private function createCertificate($domaine, $instance)
+    {
+        shell_exec('mkdir '.$this->parameterBag->get('kernel.cache_dir').'/certificat');
 
         shell_exec('password=Docapass2023 && \
-            domaine=' . $domaine . '_aes_' . $instance . ' && \
-            openssl genrsa -passout pass:$password -aes128 2048 > '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.key && \
-            openssl rsa -passout pass:$password -passin pass:$password -in '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.key -out '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.key && \
-            openssl req -passout pass:$password -utf8 -new -key '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.key -out '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.csr -subj "/C=FR/ST=IDF/L=Paris/O=ORSID PRODUCTION/OU=API/CN=$domaine/emailAddress=no-reply@docaposte.fr" && \
-            openssl x509 -in '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.csr -out '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.crt -req -signkey '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.key -days 36500 && \
-            cat '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.crt '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.key > '. $this->parameterBag->get('kernel.cache_dir') .'/certificat/$domaine.pem'
+            domaine='.$domaine.'_aes_'.$instance.' && \
+            openssl genrsa -passout pass:$password -aes128 2048 > '.$this->parameterBag->get('kernel.cache_dir').'/certificat/$domaine.key && \
+            openssl rsa -passout pass:$password -passin pass:$password -in '.$this->parameterBag->get('kernel.cache_dir').'/certificat/$domaine.key -out '.$this->parameterBag->get('kernel.cache_dir').'/certificat/$domaine.key && \
+            openssl req -passout pass:$password -utf8 -new -key '.$this->parameterBag->get('kernel.cache_dir').'/certificat/$domaine.key -out '.$this->parameterBag->get('kernel.cache_dir').'/certificat/$domaine.csr -subj "/C=FR/ST=IDF/L=Paris/O=ORSID PRODUCTION/OU=API/CN=$domaine/emailAddress=no-reply@docaposte.fr" && \
+            openssl x509 -in '.$this->parameterBag->get('kernel.cache_dir').'/certificat/$domaine.csr -out '.$this->parameterBag->get('kernel.cache_dir').'/certificat/$domaine.crt -req -signkey '.$this->parameterBag->get('kernel.cache_dir').'/certificat/$domaine.key -days 36500 && \
+            cat '.$this->parameterBag->get('kernel.cache_dir').'/certificat/$domaine.crt '.$this->parameterBag->get('kernel.cache_dir').'/certificat/$domaine.key > '.$this->parameterBag->get('kernel.cache_dir').'/certificat/$domaine.pem'
         );
 
-        return $this->parameterBag->get('kernel.cache_dir') .'/certificat/'. $domaine . '_aes_' . $instance .'.pem';
+        return $this->parameterBag->get('kernel.cache_dir').'/certificat/'.$domaine.'_aes_'.$instance.'.pem';
     }
 
-    public function saveLog(array $data = null, bool $verifypeer = false) {
-        if ((!isset($data['cc'])) ||
-            (isset($data['cc']) && empty($data['cc']))
+    public function saveLog(?array $data = null, bool $verifypeer = false)
+    {
+        if ((!isset($data['cc']))
+            || (isset($data['cc']) && empty($data['cc']))
         ) {
             return [
                 'code' => Response::HTTP_BAD_REQUEST,
-                'message' => 'No route found, empty uri found.'
+                'message' => 'No route found, empty uri found.',
             ];
         }
 
-        if ((!isset($data['moduleName'])) ||
-            (isset($data['moduleName']) && empty($data['moduleName']))
+        if ((!isset($data['moduleName']))
+            || (isset($data['moduleName']) && empty($data['moduleName']))
         ) {
             return [
                 'code' => Response::HTTP_BAD_REQUEST,
-                'message' => 'Missing Parameters moduleName'
+                'message' => 'Missing Parameters moduleName',
             ];
         }
 
-        if ((!isset($data['text'])) ||
-            (isset($data['text']) && empty($data['text']))
+        if ((!isset($data['text']))
+            || (isset($data['text']) && empty($data['text']))
         ) {
             return [
                 'code' => Response::HTTP_BAD_REQUEST,
-                'message' => 'Missing Parameters moduleName'
+                'message' => 'Missing Parameters moduleName',
             ];
         }
 
         $options = [
             'verify_peer' => $verifypeer,
-            'verify_host' =>  $verifypeer,
+            'verify_host' => $verifypeer,
         ];
         if (isset($data['version'])) {
             $options['query']['version'] = $data['version'];
@@ -664,6 +669,7 @@ class SafeDepositBoxManager
             case 500:
                 $data['error']['code'] = $statusCode;
                 $data['error']['message'] = $response->getContent();
+
                 return $data;
         }
         $headers = $response->getHeaders();
@@ -675,9 +681,9 @@ class SafeDepositBoxManager
         $data['userIdCmd'] = $headers['esc-useridcmd'][0];
         $options['headers']['ESC-sessionId'] = $sessionId;
         $options['headers']['ESC-ucsId'] = '';
-        $options['headers']['ESC-archiveId'] = isset($data["archiveId"]) ? $data["archiveId"] : false;
-        $options['headers']['ESC-moduleName'] = $data["moduleName"];
-        $options['headers']['ESC-text'] = $data["text"];
+        $options['headers']['ESC-archiveId'] = isset($data['archiveId']) ? $data['archiveId'] : false;
+        $options['headers']['ESC-moduleName'] = $data['moduleName'];
+        $options['headers']['ESC-text'] = $data['text'];
 
         $url = sprintf('%slogLifeCycleInject', $this->getUrlEsc());
 
@@ -695,10 +701,11 @@ class SafeDepositBoxManager
         ];
     }
 
-    public function getRoomId($coffre, $verifypeer = false) {
+    public function getRoomId($coffre, $verifypeer = false)
+    {
         $options = [
             'verify_peer' => $verifypeer,
-            'verify_host' =>  $verifypeer,
+            'verify_host' => $verifypeer,
         ];
 
         $options['local_cert'] = $this->parameterBag->get('path_certificate_user_system');
@@ -723,6 +730,7 @@ class SafeDepositBoxManager
             case 500:
                 $data['error']['code'] = $statusCode;
                 $data['error']['message'] = $response->getContent();
+
                 return $data;
         }
 
@@ -755,6 +763,7 @@ class SafeDepositBoxManager
             case 500:
                 $data['error']['code'] = $statusCode;
                 $data['error']['message'] = $response->getContent();
+
                 return $data;
         }
 
@@ -763,8 +772,8 @@ class SafeDepositBoxManager
         $datas = json_decode($content, true);
 
         foreach ($datas as $data) {
-            if ($data["nom"] != "SYSTEM") {
-                $coffre["room"] = $data["id_salle"];
+            if ('SYSTEM' != $data['nom']) {
+                $coffre['room'] = $data['id_salle'];
                 break;
             }
         }
@@ -772,17 +781,12 @@ class SafeDepositBoxManager
         return $coffre;
     }
 
-    /**
-     * @return HttpClientInterface
-     */
     public function getClient(): HttpClientInterface
     {
         return $this->client;
     }
 
     /**
-     * @param HttpClientInterface $client
-     *
      * @return $this
      */
     public function setClient(HttpClientInterface $client): self
@@ -792,17 +796,12 @@ class SafeDepositBoxManager
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getUrlEsc(): string
     {
         return $this->urlEsc;
     }
 
     /**
-     * @param string|array $urlEsc
-     *
      * @return $this
      */
     public function setUrlEsc(string|array $urlEsc): self
@@ -824,17 +823,12 @@ class SafeDepositBoxManager
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getCertificate(): string
     {
         return $this->certificate;
     }
 
     /**
-     * @param string $certificate
-     *
      * @return $this
      */
     public function setCertificate(string $certificate): self

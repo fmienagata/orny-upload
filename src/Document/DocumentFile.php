@@ -2,26 +2,24 @@
 
 namespace UploadBundle\Document;
 
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\OpenApi\Model;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\File;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\Id;
-use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique as MongoDBUnique;
-use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-use Doctrine\ODM\MongoDB\PersistentCollection;
 use Gedmo\Timestampable\Traits\TimestampableDocument;
-use Symfony\Component\Validator\Constraints as Assert;
-use ApiPlatform\Metadata\{ApiResource, ApiProperty};
 use Symfony\Component\Serializer\Annotation\Groups;
-use ApiPlatform\Metadata\{GetCollection, Get, Patch, Post, Delete, Put};
-use ApiPlatform\OpenApi\Model;
-use ApiPlatform\Metadata\Operation;
-use Doctrine\Common\Collections\{ArrayCollection, Collection};
 use UploadBundle\Controller\DocumentFileController;
 
 /**
  * @File(bucketName="document-file")
  */
 #[MongoDB\Document(
-    collection: "document_files",
+    collection: 'document_files',
     repositoryClass: "UploadBundle\Repository\Document\DocumentFileRepository"
 )]
 #[ApiResource(
@@ -44,7 +42,7 @@ use UploadBundle\Controller\DocumentFileController;
                 'json' => ['application/json'],
             ],
             outputFormats: [
-                'json' => ['application/json']
+                'json' => ['application/json'],
             ],
             deserialize: false,
             openapi: new Model\Operation(
@@ -56,7 +54,7 @@ use UploadBundle\Controller\DocumentFileController;
                                 'properties' => [
                                     'file' => [
                                         'type' => 'string',
-                                        'format' => 'binary'
+                                        'format' => 'binary',
                                     ],
                                     'fileName' => ['type' => 'string', 'example' => 'file.pdf'],
                                     'esc' => [
@@ -68,7 +66,7 @@ use UploadBundle\Controller\DocumentFileController;
                                             'name' => ['type' => 'string', 'example' => 'ESCNODE_410'],
                                             'room' => ['type' => 'string', 'example' => '2f6f2d9fb46c4e558e8873a2ac7899ca'],
                                             'box' => ['type' => 'string', 'example' => 'c324f337acfd4fa4a93d124f58a6a260'],
-                                        ]
+                                        ],
                                     ],
                                     'paperless' => [
                                         'type' => 'object',
@@ -82,16 +80,16 @@ use UploadBundle\Controller\DocumentFileController;
                                             'archiveTime' => ['type' => 'string', 'example' => 30],
                                             'documentSource' => ['type' => 'string', 'example' => 'BVRH UPLOAD'],
                                             'status' => ['type' => 'string', 'example' => '1'],
-                                        ]
+                                        ],
                                     ],
                                     'ticket' => [
                                         'type' => 'object',
                                         'properties' => [
-                                            'id' => ['type' => 'string', 'example' => '644aa1b61b9a4b56e405acd4']
-                                        ]
-                                    ]
-                                ]
-                            ]
+                                            'id' => ['type' => 'string', 'example' => '644aa1b61b9a4b56e405acd4'],
+                                        ],
+                                    ],
+                                ],
+                            ],
                         ],
                         'application/json' => [
                             'schema' => [
@@ -111,7 +109,7 @@ use UploadBundle\Controller\DocumentFileController;
                                             'archiveTime' => ['type' => 'string'],
                                             'documentSource' => ['type' => 'string'],
                                             'status' => ['type' => 'string'],
-                                        ]
+                                        ],
                                     ],
                                     'ticket' => [
                                         'type' => 'object',
@@ -120,11 +118,11 @@ use UploadBundle\Controller\DocumentFileController;
                                                 'type' => 'object',
                                                 'properties' => [
                                                     'name' => ['type' => 'string'],
-                                                ]
+                                                ],
                                             ],
-                                        ]
-                                    ]
-                                ]
+                                        ],
+                                    ],
+                                ],
                             ],
                             'example' => [
                                 'paperless' => [
@@ -143,10 +141,10 @@ use UploadBundle\Controller\DocumentFileController;
                                 'ticket' => [
                                     'attributes' => [
                                         'name' => 'PaySlip',
-                                    ]
-                                ]
-                            ]
-                        ]
+                                    ],
+                                ],
+                            ],
+                        ],
                     ])
                 ),
                 responses: [new Model\Response(
@@ -169,17 +167,17 @@ use UploadBundle\Controller\DocumentFileController;
                                         'type' => 'object',
                                         'properties' => [
                                             'name' => ['type' => 'string'],
-                                        ]
+                                        ],
                                     ],
                                     'createdAt' => ['type' => 'date'],
                                     'updatedAt' => ['type' => 'date'],
-                                ]
+                                ],
                             ],
                             'example' => [
                                 'id' => '6424462c03b25a3d220809c6',
-                                'associatedDocuments' => 'E000000000000411/1/5'
-                            ]
-                        ]
+                                'associatedDocuments' => 'E000000000000411/1/5',
+                            ],
+                        ],
                     ])
                 )]
             )
@@ -206,89 +204,87 @@ use UploadBundle\Controller\DocumentFileController;
                 'json' => ['application/json'],
                 'xml' => ['application/xml'],
             ],
-        )
+        ),
     ]
 )]
 class DocumentFile
 {
     use TimestampableDocument;
 
-    #[ApiProperty(identifier:true, readable: true)]
-    #[Groups(["document_files:read"])]
-    #[MongoDB\Field(type:"string")]
-    #[MongoDB\Id(type: 'string', strategy: "auto")]
+    #[ApiProperty(identifier: true, readable: true)]
+    #[Groups(['document_files:read'])]
+    #[MongoDB\Field(type: 'string')]
+    #[Id(type: 'string', strategy: 'auto')]
     private ?string $id;
 
-    #[MongoDB\Field(type:"string")]
-    #[Groups(["document_files:read", "document_files:write"])]
+    #[MongoDB\Field(type: 'string')]
+    #[Groups(['document_files:read', 'document_files:write'])]
     private string $originalName;
 
-    #[MongoDB\Field(type:"string")]
-    #[Groups(["document_files:read", "document_files:write"])]
+    #[MongoDB\Field(type: 'string')]
+    #[Groups(['document_files:read', 'document_files:write'])]
     private string $ticket;
 
-    #[Gedmo\Timestampable(on: "create")]
-    #[MongoDB\Field(type:"date")]
-    #[Groups(["document_files:read", "document_files:write"])]
+    #[Gedmo\Timestampable(on: 'create')]
+    #[MongoDB\Field(type: 'date')]
+    #[Groups(['document_files:read', 'document_files:write'])]
     private \DateTime $uploadDate;
 
-    #[MongoDB\Field(type:"int")]
-    #[Groups(["document_files:read", "document_files:write"])]
+    #[MongoDB\Field(type: 'int')]
+    #[Groups(['document_files:read', 'document_files:write'])]
     private int $length;
 
-    #[MongoDB\Field(type:"int")]
-    #[Groups(["document_files:read", "document_files:write"])]
+    #[MongoDB\Field(type: 'int')]
+    #[Groups(['document_files:read', 'document_files:write'])]
     private int $chunkSize;
 
-    #[MongoDB\Field(type:"raw")]
-    #[Groups(["document_files:read", "document_files:write"])]
+    #[MongoDB\Field(type: 'raw')]
+    #[Groups(['document_files:read', 'document_files:write'])]
     #[File\Metadata(targetDocument: DocumentMetaData::class)]
     private $metadata;
 
     #[ApiProperty(types: ['https://schema.org/file'])]
-    #[Groups(["document_files:read", "document_files:write"])]
-    public \Symfony\Component\HttpFoundation\File\File|null $file = null;
+    #[Groups(['document_files:read', 'document_files:write'])]
+    public ?\Symfony\Component\HttpFoundation\File\File $file = null;
 
     #[ApiProperty(types: ['https://schema.org/file'])]
-    #[Groups(["document_files:read"])]
+    #[Groups(['document_files:read'])]
     public ?MediaObject $media = null;
 
-    #[MongoDB\Field(type:"string")]
-    #[Groups(["document_files:read", "document_files:write"])]
+    #[MongoDB\Field(type: 'string')]
+    #[Groups(['document_files:read', 'document_files:write'])]
     private string $archiveId;
 
-    #[MongoDB\Field(type:"string")]
-    #[Groups(["document_files:read", "document_files:write"])]
+    #[MongoDB\Field(type: 'string')]
+    #[Groups(['document_files:read', 'document_files:write'])]
     private string $ucsId;
 
-    #[MongoDB\Field(type:"date")]
-    #[Groups(["document_files:read", "document_files:write"])]
+    #[MongoDB\Field(type: 'date')]
+    #[Groups(['document_files:read', 'document_files:write'])]
     private string|\DateTime $timestamp;
 
-    #[MongoDB\Field(type:"string")]
-    #[Groups(["document_files:read", "document_files:write"])]
+    #[MongoDB\Field(type: 'string')]
+    #[Groups(['document_files:read', 'document_files:write'])]
     private string $escName;
 
-    #[MongoDB\Field(type:"string")]
-    #[Groups(["document_files:read", "document_files:write"])]
+    #[MongoDB\Field(type: 'string')]
+    #[Groups(['document_files:read', 'document_files:write'])]
     private string $userIdCmd;
 
     #[MongoDB\Field(type: 'date')]
-    #[Groups(["tickets:read"])]
-    #[Gedmo\Timestampable(on: "create")]
+    #[Groups(['tickets:read'])]
+    #[Gedmo\Timestampable(on: 'create')]
     protected $createdAt;
 
     #[MongoDB\Field(type: 'date')]
-    #[Groups(["tickets:read"])]
-    #[Gedmo\Timestampable(on: "update", field: "updatedAt")]
+    #[Groups(['tickets:read'])]
+    #[Gedmo\Timestampable(on: 'update', field: 'updatedAt')]
     protected $updatedAt;
 
     /**
      * DocumentFile constructor.
-     *
-     * @param \Symfony\Component\HttpFoundation\File\File|null $file
      */
-    public function __construct(\Symfony\Component\HttpFoundation\File\File $file = null)
+    public function __construct(?\Symfony\Component\HttpFoundation\File\File $file = null)
     {
         if ($file) {
             $this->setOriginalName($file->getFilename());
@@ -297,25 +293,17 @@ class DocumentFile
         }
     }
 
-    /**
-     * @return string|null
-     */
     public function getId(): ?string
     {
         return $this->id ?? null;
     }
 
-    /**
-     * @return string
-     */
     public function getOriginalName(): string
     {
         return $this->originalName;
     }
 
     /**
-     * @param string $originalName
-     *
      * @return $this
      */
     public function setOriginalName(string $originalName): self
@@ -325,17 +313,12 @@ class DocumentFile
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getTicket(): string
     {
         return $this->ticket;
     }
 
     /**
-     * @param string $ticket
-     *
      * @return $this
      */
     public function setTicket(string $ticket): self
@@ -345,17 +328,12 @@ class DocumentFile
         return $this;
     }
 
-    /**
-     * @return \DateTime
-     */
     public function getUploadDate(): \DateTime
     {
         return $this->uploadDate;
     }
 
     /**
-     * @param \DateTime $uploadDate
-     *
      * @return $this
      */
     public function setUploadDate(\DateTime $uploadDate): self
@@ -365,17 +343,12 @@ class DocumentFile
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getLength(): int
     {
         return $this->length;
     }
 
     /**
-     * @param int $length
-     *
      * @return $this
      */
     public function setLength(int $length): self
@@ -385,17 +358,12 @@ class DocumentFile
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getChunkSize(): int
     {
         return $this->chunkSize;
     }
 
     /**
-     * @param int $chunkSize
-     *
      * @return $this
      */
     public function setChunkSize(int $chunkSize): self
@@ -405,25 +373,16 @@ class DocumentFile
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getMetadata()
     {
         return $this->metadata;
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\File\File|null
-     */
     public function getFile(): ?\Symfony\Component\HttpFoundation\File\File
     {
         return $this->file;
     }
 
-    /**
-     * @param \Symfony\Component\HttpFoundation\File\File|null $file
-     */
     public function setFile(?\Symfony\Component\HttpFoundation\File\File $file): self
     {
         $this->file = $file;
@@ -432,8 +391,6 @@ class DocumentFile
     }
 
     /**
-     * @param $metadata
-     *
      * @return $this
      */
     public function setMetadata($metadata): self
@@ -443,17 +400,12 @@ class DocumentFile
         return $this;
     }
 
-    /**
-     * @return MediaObject|null
-     */
     public function getMedia(): ?MediaObject
     {
         return $this->media;
     }
 
     /**
-     * @param MediaObject|\Symfony\Component\HttpFoundation\File\File|null $media
-     *
      * @return $this
      */
     public function setMedia(MediaObject|\Symfony\Component\HttpFoundation\File\File|null $media): self
@@ -470,17 +422,12 @@ class DocumentFile
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getArchiveId(): string
     {
         return $this->archiveId;
     }
 
     /**
-     * @param string $archiveId
-     *
      * @return $this
      */
     public function setArchiveId(string $archiveId): self
@@ -490,17 +437,12 @@ class DocumentFile
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getUcsId(): string
     {
         return $this->ucsId;
     }
 
     /**
-     * @param string $ucsId
-     *
      * @return $this
      */
     public function setUcsId(string $ucsId): self
@@ -510,22 +452,17 @@ class DocumentFile
         return $this;
     }
 
-    /**
-     * @return string|\DateTime
-     */
     public function getTimestamp(): string|\DateTime
     {
         return $this->timestamp instanceof \DateTime ? $this->timestamp->format('Y-m-d H:i:s') : $this->timestamp;
     }
 
     /**
-     * @param \DateTime|string $timestamp
-     *
      * @return $this
      */
     public function setTimestamp(\DateTime|string $timestamp): self
     {
-        if(is_string($timestamp)) {
+        if (is_string($timestamp)) {
             $timestamp = new \DateTime($timestamp);
         }
         $this->timestamp = $timestamp;
@@ -533,17 +470,12 @@ class DocumentFile
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getEscName(): string
     {
         return $this->escName;
     }
 
     /**
-     * @param string $escName
-     *
      * @return $this
      */
     public function setEscName(string $escName): self
@@ -553,17 +485,12 @@ class DocumentFile
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getUserIdCmd(): string
     {
         return $this->userIdCmd;
     }
 
     /**
-     * @param string $userIdCmd
-     *
      * @return $this
      */
     public function setUserIdCmd(string $userIdCmd): self

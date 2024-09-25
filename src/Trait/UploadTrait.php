@@ -6,11 +6,7 @@ namespace UploadBundle\Trait;
 trait UploadTrait
 {
     /**
-     * Minification du JSON
-     *
-     * @param $json
-     *
-     * @return mixed
+     * Minification du JSON.
      */
     protected function jsonMinify($json)
     {
@@ -30,35 +26,35 @@ trait UploadTrait
             if (!$multilineComment && !$singleLineComment) {
                 $tmp2 = substr($leftCase, $from);
                 if (!$inString) {
-                    $tmp2 = preg_replace("/(\n|\r|\s)*/", "", $tmp2);
+                    $tmp2 = preg_replace("/(\n|\r|\s)*/", '', $tmp2);
                 }
                 $newStr[] = $tmp2;
             }
             $from = $lastIndex;
 
-            if ($tmp[0] == "\"" && !$multilineComment && !$singleLineComment) {
-                preg_match("/(\\\\)*$/", $leftCase, $tmp2);
+            if ('"' == $tmp[0] && !$multilineComment && !$singleLineComment) {
+                preg_match('/(\\\\)*$/', $leftCase, $tmp2);
                 // start of string with ", or unescaped " character found to end string
                 if (!$inString || !$tmp2 || (strlen($tmp2[0]) % 2) == 0) {
                     $inString = !$inString;
                 }
-                $from--; // include " character in next catch
+                --$from; // include " character in next catch
                 $rightCase = substr($json, $from);
-            } elseif ($tmp[0] == "/*" && !$inString && !$multilineComment && !$singleLineComment) {
+            } elseif ('/*' == $tmp[0] && !$inString && !$multilineComment && !$singleLineComment) {
                 $multilineComment = true;
-            } elseif ($tmp[0] == "*/" && !$inString && $multilineComment && !$singleLineComment) {
+            } elseif ('*/' == $tmp[0] && !$inString && $multilineComment && !$singleLineComment) {
                 $multilineComment = false;
-            } elseif ($tmp[0] == "//" && !$inString && !$multilineComment && !$singleLineComment) {
+            } elseif ('//' == $tmp[0] && !$inString && !$multilineComment && !$singleLineComment) {
                 $singleLineComment = true;
-            } elseif (($tmp[0] == "\n" || $tmp[0] == "\r") && !$inString && !$multilineComment && $singleLineComment) {
+            } elseif (("\n" == $tmp[0] || "\r" == $tmp[0]) && !$inString && !$multilineComment && $singleLineComment) {
                 $singleLineComment = false;
-            } elseif (!$multilineComment && !$singleLineComment && !(preg_match("/\n|\r|\s/", $tmp[0]))) {
+            } elseif (!$multilineComment && !$singleLineComment && !preg_match("/\n|\r|\s/", $tmp[0])) {
                 $newStr[] = $tmp[0];
             }
         }
 
         $newStr[] = preg_replace('/\s+/', '', $rightCase);
 
-        return implode("", $newStr);
+        return implode('', $newStr);
     }
 }
