@@ -201,9 +201,9 @@ pipeline {
             steps {
                 echo 'Preparing environment...'
                 sh '''
-                ${PHP_PATH} ${BASEDIR}/composer.phar dump-env dev
-                ${PHP_PATH} ${BASEDIR}/composer.phar dump-autoload --optimize --classmap-authoritative
-                ${PHP_PATH} ${BASEDIR}/bin/console lexik:jwt:generate-keypair --overwrite
+                ${PHP82} ${BASEDIR}/composer.phar dump-env dev
+                ${PHP82} ${BASEDIR}/composer.phar dump-autoload --optimize --classmap-authoritative
+                ${PHP82} ${BASEDIR}/bin/console lexik:jwt:generate-keypair --overwrite
                 '''
             }
         }
