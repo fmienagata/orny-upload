@@ -1,0 +1,24 @@
+# Codeception Test Suite Configuration
+#
+# Suite for unit or integration tests.
+
+actor: UnitTester
+modules:
+    enabled:
+        - Symfony:
+              app_path: 'src'
+              environment: 'test'
+              kernel_class: 'UploadBundle\Kernel'
+              debug: true
+        - MongoDb:
+              dsn: 'mongodb://user_upload_aes_test:user_upload_aes_test@127.0.0.1:27017/upload-aes-db-test?authSource=upload-aes-db-test'
+              user: 'user_upload_aes_test'
+              password: 'user_upload_aes_test'
+              cleanup: false # run populator before each test
+        - Asserts
+        - Mockery
+        - \Aes\Tests\Helper\Unit
+params:
+    username: "username"
+    password: "password"
+

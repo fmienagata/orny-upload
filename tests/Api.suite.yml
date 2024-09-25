@@ -1,0 +1,28 @@
+---
+actor: ApiTester
+step_decorators:
+  - \Codeception\Step\AsJson
+suite_namespace: UploadBundle\Tests\Api
+modules:
+  # enable helpers as array
+  enabled:
+    - REST:
+        url: https://localhost/upload/
+        depends: Symfony
+        part: Json
+    - Symfony:
+        app_path: 'src'
+        environment: 'test'
+        kernel_class: 'Aes\Kernel'
+        debug: true
+    - MongoDb:
+        dsn: 'mongodb://user_upload_aes_test:user_upload_aes_test@127.0.0.1:27017/upload-aes-db-test?authSource=upload-aes-db-test'
+        user: 'user_upload_aes_test'
+        password: 'user_upload_aes_test'
+        cleanup: false # run populator before each test
+    - Asserts
+    - Mockery
+    - \UploadBundle\Tests\Helper\Api
+params:
+  username: "username"
+  password: "password"

@@ -8,7 +8,7 @@ trait UploadTrait
     /**
      * Minification du JSON.
      */
-    protected function jsonMinify($json)
+    protected function jsonMinify(string $json)
     {
         $tokenizer = "/\"|(\/\*)|(\*\/)|(\/\/)|\n|\r/";
         $inString = false;
