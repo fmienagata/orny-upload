@@ -6,20 +6,20 @@
 /.env.local
 /.env.local.php
 /.env.*.local
+/esc.*
 /bin/curl
 /bin/java
 /bin/httpclient-4.2.3.jar
+/bin/esc/
+/bin/esc*
+/bin/PAC*
+/bin/test.sh
 
 /config/keycloack/*
 !/config/keycloack/.gitkeep
+/config/esc/
 /config/secrets/prod/prod.decrypt.private.php
-/config/esc/certificats/*
-!/config/esc/certificats/index.txt
-!/config/esc/certificats/ca.cnf
-!/config/esc/certificats/certificatFunctions.sh
-!/config/esc/certificats/generateCertificats.sh
-!/config/esc/certificats/preparer.sh
-!/config/esc/certificats/ssl
+/config/*esc*
 
 /public/bundles/
 /public/media/*
